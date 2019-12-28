@@ -35,7 +35,7 @@ public class AutoMark2 extends LinearOpMode {
     private Robot robot;
     private ElapsedTime timer;
 
-    private VuforiaLocalizer vuforia;
+    private VuforiaLocalizer vuforia = null;
 
     private static final double     DRIVE_SPEED             = 0.4;
     private static final double     TURN_SPEED              = 0.3;
@@ -108,9 +108,11 @@ public class AutoMark2 extends LinearOpMode {
 
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
-    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
 
-    private VuforiaTrackables targetsRoverRuckus;
+    // IMPORTANT: If you are using a USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
+    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
+    private static final boolean PHONE_IS_PORTRAIT = false  ;
+
     private List<VuforiaTrackable> allTrackables;
     VuforiaTrackables targetsSkyStone;
 
@@ -216,6 +218,8 @@ public class AutoMark2 extends LinearOpMode {
         // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
         telemetry.addLine("Vuforia Init Done");
         telemetry.update();
+telemetry.addData("test", 1);
+telemetry.update();
         //Tensorflow init
 //        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
 //                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -227,6 +231,9 @@ public class AutoMark2 extends LinearOpMode {
         // Load the data sets that for the trackable objects. These particular data
         // sets are stored in the 'assets' part of our application.
         targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+
+telemetry.addData("test", 2);
+telemetry.update();
 
         VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
         stoneTarget.setName("Stone Target");
@@ -255,10 +262,15 @@ public class AutoMark2 extends LinearOpMode {
         VuforiaTrackable rear2 = targetsSkyStone.get(12);
         rear2.setName("Rear Perimeter 2");
 
+telemetry.addData("test", 3);
+telemetry.update();
+
         // For convenience, gather together all the trackable objects in one easily-iterable collection */
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targetsSkyStone);
 
+telemetry.addData("test", 4);
+telemetry.update();
 
         // Set the position of the Stone Target.  Since it's not fixed in position, assume it's at the field origin.
         // Rotated it to to face forward, and raised it to sit on the ground correctly.
@@ -317,6 +329,8 @@ public class AutoMark2 extends LinearOpMode {
                 .translation(halfField, -quadField, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
 
+telemetry.addData("test", 5);
+telemetry.update();
 
         /**
          * Create a transformation matrix describing where the phone is on the robot.
@@ -356,6 +370,7 @@ public class AutoMark2 extends LinearOpMode {
             ((VuforiaTrackableDefaultListener)trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
         }
 
+
     }
 
     private void log(String message) {
@@ -366,7 +381,6 @@ public class AutoMark2 extends LinearOpMode {
 
     private double[] robotPosNav() {
         /** Start tracking the data sets we care about. */
-        targetsRoverRuckus.activate();
 
         // check all the trackable target to see which one (if any) is visible.
         targetVisible = false;
