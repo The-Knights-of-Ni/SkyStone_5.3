@@ -112,6 +112,7 @@ public class AutoMark2 extends LinearOpMode {
 
     private VuforiaTrackables targetsRoverRuckus;
     private List<VuforiaTrackable> allTrackables;
+    VuforiaTrackables targetsSkyStone;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -225,7 +226,7 @@ public class AutoMark2 extends LinearOpMode {
         //Vuforia Navigation Init
         // Load the data sets that for the trackable objects. These particular data
         // sets are stored in the 'assets' part of our application.
-        VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+        targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
 
         VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
         stoneTarget.setName("Stone Target");
