@@ -39,6 +39,8 @@ public class AutoMark2 extends LinearOpMode {
 
     private static final double     DRIVE_SPEED             = 0.4;
     private static final double     TURN_SPEED              = 0.3;
+    WebcamName webcamName = null;
+    WebcamName armWebcamName = null;
 
 
     //Timing Constants
@@ -110,7 +112,6 @@ public class AutoMark2 extends LinearOpMode {
 
     private VuforiaTrackables targetsRoverRuckus;
     private List<VuforiaTrackable> allTrackables;
-    VuforiaTrackables targetsSkyStone;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -196,6 +197,8 @@ public class AutoMark2 extends LinearOpMode {
 
     private void initVuforiaEngine() {
         //Vuforia initialization
+        armWebcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam 2");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
@@ -204,7 +207,8 @@ public class AutoMark2 extends LinearOpMode {
         parameters.vuforiaLicenseKey = "AUey4R3/////AAABmbFoecjBlEnSh5usfx1hlc07SLGE4hI5MyuUAr+09rNNBp/u1d50TPc3ydiXin5F4zAvyFKEU2pnn8ffcyfP7lydQcM+S7FZ2MXu8uIaXI3X4LpocXI22NN5KnuM/DcnjZb+1GqT41lzVUz9HX2SzgztBYDBPBvYDmCo9OcMywWkCHE9QSvWt9P1J5n2uCMZc9ZClJiKaybVac39bK4dAM/yk4TxBpRdLKbRDBGKSqlhWbGsDYmkb770A5EU4aPKLKeiQ55BOaUx9OTENNbE/vvJQnmcHkl8uz1JGpAFIvE05IFQZXLOJlgm4JtueSn33cDD3F7n0wBVVB4+ztF9IetvlYZ9Tqx00pJRSiwNJcFF";
         telemetry.addData("After license key", "");
         telemetry.update();
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        parameters.cameraName = webcamName;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -221,7 +225,7 @@ public class AutoMark2 extends LinearOpMode {
         //Vuforia Navigation Init
         // Load the data sets that for the trackable objects. These particular data
         // sets are stored in the 'assets' part of our application.
-        targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+        VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
 
         VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
         stoneTarget.setName("Stone Target");
