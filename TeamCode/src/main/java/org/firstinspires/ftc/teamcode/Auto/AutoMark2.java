@@ -114,7 +114,7 @@ public class AutoMark2 extends LinearOpMode {
     private static final boolean PHONE_IS_PORTRAIT = false  ;
 
     private List<VuforiaTrackable> allTrackables;
-    VuforiaTrackables targetsSkyStone;
+    private VuforiaTrackables targetsSkyStone;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -152,7 +152,6 @@ public class AutoMark2 extends LinearOpMode {
                     break;
                 }
             }
-
             // Provide feedback as to where the robot is located (if we know).
             if (targetVisible) {
                 // express position (translation) of robot in inches.
@@ -196,6 +195,7 @@ public class AutoMark2 extends LinearOpMode {
         telemetry.addLine("Finished Initialization. Waiting for start.");
         telemetry.update();
         Log.d(TAG, "Finished Initialization. Waiting for start.");
+        sleep(1000);
     }
 
     private void initVuforiaEngine() {
@@ -205,21 +205,15 @@ public class AutoMark2 extends LinearOpMode {
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        telemetry.addData("before license key", "");
-        telemetry.update();
         parameters.vuforiaLicenseKey = "AUey4R3/////AAABmbFoecjBlEnSh5usfx1hlc07SLGE4hI5MyuUAr+09rNNBp/u1d50TPc3ydiXin5F4zAvyFKEU2pnn8ffcyfP7lydQcM+S7FZ2MXu8uIaXI3X4LpocXI22NN5KnuM/DcnjZb+1GqT41lzVUz9HX2SzgztBYDBPBvYDmCo9OcMywWkCHE9QSvWt9P1J5n2uCMZc9ZClJiKaybVac39bK4dAM/yk4TxBpRdLKbRDBGKSqlhWbGsDYmkb770A5EU4aPKLKeiQ55BOaUx9OTENNbE/vvJQnmcHkl8uz1JGpAFIvE05IFQZXLOJlgm4JtueSn33cDD3F7n0wBVVB4+ztF9IetvlYZ9Tqx00pJRSiwNJcFF";
-        telemetry.addData("After license key", "");
-        telemetry.update();
 
-        parameters.cameraName = webcamName;
+        parameters.cameraName = armWebcamName;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
         // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
         telemetry.addLine("Vuforia Init Done");
         telemetry.update();
-telemetry.addData("test", 1);
-telemetry.update();
         //Tensorflow init
 //        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
 //                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -230,10 +224,8 @@ telemetry.update();
         //Vuforia Navigation Init
         // Load the data sets that for the trackable objects. These particular data
         // sets are stored in the 'assets' part of our application.
-        targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
 
-telemetry.addData("test", 2);
-telemetry.update();
+        targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
 
         VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
         stoneTarget.setName("Stone Target");
@@ -262,15 +254,9 @@ telemetry.update();
         VuforiaTrackable rear2 = targetsSkyStone.get(12);
         rear2.setName("Rear Perimeter 2");
 
-telemetry.addData("test", 3);
-telemetry.update();
-
         // For convenience, gather together all the trackable objects in one easily-iterable collection */
-        List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
+        allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targetsSkyStone);
-
-telemetry.addData("test", 4);
-telemetry.update();
 
         // Set the position of the Stone Target.  Since it's not fixed in position, assume it's at the field origin.
         // Rotated it to to face forward, and raised it to sit on the ground correctly.
@@ -329,9 +315,6 @@ telemetry.update();
                 .translation(halfField, -quadField, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
 
-telemetry.addData("test", 5);
-telemetry.update();
-
         /**
          * Create a transformation matrix describing where the phone is on the robot.
          *
@@ -365,11 +348,9 @@ telemetry.update();
                         CAMERA_CHOICE == FRONT ? 90 : -90, 0, 0));
 
         /**  Let all the trackable listeners know where the phone is.  */
-        for (VuforiaTrackable trackable : allTrackables)
-        {
-            ((VuforiaTrackableDefaultListener)trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+        for (VuforiaTrackable trackable : allTrackables) {
+            ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
         }
-
 
     }
 
