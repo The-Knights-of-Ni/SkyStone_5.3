@@ -155,6 +155,7 @@ public class AutoEncoder extends LinearOpMode {
         // Now back up to starting point. In this example instead of
         // having the motor monitor the encoder, we will monitor the encoder ourselves.
         driveFL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        driveBL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         driveFL.setPower(-0.25);
         driveFR.setPower(-0.25);
