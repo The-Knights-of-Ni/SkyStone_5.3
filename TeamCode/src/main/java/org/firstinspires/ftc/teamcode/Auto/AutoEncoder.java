@@ -89,18 +89,13 @@ public class AutoEncoder extends LinearOpMode {
         robot.drive.rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Wait for the robot driver to start the autonomous mode
-        telemetry.addData(">", "Press Play to start tracking");
+        telemetry.addLine("Wait For Start");
         telemetry.update();
         waitForStart();
 
-        robot.drive.frontLeft.setTargetPosition(500);
-        robot.drive.rearLeft.setTargetPosition(500);
-        robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.drive.rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        driveForwardDistance(0.2,200);
-        sleep(500);
-        driveForwardDistance(0.2,-200);
+        robot.drive.moveForward(1000);
+        sleep(1000);
+        robot.drive.moveBackward(1000);
     }
 
     public void driveForwardDistance(double power, int distance) {

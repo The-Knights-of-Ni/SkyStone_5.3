@@ -205,7 +205,7 @@ public class Drive extends Subsystem {
         stop();
     }
 
-    private void setPower2D(double targetPositionX, double targetPositionY, double motorPower) {
+    public void setPower2D(double targetPositionX, double targetPositionY, double motorPower) {
         // distribute power appropriately according to the direction of motion
         double[] motorPowers = calcMotorPowers2D(targetPositionX, targetPositionY, motorPower);
         rearLeft.setPower(motorPowers[0]);
@@ -214,7 +214,7 @@ public class Drive extends Subsystem {
         frontRight.setPower(motorPowers[3]);
     }
 
-    private void setTargetPosition2D(double targetPositionX, double targetPositionY) {
+    public void setTargetPosition2D(double targetPositionX, double targetPositionY) {
         // set motor rotation targets appropriately according to the direction of motion
         frontLeft.setTargetPosition((int)  ((+ targetPositionX + targetPositionY)*Math.sqrt(2.0)));
         frontRight.setTargetPosition((int) ((- targetPositionX + targetPositionY)*Math.sqrt(2.0)));
@@ -222,7 +222,7 @@ public class Drive extends Subsystem {
         rearRight.setTargetPosition((int)  ((+ targetPositionX + targetPositionY)*Math.sqrt(2.0)));
     }
 
-    private double[] calcMotorPowers2D(double targetPositionX, double targetPositionY, double motorPower)
+    public double[] calcMotorPowers2D(double targetPositionX, double targetPositionY, double motorPower)
     {
         // targetPositionX and targetPositionY determine the direction of movement
         // motorPower determines the magnitude of motor power
@@ -234,7 +234,7 @@ public class Drive extends Subsystem {
         return new double[]{lrPower, lfPower, rrPower, rfPower};
     }
 
-    private void turnRobot(double degrees) {
+    public void turnRobot(double degrees) {
         this.turnByAngle(TURN_SPEED, degrees);
 //        robotCurrentPosX += ROBOT_HALF_LENGTH * (Math.cos((robotCurrentAngle+degrees)*Math.PI/180.0)
 //                - Math.cos(robotCurrentAngle*Math.PI/180.0));
@@ -247,7 +247,7 @@ public class Drive extends Subsystem {
 //        opMode.sleep(100);
     }
 
-    private void moveToPosABS(double targetPositionX, double targetPositionY) {
+    public void moveToPosABS(double targetPositionX, double targetPositionY) {
         // move to (targetPositionX, targetPositionY) in absolute field coordinate
         double  deltaX = targetPositionX - robotCurrentPosX;    // in absolute field coordinate
         double  deltaY = targetPositionY - robotCurrentPosY;    // in absolute field coordinate
@@ -266,7 +266,7 @@ public class Drive extends Subsystem {
 //        sleep(100);
     }
 
-    private void moveToPosREL(double targetPositionX, double targetPositionY) {
+    public void moveToPosREL(double targetPositionX, double targetPositionY) {
         // move to (targetPositionX, targetPositionY) in relative robot coordinate
         this.moveToPos2D(DRIVE_SPEED, targetPositionX, targetPositionY);
         robotCurrentPosX += targetPositionY * Math.cos(robotCurrentAngle*Math.PI/180.0)
@@ -279,7 +279,7 @@ public class Drive extends Subsystem {
 //        sleep(100);
     }
 
-    private void moveForward(double distance) {
+    public void moveForward(double distance) {
         this.moveToPos2D(DRIVE_SPEED, 0.0, distance);
         robotCurrentPosX += distance * Math.cos(robotCurrentAngle*Math.PI/180.0);
         robotCurrentPosY += distance * Math.sin(robotCurrentAngle*Math.PI/180.0);
@@ -289,7 +289,7 @@ public class Drive extends Subsystem {
 //        sleep(100);
     }
 
-    private void moveBackward(double distance) {
+    public void moveBackward(double distance) {
         this.moveToPos2D(DRIVE_SPEED, 0.0, -distance);
         robotCurrentPosX += distance * Math.cos((robotCurrentAngle+180.0)*Math.PI/180.0);
         robotCurrentPosY += distance * Math.sin((robotCurrentAngle+180.0)*Math.PI/180.0);
@@ -299,7 +299,7 @@ public class Drive extends Subsystem {
 //        sleep(100);
     }
 
-    private void moveLeft(double distance) {
+    public void moveLeft(double distance) {
         this.moveToPos2D(DRIVE_SPEED, -distance, 0.0);
         robotCurrentPosX += distance * Math.cos((robotCurrentAngle+90.0)*Math.PI/180.0);
         robotCurrentPosY += distance * Math.sin((robotCurrentAngle+90.0)*Math.PI/180.0);
@@ -309,7 +309,7 @@ public class Drive extends Subsystem {
 //        sleep(100);
     }
 
-    private void moveRight(double distance) {
+    public void moveRight(double distance) {
         this.moveToPos2D(DRIVE_SPEED, distance, 0.0);
         robotCurrentPosX += distance * Math.cos((robotCurrentAngle-90.0)*Math.PI/180.0);
         robotCurrentPosY += distance * Math.sin((robotCurrentAngle-90.0)*Math.PI/180.0);
