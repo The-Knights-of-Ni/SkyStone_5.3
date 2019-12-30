@@ -51,6 +51,13 @@ public class AutoEncoder extends LinearOpMode {
     // DcMotor robot.drive.frontRight, robot.drive.frontLeft, robot.drive.rearRight, robot.drive.rearLeft;
     private Robot robot;
 
+    // define robot position global variables
+    private double robotCurrentPosX;    // unit in inches
+    private double robotCurrentPosY;    // unit in inches
+    private double robotCurrentAngle;   // unit in degrees
+
+    private static final double DRIVE_SPEED = 0.4;
+
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
      * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
@@ -75,26 +82,6 @@ public class AutoEncoder extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        // Create and set localizer parameters
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        parameters.vuforiaLicenseKey =
-                "AR194VT/////AAABmV+h6Y9UMUSyo6qzOXtt2dAwNZ9bJ8m/6RSx/0vIwbrT4cjrgvkWuEXawFdMC7y6rbDpSZTcSs+eRZxKp0k43J6jKJktNwCLMF2iPA6yfQ6pNOIwOCoYIGC+uGdSi9+E+g9l7OH+zUWl6CXHyhUwbwTIFlduAIVaX0I2kpPuxJO4drMmZzEwsr7nHME98s/eNV30jACsP6yhUN/7w+CNEDcIvGM+J+16B978QXaGHa23ACXSkv0gXwLaztGPuPrLAfSd0kmnIaAgbDm0BUdTayFhVFaVU/VgvAjgZ7eT40BoOkAtvayDx+uPmjfTibskPk0n/eosVD7I2uxaBLHJ20w6xgOqCYlnWZ11axpyiECJ";
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-
-        // Create localizer
-        VuforiaLocalizer localizer = ClassFactory.createVuforiaLocalizer(parameters);
-
-        // Set up the stone target listener
-        VuforiaTrackables skystone = localizer.loadTrackablesFromAsset("Skystone");
-        VuforiaTrackable stoneTarget = skystone.get(0);
-        stoneTarget.setName("Stone Target");
-        VuforiaTrackableDefaultListener stoneListener =
-                (VuforiaTrackableDefaultListener)stoneTarget.getListener();
-
-        // Active the listeners
-        // Declare motors
-        skystone.activate();
 
         robot.drive.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -184,62 +171,12 @@ public class AutoEncoder extends LinearOpMode {
 
         // analyze skystone
 
-        VectorF angles = anglesFromTarget (stoneListener);
-        VectorF trans = navOffWall(stoneListener.getPose().getTranslation(), Math.toDegrees(angles.get(0)) - 90, new VectorF(500, 0, 0));
-
-        if(trans.get(0) >0){
-            robot.drive.frontLeft.setPower(0.02);
-            robot.drive.frontRight.setPower(-0.02);
-            robot.drive.rearLeft.setPower(0.02);
-            robot.drive.rearRight.setPower(-0.02);
-        } else {
-            robot.drive.frontLeft.setPower(-0.02);
-            robot.drive.frontRight.setPower(0.02);
-            robot.drive.rearLeft.setPower(-0.02);
-            robot.drive.rearRight.setPower(0.02);
-        }
-
-        do{
-            if(stoneListener.getPose() != null) {
-                trans = navOffWall(stoneListener.getPose().getTranslation(), Math.toDegrees(angles.get(0)) - 90, new VectorF(500, 0, 0));
-            }
-            idle();
-        } while (opModeIsActive() && Math.abs(trans.get(0)) > 30);
-
         robot.drive.frontLeft.setPower(0);
         robot.drive.frontRight.setPower(0);
         robot.drive.rearLeft.setPower(0);
         robot.drive.rearRight.setPower(0);
 
-        robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.drive.frontLeft.setTargetPosition(1440);
-        while(robot.drive.frontLeft.isBusy() && opModeIsActive()) {
-            //Loop body can be empty
-        }
-        robot.drive.frontLeft.setPower(0);
 
-        robot.drive.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.drive.frontRight.setTargetPosition(1440);
-        while(robot.drive.frontRight.isBusy() && opModeIsActive()) {
-            //Loop body can be empty
-        }
-        robot.drive.frontRight.setPower(0);
-
-
-        robot.drive.rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.drive.rearLeft.setTargetPosition(1440);
-
-        while(robot.drive.rearLeft.isBusy() && opModeIsActive()) {
-            //Loop body can be empty
-        }
-        robot.drive.rearLeft.setPower(0);
-
-        robot.drive.rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.drive.rearRight.setTargetPosition(1440);
-        while(robot.drive.rearRight.isBusy() && opModeIsActive()) {
-            //Loop body can be empty
-        }
-        robot.drive.rearRight.setPower(0);
 
         driveForwardDistance(0.2,200);
         sleep(500);
@@ -277,6 +214,16 @@ public class AutoEncoder extends LinearOpMode {
 
     public void stopDriving() {
         driveForward(0);
+    }
+
+    private void moveForward(double distance) {
+        robot.drive.moveToPos2D(DRIVE_SPEED, 0.0, distance);
+        robotCurrentPosX += distance * Math.cos(robotCurrentAngle*Math.PI/180.0);
+        robotCurrentPosY += distance * Math.sin(robotCurrentAngle*Math.PI/180.0);
+        // Display it for the driver.
+        telemetry.addData("moveForward",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        telemetry.update();
+        sleep(100);
     }
 
     public void driveForward(double power) {
