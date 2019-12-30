@@ -200,8 +200,12 @@ public class TeleopMark2 extends LinearOpMode {
             // add servos
 
             robot.fClawL.setPosition(this.gamepad2.left_stick_x*0.5+0.5);
+            robot.fClawR.setPosition(this.gamepad2.right_stick_x*0.5+0.5);
 
-            telemetry.addData("Foundation Claw Servo Position", robot.fClawL.getPosition());
+            telemetry.addData("LEFT Foundation Claw Servo Position", robot.fClawL.getPosition());
+            telemetry.addData("Status", "Running");
+
+            telemetry.addData("RIGHT Foundation Claw Servo Position", robot.fClawR.getPosition());
             telemetry.addData("Status", "Running");
 
             telemetry.update();
