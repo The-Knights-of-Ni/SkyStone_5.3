@@ -79,7 +79,7 @@ public class SimpleTestDrive extends LinearOpMode {
             timeCurrent = timer.nanoseconds();
 
             double[] motorPowers = calcMotorPowers(leftStickX);
-            double multiplier = 0.8*793.33;
+            double multiplier = 793.33;
             robot.rearLeftDriveMotor.setVelocity(motorPowers[0]*multiplier);
             robot.frontLeftDriveMotor.setVelocity(motorPowers[1]*multiplier);
             robot.rearRightDriveMotor.setVelocity(motorPowers[2]*multiplier);
