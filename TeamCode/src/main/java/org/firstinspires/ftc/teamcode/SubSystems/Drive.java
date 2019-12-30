@@ -204,6 +204,11 @@ public class Drive extends Subsystem {
         // move to X, Y position relative to the robot coordinate system
         // the center of robot is 0,0
         setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setTargetPosition(0);
+        frontRight.setTargetPosition(0);
+        rearLeft.setTargetPosition(0);
+        rearRight.setTargetPosition(0);
+
         setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
         // convert from inches to motor counts
         // correct for X and Y motion asymmetry

@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -13,36 +14,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.Robot;
 
-/* Copyright (c) 2019 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 
-@Autonomous(name = "AutoEncoder", group = "Concept")
+@Autonomous(name = "AutoEncoder")
 
 public class AutoEncoder extends LinearOpMode {
     private static final String LABEL_FIRST_ELEMENT = "Stone";
@@ -50,6 +23,7 @@ public class AutoEncoder extends LinearOpMode {
 
     // DcMotor robot.drive.frontRight, robot.drive.frontLeft, robot.drive.rearRight, robot.drive.rearLeft;
     private Robot robot;
+    private ElapsedTime timer;
 
     // define robot position global variables
     private double robotCurrentPosX;    // unit in inches
@@ -83,12 +57,15 @@ public class AutoEncoder extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        timer = new ElapsedTime();
+        robot = new Robot(this, timer);
         robot.drive.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.drive.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.drive.rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.drive.rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Wait for the robot driver to start the autonomous mode
+
         telemetry.addLine("Wait For Start");
         telemetry.update();
         waitForStart();
@@ -98,24 +75,6 @@ public class AutoEncoder extends LinearOpMode {
         while(robot.drive.rearLeft.isBusy()){
 
         }
-    }
-
-    public void driveForwardDistance(double power, int distance) {
-        setAllModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.drive.frontLeft.setTargetPosition(distance);
-        robot.drive.frontRight.setTargetPosition(distance);
-        robot.drive.rearLeft.setTargetPosition(distance);
-        robot.drive.rearRight.setTargetPosition(distance);
-        setAllModes(DcMotor.RunMode.RUN_TO_POSITION);
-
-        driveForward(power);
-
-        while(allBusy()) {
-            // wait until target position is reached
-        }
-
-        stopDriving();
-        setAllModes(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setAllModes(DcMotor.RunMode mode) {
@@ -129,9 +88,6 @@ public class AutoEncoder extends LinearOpMode {
         return robot.drive.frontLeft.isBusy() && robot.drive.frontRight.isBusy() && robot.drive.rearLeft.isBusy() && robot.drive.rearRight.isBusy();
     }
 
-    public void stopDriving() {
-        driveForward(0);
-    }
 
     private void moveForward(double distance) {
         robot.drive.moveToPos2D(DRIVE_SPEED, 0.0, distance);
@@ -141,17 +97,6 @@ public class AutoEncoder extends LinearOpMode {
         telemetry.addData("moveForward",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
         telemetry.update();
         sleep(100);
-    }
-
-    public void driveForward(double power) {
-        robot.drive.frontLeft.setPower(power);
-        robot.drive.frontRight.setPower(power);
-        robot.drive.rearLeft.setPower(power);
-        robot.drive.rearRight.setPower(power);
-    }
-
-    public void turnLeft(double power) {
-
     }
 
     public VectorF navOffWall(VectorF trans, double robotAngle, VectorF offWall){
