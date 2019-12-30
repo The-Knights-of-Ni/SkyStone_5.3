@@ -32,8 +32,8 @@ public class Drive extends Subsystem {
     private OpMode opMode;
     private HardwareMap hardwareMap;
 
-    private double robotCurrentPosX;    // unit in inches
-    private double robotCurrentPosY;    // unit in inches
+    private double robotCurrentPosX;    // unit in mm
+    private double robotCurrentPosY;    // unit in mm
     private double robotCurrentAngle;   // unit in degrees
 
 
@@ -44,8 +44,10 @@ public class Drive extends Subsystem {
     private static final double     COUNTS_PER_MOTOR_REV_20         = 537.6*0.646;    // AM Orbital 20 motor
     private static final double     DRIVE_GEAR_REDUCTION            = 1.0 ;     // This is < 1.0 if geared UP
     private static final double     WHEEL_DIAMETER_INCHES           = 4.0 ;     // For figuring circumference
+    private static final double     WHEEL_DIAMETER_MM               = 4.0 * 2.54 * 10.0;
     private static final double     COUNTS_PER_INCH                 = (COUNTS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
+    private static final double     COUNTS_PER_MM                 = (COUNTS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * Math.PI);
     private static final double     COUNTS_CORRECTION_X             = 0.939;
     private static final double     COUNTS_CORRECTION_Y             = 0.646;
 
@@ -193,8 +195,8 @@ public class Drive extends Subsystem {
         // convert from inches to motor counts
         // correct for X and Y motion asymmetry
         double distanceCountX, distanceCountY;
-        distanceCountX = targetPositionX * COUNTS_PER_INCH * COUNTS_CORRECTION_X;
-        distanceCountY = targetPositionY * COUNTS_PER_INCH * COUNTS_CORRECTION_Y;
+        distanceCountX = targetPositionX * COUNTS_PER_MM * COUNTS_CORRECTION_X;
+        distanceCountY = targetPositionY * COUNTS_PER_MM * COUNTS_CORRECTION_Y;
         setTargetPosition2D(distanceCountX, distanceCountY);
         setPower2D(distanceCountX, distanceCountY, power);
         while (frontLeft.isBusy() && frontRight.isBusy() && rearLeft.isBusy() && rearRight.isBusy()) {

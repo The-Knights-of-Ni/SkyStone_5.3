@@ -71,7 +71,7 @@ public class DriveByWire extends LinearOpMode {
 
         sleep(1000);
 
-        robot.drive.turnByAngle(0.2, 180);
+        robot.drive.turnByAngle(0.2, 720);
 
         // drive until end of period.
 
@@ -106,14 +106,14 @@ public class DriveByWire extends LinearOpMode {
             double r = 0.3;
             double goalAngle = 0;
             double correctionAmount = robotAngle - goalAngle;
-//                //double correctedAngle = goalAngle - correctionAmount;
+                //double correctedAngle = goalAngle - correctionAmount;
 //                if(Math.abs(correctionAmount) <= 30) {
 //                    robot.rearLeftDriveMotor.setPower(0.1);
 //                    robot.frontLeftDriveMotor.setPower(0.1);
 //                    robot.rearRightDriveMotor.setPower(0.1);
 //                    robot.frontRightDriveMotor.setPower(0.1);
 //                } else if (Math.abs(correctionAmount) >= 5) {
-//                    double lrPower = r;
+//                    double lrPoweqr = r;
 //                    double lfPower = r;
 //                    double rrPower = r;
 //                    double rfPower = r;
@@ -129,18 +129,8 @@ public class DriveByWire extends LinearOpMode {
 //                }
 
 
-            // Use gyro to drive in a straight line.
-            //telemetry.addData("Correction Angle: ", correctionAmount );
             telemetry.addData("Robot Angle: ", robotAngle );
-            //telemetry.addData("1 imu heading", lastAngles.firstAngle);
-            //telemetry.addData("2 global heading", globalAngle);
-            //telemetry.addData("3 correction", correction);
             telemetry.update();
-
-//                robot.drive.frontLeft.setPower(power);
-//                robot.drive.rearLeft.setPower(power);
-//                robot.drive.frontRight.setPower(power);
-//                robot.drive.rearRight.setPower(power);
             resetAngle();
         }
 
@@ -161,5 +151,12 @@ public class DriveByWire extends LinearOpMode {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         globalAngle = 0;
+    }
+
+    private void turn(double speed) {
+        robot.drive.frontLeft.setPower(speed);
+        robot.drive.rearLeft.setPower(speed);
+        robot.drive.frontRight.setPower(speed);
+        robot.drive.rearRight.setPower(speed);
     }
 }
