@@ -71,13 +71,10 @@ public class DriveByWire extends LinearOpMode {
 
         sleep(1000);
 
-        robot.drive.turnByAngle(0.2, 180);
-        sleep(1000);
         robot.drive.turnByAngle(0.2, 360);
         sleep(1000);
-        robot.drive.turnByAngle(0.2, 720);
+        robot.drive.turnByAngle(0.2, 360);
 
-        // drive until end of period.
 
         while (opModeIsActive())
         {
