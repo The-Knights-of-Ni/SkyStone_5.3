@@ -1,12 +1,26 @@
 
 package org.firstinspires.ftc.teamcode.SubSystems;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
 import org.firstinspires.ftc.teamcode.SubSystems.Subsystem;
+
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
 /** Mecanum drivetrain subsystem */
 public class Drive extends Subsystem {
@@ -15,6 +29,13 @@ public class Drive extends Subsystem {
     public DcMotorEx frontRight;
     public DcMotorEx rearLeft;
     public DcMotorEx rearRight;
+    private OpMode opMode;
+    private HardwareMap hardwareMap;
+
+    private double robotCurrentPosX;    // unit in inches
+    private double robotCurrentPosY;    // unit in inches
+    private double robotCurrentAngle;   // unit in degrees
+
 
     //Sensors
     public BNO055IMU imu;
@@ -39,13 +60,16 @@ public class Drive extends Subsystem {
     private static final double     WINCH_MAX_SPEED_TICK_PER_SEC        = (MOTOR_TICK_PER_REV_NEVERREST40 * 160.0) / 60.0;
     private static final double     TILT_MAX_SPEED_TICK_PER_SEC         = (MOTOR_TICK_PER_REV_YELLOJACKET223 * REV_PER_MIN_YELLOJACKET223) / 60.0;
 
+    private static final double     DRIVE_SPEED             = 0.4;
+    private static final double     TURN_SPEED              = 0.3;
 
 
-    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, ElapsedTime timer) {
+    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, ElapsedTime timer, OpMode opMode) {
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
         this.rearLeft = rearLeft;
         this.rearRight = rearRight;
+        this.hardwareMap = opMode.hardwareMap;
         this.imu = imu;
         this.timer = timer;
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -94,12 +118,6 @@ public class Drive extends Subsystem {
         rearRight.setZeroPowerBehavior(mode);
     }
 
-    public void turnRobot(double power) {
-        frontLeft.setPower(power);
-        frontRight.setPower(-power);
-        rearLeft.setPower(power);
-        rearRight.setPower(-power);
-    }
 
     public void turn(double power) {
         frontLeft.setPower(power);
@@ -212,5 +230,90 @@ public class Drive extends Subsystem {
         double rrPower = motorPower * (+ targetPositionX + targetPositionY) / angleScale;
         double rfPower = motorPower * (- targetPositionX + targetPositionY) / angleScale;
         return new double[]{lrPower, lfPower, rrPower, rfPower};
+    }
+
+    private void turnRobot(double degrees) {
+        this.turnByAngle(TURN_SPEED, degrees);
+//        robotCurrentPosX += ROBOT_HALF_LENGTH * (Math.cos((robotCurrentAngle+degrees)*Math.PI/180.0)
+//                - Math.cos(robotCurrentAngle*Math.PI/180.0));
+//        robotCurrentPosY += ROBOT_HALF_LENGTH * (Math.sin((robotCurrentAngle+degrees)*Math.PI/180.0)
+//                - Math.sin(robotCurrentAngle*Math.PI/180.0));
+        robotCurrentAngle += degrees;
+        // Display it for the driver.
+        opMode.telemetry.addData("turnRobot",  "turn to %7.2f degrees", robotCurrentAngle);
+        opMode.telemetry.update();
+//        opMode.sleep(100);
+    }
+
+    private void moveToPosABS(double targetPositionX, double targetPositionY) {
+        // move to (targetPositionX, targetPositionY) in absolute field coordinate
+        double  deltaX = targetPositionX - robotCurrentPosX;    // in absolute field coordinate
+        double  deltaY = targetPositionY - robotCurrentPosY;    // in absolute field coordinate
+        double  distanceCountX, distanceCountY;  // distance in motor count in robot coordinate
+        // rotate vector from field coordinate to robot coordinate
+        distanceCountX = deltaX * Math.cos((robotCurrentAngle-90.0)*Math.PI/180.0)
+                + deltaY * Math.sin((robotCurrentAngle-90.0)*Math.PI/180.0);
+        distanceCountY = deltaX * Math.cos(robotCurrentAngle*Math.PI/180.0)
+                + deltaY * Math.sin(robotCurrentAngle*Math.PI/180.0);
+        this.moveToPos2D(DRIVE_SPEED, distanceCountX, distanceCountY);
+        robotCurrentPosX = targetPositionX;
+        robotCurrentPosY = targetPositionY;
+        // Display it for the driver.
+        opMode.telemetry.addData("moveToPosABS",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        opMode.telemetry.update();
+//        sleep(100);
+    }
+
+    private void moveToPosREL(double targetPositionX, double targetPositionY) {
+        // move to (targetPositionX, targetPositionY) in relative robot coordinate
+        this.moveToPos2D(DRIVE_SPEED, targetPositionX, targetPositionY);
+        robotCurrentPosX += targetPositionY * Math.cos(robotCurrentAngle*Math.PI/180.0)
+                + targetPositionX * Math.cos((robotCurrentAngle-90.0)*Math.PI/180.0);
+        robotCurrentPosY += targetPositionY * Math.sin(robotCurrentAngle*Math.PI/180.0)
+                + targetPositionX * Math.sin((robotCurrentAngle-90.0)*Math.PI/180.0);
+        // Display it for the driver.
+        opMode.telemetry.addData("moveToPosREL",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        opMode.telemetry.update();
+//        sleep(100);
+    }
+
+    private void moveForward(double distance) {
+        this.moveToPos2D(DRIVE_SPEED, 0.0, distance);
+        robotCurrentPosX += distance * Math.cos(robotCurrentAngle*Math.PI/180.0);
+        robotCurrentPosY += distance * Math.sin(robotCurrentAngle*Math.PI/180.0);
+        // Display it for the driver.
+        opMode.telemetry.addData("moveForward",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        opMode.telemetry.update();
+//        sleep(100);
+    }
+
+    private void moveBackward(double distance) {
+        this.moveToPos2D(DRIVE_SPEED, 0.0, -distance);
+        robotCurrentPosX += distance * Math.cos((robotCurrentAngle+180.0)*Math.PI/180.0);
+        robotCurrentPosY += distance * Math.sin((robotCurrentAngle+180.0)*Math.PI/180.0);
+        // Display it for the driver.
+        opMode.telemetry.addData("moveBackward",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        opMode.telemetry.update();
+//        sleep(100);
+    }
+
+    private void moveLeft(double distance) {
+        this.moveToPos2D(DRIVE_SPEED, -distance, 0.0);
+        robotCurrentPosX += distance * Math.cos((robotCurrentAngle+90.0)*Math.PI/180.0);
+        robotCurrentPosY += distance * Math.sin((robotCurrentAngle+90.0)*Math.PI/180.0);
+        // Display it for the driver.
+        opMode.telemetry.addData("moveLeft",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        opMode.telemetry.update();
+//        sleep(100);
+    }
+
+    private void moveRight(double distance) {
+        this.moveToPos2D(DRIVE_SPEED, distance, 0.0);
+        robotCurrentPosX += distance * Math.cos((robotCurrentAngle-90.0)*Math.PI/180.0);
+        robotCurrentPosY += distance * Math.sin((robotCurrentAngle-90.0)*Math.PI/180.0);
+        // Display it for the driver.
+        opMode.telemetry.addData("moveRight",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        opMode.telemetry.update();
+//        sleep(100);
     }
 }
