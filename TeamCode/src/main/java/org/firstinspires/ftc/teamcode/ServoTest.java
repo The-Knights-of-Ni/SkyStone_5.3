@@ -36,9 +36,11 @@ public class ServoTest extends LinearOpMode {
     }
     public void runOpMode() {
         initOpMode();
+        telemetry.addLine("Wait For Start");
+        telemetry.update();
         waitForStart();
-        robot.fClawL.setPosition(0);
-        robot.fClawR.setPosition(0);
+//        robot.fClawL.setPosition(0.5);
+//        robot.fClawR.setPosition(0.5);
 
         while(opModeIsActive()){
             telemetry.addData("fClawR", robot.fClawR.getPosition());

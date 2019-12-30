@@ -58,8 +58,8 @@ public class Robot {
      * tilt     0
      * winch    1
      *
-     * fL (fClawL)          1
-     * fR (fClawR)          0
+     * fL (fClawL)          2
+     * fR (fClawR)          1
      */
 
     //Sensors
