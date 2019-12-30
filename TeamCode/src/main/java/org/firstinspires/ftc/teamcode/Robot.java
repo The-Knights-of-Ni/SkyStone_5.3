@@ -35,11 +35,32 @@ public class Robot {
     //Servos
     public Servo mainArm;
     public Servo mainRotation;
-    public Servo mainClaw;
+    public Servo mainClaw; //0
     public Servo csClaw; //capstone claw
     public Servo csArm; //capstone arm
-    public Servo foundationClawLeft;
-    public Servo foundationClawRight;
+    public Servo fClawL; //foundationClawLeft
+    public Servo fClawR; // foundationClawRight
+
+    /**
+     * HUB2
+     * fl   0
+     * fr   1
+     * bl   2
+     * br   3
+     *
+     * mA (mainArm)         2
+     * mR (mainRotation)    1
+     * mC (mainClaw)        0
+     * csC (csClaw)         3
+     * csA (csArm)          4
+     * --------------------
+     * HUB1
+     * tilt     0
+     * winch    1
+     *
+     * fL (fClawL)          1
+     * fR (fClawR)          0
+     */
 
     //Sensors
     private BNO055IMU imu;
@@ -80,13 +101,13 @@ public class Robot {
         armTilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //Servos
-//        mainArm = hardwareMap.servo.get("mA");
-//        mainRotation = hardwareMap.servo.get("mR");
-//        mainClaw = hardwareMap.servo.get("mC");
+        mainArm = hardwareMap.servo.get("mA");
+        mainRotation = hardwareMap.servo.get("mR");
+        mainClaw = hardwareMap.servo.get("mC");
 //        csClaw = hardwareMap.servo.get("csC"); //capstone claw
 //        csArm = hardwareMap.servo.get("csA"); //capstone arm
-//        foundationClawLeft = hardwareMap.servo.get("fLeft");
-//        foundationClawRight = hardwareMap.servo.get("fRight");
+        fClawL = hardwareMap.servo.get("fL");
+        fClawR = hardwareMap.servo.get("fR");
 
         //Sensors
         imu = hardwareMap.get(BNO055IMU.class, "imu");

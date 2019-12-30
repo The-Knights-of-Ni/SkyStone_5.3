@@ -21,7 +21,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
  * Created by tarunsingh on 12/5/17.
  */
 
-@TeleOp(name="Vision Test")
+@TeleOp(name="Servo Test")
 public class ServoTest extends LinearOpMode {
     private static final int targetPosition = 315;
     private static final double maxPower = 0;
@@ -37,8 +37,13 @@ public class ServoTest extends LinearOpMode {
     public void runOpMode() {
         initOpMode();
         waitForStart();
+        robot.fClawL.setPosition(0);
+        robot.fClawR.setPosition(0);
 
         while(opModeIsActive()){
+            telemetry.addData("fClawR", robot.fClawR.getPosition());
+            telemetry.addData("fClawL", robot.fClawL.getPosition());
+            telemetry.update();
         }
 
     }
