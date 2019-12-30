@@ -70,8 +70,7 @@ public class AutoEncoder extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        robot.drive.moveLeft(1000);
-        sleep(1000);
+        robot.drive.moveLeft(1500);
         while(robot.drive.rearLeft.isBusy()){
 
         }

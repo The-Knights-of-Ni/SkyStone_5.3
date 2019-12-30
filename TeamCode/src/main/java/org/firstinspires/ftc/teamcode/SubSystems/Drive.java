@@ -42,7 +42,8 @@ public class Drive extends Subsystem {
     public BNO055IMU imu;
 
     //DO WITH ENCODERS
-    private static final double     COUNTS_PER_MOTOR_REV_20         = 537.6*0.646;    // AM Orbital 20 motor
+    private static final double     COUNTS_PER_MOTOR_REV_20         = 140;    // AM Orbital 20 motor
+    private static final double     RPM_MAX_NEVERREST_20            = 340;
     private static final double     DRIVE_GEAR_REDUCTION            = 1.0 ;     // This is < 1.0 if geared UP
     private static final double     WHEEL_DIAMETER_INCHES           = 4.0 ;     // For figuring circumference
     private static final double     WHEEL_DIAMETER_MM               = 4.0 * 2.54 * 10.0;
