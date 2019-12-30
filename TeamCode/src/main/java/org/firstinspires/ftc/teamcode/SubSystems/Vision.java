@@ -76,7 +76,7 @@ public class Vision {
         armWebcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 2");
 
-        int cameraMonitorViewIdWebcam = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewIdWebcam", "id", hardwareMap.appContext.getPackageName());
+        int cameraMonitorViewIdWebcam = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parametersWebcam = new VuforiaLocalizer.Parameters(cameraMonitorViewIdWebcam);
         parametersWebcam.vuforiaLicenseKey = "AUey4R3/////AAABmbFoecjBlEnSh5usfx1hlc07SLGE4hI5MyuUAr+09rNNBp/u1d50TPc3ydiXin5F4zAvyFKEU2pnn8ffcyfP7lydQcM+S7FZ2MXu8uIaXI3X4LpocXI22NN5KnuM/DcnjZb+1GqT41lzVUz9HX2SzgztBYDBPBvYDmCo9OcMywWkCHE9QSvWt9P1J5n2uCMZc9ZClJiKaybVac39bK4dAM/yk4TxBpRdLKbRDBGKSqlhWbGsDYmkb770A5EU4aPKLKeiQ55BOaUx9OTENNbE/vvJQnmcHkl8uz1JGpAFIvE05IFQZXLOJlgm4JtueSn33cDD3F7n0wBVVB4+ztF9IetvlYZ9Tqx00pJRSiwNJcFF";
 
@@ -86,18 +86,12 @@ public class Vision {
         vuforiaWebcam = ClassFactory.getInstance().createVuforia(parametersWebcam);
         // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
 
-        int cameraMonitorViewIdArm = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewIdArmcam", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parametersArmcam = new VuforiaLocalizer.Parameters(cameraMonitorViewIdArm);
-        parametersArmcam.vuforiaLicenseKey = "AQUqdRj/////AAABmbnChT8nw00Hua9Tp40md6UO4SwfTRAlB4qfR4ZYJYiwGGuzzTBJFyhHc7zwSznfD23dl9RjUW81OXVyF47Hst1YYbBbNvwD/Lc96dIkzmyLqzLgN9rYtrIQf8rbsV0wo71Xuz92SjPv46VI5TBHB5WeW0Cq8/V3nn+Exu7uQkBnTjolq56Sif2+ZiyWZJbhGlZL/MSUAEvrkzgp6Mupsi5t38vSxwQY8c8abpECV5uoUv9OJtU+2qQZHzxTq6aYoha9G0U+boREFW3NUt/cNDYnp05Y0HXUsdGMl8/5eUjlapWfNRivGnFW/r5GkFGzAM548t9WD5BiH7JZSrqBx5tXw2uVmeFQrrqwe20Y2Bep";
-        parametersArmcam.cameraName = armWebcamName;
-        vuforiaArmcam = ClassFactory.getInstance().createVuforia(parametersArmcam);
+//        int cameraMonitorViewIdArm = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        VuforiaLocalizer.Parameters parametersArmcam = new VuforiaLocalizer.Parameters(cameraMonitorViewIdArm);
+//        parametersArmcam.vuforiaLicenseKey = "AQUqdRj/////AAABmbnChT8nw00Hua9Tp40md6UO4SwfTRAlB4qfR4ZYJYiwGGuzzTBJFyhHc7zwSznfD23dl9RjUW81OXVyF47Hst1YYbBbNvwD/Lc96dIkzmyLqzLgN9rYtrIQf8rbsV0wo71Xuz92SjPv46VI5TBHB5WeW0Cq8/V3nn+Exu7uQkBnTjolq56Sif2+ZiyWZJbhGlZL/MSUAEvrkzgp6Mupsi5t38vSxwQY8c8abpECV5uoUv9OJtU+2qQZHzxTq6aYoha9G0U+boREFW3NUt/cNDYnp05Y0HXUsdGMl8/5eUjlapWfNRivGnFW/r5GkFGzAM548t9WD5BiH7JZSrqBx5tXw2uVmeFQrrqwe20Y2Bep";
+//        parametersArmcam.cameraName = armWebcamName;
+//        vuforiaArmcam = ClassFactory.getInstance().createVuforia(parametersArmcam);
 
-        //Tensorflow init
-//        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-//                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-//        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-//        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
 
         //Vuforia Navigation Init
         // Load the data sets that for the trackable objects. These particular data

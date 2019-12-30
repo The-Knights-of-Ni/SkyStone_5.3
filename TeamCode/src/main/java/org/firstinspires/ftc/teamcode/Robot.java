@@ -38,6 +38,8 @@ public class Robot {
     public Servo mainClaw;
     public Servo csClaw; //capstone claw
     public Servo csArm; //capstone arm
+    public Servo foundationClawLeft;
+    public Servo foundationClawRight;
 
     //Sensors
     private BNO055IMU imu;
@@ -83,6 +85,8 @@ public class Robot {
 //        mainClaw = hardwareMap.servo.get("mC");
 //        csClaw = hardwareMap.servo.get("csC"); //capstone claw
 //        csArm = hardwareMap.servo.get("csA"); //capstone arm
+//        foundationClawLeft = hardwareMap.servo.get("fLeft");
+//        foundationClawRight = hardwareMap.servo.get("fRight");
 
         //Sensors
         imu = hardwareMap.get(BNO055IMU.class, "imu");
