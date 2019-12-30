@@ -136,7 +136,6 @@ public class TeleopMark1 extends LinearOpMode {
                 robot.xRailWinch.setTargetPosition(winchTargetPositionCurrent);
                 winchTargetPositionPre = winchTargetPositionCurrent;
             }
-
             //Tilt
             if((rightStickY2 > 0.5)){
                 robot.armTilt.setPower(1.0);

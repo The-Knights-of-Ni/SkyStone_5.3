@@ -42,7 +42,8 @@ public class Drive extends Subsystem {
     public BNO055IMU imu;
 
     //DO WITH ENCODERS
-    private static final double     COUNTS_PER_MOTOR_REV_20         = 537.6*0.646;    // AM Orbital 20 motor
+    private static final double     COUNTS_PER_MOTOR_REV_20         = 140;    // AM Orbital 20 motor
+    private static final double     RPM_MAX_NEVERREST_20            = 340;
     private static final double     DRIVE_GEAR_REDUCTION            = 1.0 ;     // This is < 1.0 if geared UP
     private static final double     WHEEL_DIAMETER_INCHES           = 4.0 ;     // For figuring circumference
     private static final double     WHEEL_DIAMETER_MM               = 4.0 * 2.54 * 10.0;
@@ -204,6 +205,11 @@ public class Drive extends Subsystem {
         // move to X, Y position relative to the robot coordinate system
         // the center of robot is 0,0
         setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setTargetPosition(0);
+        frontRight.setTargetPosition(0);
+        rearLeft.setTargetPosition(0);
+        rearRight.setTargetPosition(0);
+
         setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
         // convert from inches to motor counts
         // correct for X and Y motion asymmetry
