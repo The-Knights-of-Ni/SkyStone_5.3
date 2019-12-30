@@ -37,7 +37,6 @@ public class VisionTest extends LinearOpMode {
     public void runOpMode() {
         initOpMode();
         waitForStart();
-
         robot.vision.getTargetsSkyStone().activate();
         while (!isStopRequested()) {
 
