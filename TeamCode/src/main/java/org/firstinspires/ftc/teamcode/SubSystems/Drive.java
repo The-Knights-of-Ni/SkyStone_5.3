@@ -37,6 +37,7 @@ public class Drive extends Subsystem {
     private double robotCurrentAngle;   // unit in degrees
 
 
+
     //Sensors
     public BNO055IMU imu;
 
@@ -64,6 +65,18 @@ public class Drive extends Subsystem {
 
     private static final double     DRIVE_SPEED             = 0.4;
     private static final double     TURN_SPEED              = 0.3;
+
+    private static final double     ROBOT_INIT_POS_X    = 15.0;
+    private static final double     ROBOT_INIT_POS_Y    = 15.0;
+    private static final double     ROBOT_INIT_ANGLE    = 45.0;
+    private static final float      mmPerInch        = 25.4f;
+
+
+    private boolean allianceRed = false;
+
+
+    private OpenGLMatrix lastLocation = null;
+    private boolean targetVisible = false;
 
 
     public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, ElapsedTime timer, OpMode opMode) {
