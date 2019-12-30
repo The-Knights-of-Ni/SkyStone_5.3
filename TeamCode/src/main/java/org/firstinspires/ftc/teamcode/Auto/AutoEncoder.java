@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Robot;
 
 /* Copyright (c) 2019 FIRST. All rights reserved.
  *
@@ -47,7 +48,8 @@ public class AutoEncoder extends LinearOpMode {
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
 
-    DcMotor driveFR, driveFL, driveBR, driveBL;
+    // DcMotor robot.drive.frontRight, robot.drive.frontLeft, robot.drive.rearRight, robot.drive.rearLeft;
+    private Robot robot;
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -94,19 +96,13 @@ public class AutoEncoder extends LinearOpMode {
         // Declare motors
         skystone.activate();
 
-        driveFL = hardwareMap.dcMotor.get("fl");
-        driveFL.setDirection(DcMotorSimple.Direction.REVERSE);
-        driveFL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.drive.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        driveFR = hardwareMap.dcMotor.get("fr");
-        driveFR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.drive.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        driveBL = hardwareMap.dcMotor.get("bl");
-        driveBL.setDirection(DcMotorSimple.Direction.REVERSE);
-        driveBL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.drive.rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        driveBR = hardwareMap.dcMotor.get("br");
-        driveBR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.drive.rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         int TICKS_PER_REV = 1120;
 
@@ -115,21 +111,21 @@ public class AutoEncoder extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        driveFL.setTargetPosition(500);
-        driveBL.setTargetPosition(500);
-        driveFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.drive.frontLeft.setTargetPosition(500);
+        robot.drive.rearLeft.setTargetPosition(500);
+        robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.drive.rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
-//        driveFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // find what out this is doing
-//        driveFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // find what out this is doing
+//        robot.drive.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        driveFL.setPower(0.2);
-        driveFR.setPower(0.2);
-        driveBL.setPower(0.2);
-        driveBR.setPower(0.2);
+        robot.drive.frontLeft.setPower(0.2);
+        robot.drive.frontRight.setPower(0.2);
+        robot.drive.rearLeft.setPower(0.2);
+        robot.drive.rearRight.setPower(0.2);
 
-        while (opModeIsActive() && driveFL.isBusy())
+        while (opModeIsActive() && robot.drive.frontLeft.isBusy())
         {
             idle();
         }
@@ -137,51 +133,51 @@ public class AutoEncoder extends LinearOpMode {
 //            idle();
 //        }
 
-        driveFL.setPower(0);
-        driveFR.setPower(0);
-        driveBL.setPower(0);
-        driveBR.setPower(0);
+        robot.drive.frontLeft.setPower(0);
+        robot.drive.frontRight.setPower(0);
+        robot.drive.rearLeft.setPower(0);
+        robot.drive.rearRight.setPower(0);
 
         // wait 5 sec so you can observe the final encoder position.
         resetStartTime();
 
         while (opModeIsActive() && getRuntime() < 5)
         {
-            telemetry.addData("encoder-fwd-end", driveFL.getCurrentPosition() + "  busy=" + driveFL.isBusy());
+            telemetry.addData("encoder-fwd-end", robot.drive.frontLeft.getCurrentPosition() + "  busy=" + robot.drive.frontLeft.isBusy());
             telemetry.update();
             idle();
         }
 
         // Now back up to starting point. In this example instead of
         // having the motor monitor the encoder, we will monitor the encoder ourselves.
-        driveFL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        driveBL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.drive.rearLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        driveFL.setPower(-0.25);
-        driveFR.setPower(-0.25);
-        driveBL.setPower(-0.25);
-        driveBR.setPower(-0.25);
+        robot.drive.frontLeft.setPower(-0.25);
+        robot.drive.frontRight.setPower(-0.25);
+        robot.drive.rearLeft.setPower(-0.25);
+        robot.drive.rearRight.setPower(-0.25);
 
-        while (opModeIsActive() && driveFL.getCurrentPosition() > 0)
+        while (opModeIsActive() && robot.drive.frontLeft.getCurrentPosition() > 0)
         {
-            telemetry.addData("encoder-back", driveFL.getCurrentPosition());
+            telemetry.addData("encoder-back", robot.drive.frontLeft.getCurrentPosition());
             telemetry.update();
             idle();
         }
 
         // set motor power to zero to stop motors.
 
-        driveFL.setPower(0);
-        driveFR.setPower(0);
-        driveBL.setPower(0);
-        driveBR.setPower(0);
+        robot.drive.frontLeft.setPower(0);
+        robot.drive.frontRight.setPower(0);
+        robot.drive.rearLeft.setPower(0);
+        robot.drive.rearRight.setPower(0);
 
         // wait 5 sec so you can observe the final encoder position.
         resetStartTime();
 
         while (opModeIsActive() && getRuntime() < 5)
         {
-            telemetry.addData("encoder-back-end", driveFL.getCurrentPosition());
+            telemetry.addData("encoder-back-end", robot.drive.frontLeft.getCurrentPosition());
             telemetry.update();
             idle();
         }
@@ -192,15 +188,15 @@ public class AutoEncoder extends LinearOpMode {
         VectorF trans = navOffWall(stoneListener.getPose().getTranslation(), Math.toDegrees(angles.get(0)) - 90, new VectorF(500, 0, 0));
 
         if(trans.get(0) >0){
-            driveFL.setPower(0.02);
-            driveFR.setPower(-0.02);
-            driveBL.setPower(0.02);
-            driveBR.setPower(-0.02);
+            robot.drive.frontLeft.setPower(0.02);
+            robot.drive.frontRight.setPower(-0.02);
+            robot.drive.rearLeft.setPower(0.02);
+            robot.drive.rearRight.setPower(-0.02);
         } else {
-            driveFL.setPower(-0.02);
-            driveFR.setPower(0.02);
-            driveBL.setPower(-0.02);
-            driveBR.setPower(0.02);
+            robot.drive.frontLeft.setPower(-0.02);
+            robot.drive.frontRight.setPower(0.02);
+            robot.drive.rearLeft.setPower(-0.02);
+            robot.drive.rearRight.setPower(0.02);
         }
 
         do{
@@ -210,40 +206,40 @@ public class AutoEncoder extends LinearOpMode {
             idle();
         } while (opModeIsActive() && Math.abs(trans.get(0)) > 30);
 
-        driveFL.setPower(0);
-        driveFR.setPower(0);
-        driveBL.setPower(0);
-        driveBR.setPower(0);
+        robot.drive.frontLeft.setPower(0);
+        robot.drive.frontRight.setPower(0);
+        robot.drive.rearLeft.setPower(0);
+        robot.drive.rearRight.setPower(0);
 
-        driveFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveFL.setTargetPosition(1440);
-        while(driveFL.isBusy() && opModeIsActive()) {
+        robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.drive.frontLeft.setTargetPosition(1440);
+        while(robot.drive.frontLeft.isBusy() && opModeIsActive()) {
             //Loop body can be empty
         }
-        driveFL.setPower(0);
+        robot.drive.frontLeft.setPower(0);
 
-        driveFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveFR.setTargetPosition(1440);
-        while(driveFR.isBusy() && opModeIsActive()) {
+        robot.drive.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.drive.frontRight.setTargetPosition(1440);
+        while(robot.drive.frontRight.isBusy() && opModeIsActive()) {
             //Loop body can be empty
         }
-        driveFR.setPower(0);
+        robot.drive.frontRight.setPower(0);
 
 
-        driveBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveBL.setTargetPosition(1440);
+        robot.drive.rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.drive.rearLeft.setTargetPosition(1440);
 
-        while(driveBL.isBusy() && opModeIsActive()) {
+        while(robot.drive.rearLeft.isBusy() && opModeIsActive()) {
             //Loop body can be empty
         }
-        driveBL.setPower(0);
+        robot.drive.rearLeft.setPower(0);
 
-        driveBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveBR.setTargetPosition(1440);
-        while(driveBR.isBusy() && opModeIsActive()) {
+        robot.drive.rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.drive.rearRight.setTargetPosition(1440);
+        while(robot.drive.rearRight.isBusy() && opModeIsActive()) {
             //Loop body can be empty
         }
-        driveBR.setPower(0);
+        robot.drive.rearRight.setPower(0);
 
         driveForwardDistance(0.2,200);
         sleep(500);
@@ -252,10 +248,10 @@ public class AutoEncoder extends LinearOpMode {
 
     public void driveForwardDistance(double power, int distance) {
         setAllModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        driveFL.setTargetPosition(distance);
-        driveFR.setTargetPosition(distance);
-        driveBL.setTargetPosition(distance);
-        driveBR.setTargetPosition(distance);
+        robot.drive.frontLeft.setTargetPosition(distance);
+        robot.drive.frontRight.setTargetPosition(distance);
+        robot.drive.rearLeft.setTargetPosition(distance);
+        robot.drive.rearRight.setTargetPosition(distance);
         setAllModes(DcMotor.RunMode.RUN_TO_POSITION);
 
         driveForward(power);
@@ -269,14 +265,14 @@ public class AutoEncoder extends LinearOpMode {
     }
 
     public void setAllModes(DcMotor.RunMode mode) {
-        driveFL.setMode(mode);
-        driveFR.setMode(mode);
-        driveBL.setMode(mode);
-        driveBR.setMode(mode);
+        robot.drive.frontLeft.setMode(mode);
+        robot.drive.frontRight.setMode(mode);
+        robot.drive.rearLeft.setMode(mode);
+        robot.drive.rearRight.setMode(mode);
     }
 
     public boolean allBusy() {
-        return driveFL.isBusy() && driveFR.isBusy() && driveBL.isBusy() && driveBR.isBusy();
+        return robot.drive.frontLeft.isBusy() && robot.drive.frontRight.isBusy() && robot.drive.rearLeft.isBusy() && robot.drive.rearRight.isBusy();
     }
 
     public void stopDriving() {
@@ -284,10 +280,10 @@ public class AutoEncoder extends LinearOpMode {
     }
 
     public void driveForward(double power) {
-        driveFL.setPower(power);
-        driveFR.setPower(power);
-        driveBL.setPower(power);
-        driveBR.setPower(power);
+        robot.drive.frontLeft.setPower(power);
+        robot.drive.frontRight.setPower(power);
+        robot.drive.rearLeft.setPower(power);
+        robot.drive.rearRight.setPower(power);
     }
 
     public void turnLeft(double power) {
