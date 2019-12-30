@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Robot;
 
 /**
- * Created by tarunsingh on 9/24/17.
+ * Created by AndrewChiang on 12/27/19.
  */
 
 @TeleOp(name = "TeleopMark1")

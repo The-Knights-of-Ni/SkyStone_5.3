@@ -11,9 +11,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.teamcode.SubSystems.Drive;
+import org.firstinspires.ftc.teamcode.SubSystems.Vision;
+
 /**
- * Created by AndrewC on 11/25/2017.
+ * Created by AndrewC on 12/27/2019.
  */
 
 public class Robot {
@@ -42,6 +45,7 @@ public class Robot {
 
     //Subsystems
     public Drive drive;
+    public Vision vision;
 
     public Robot(OpMode opMode, ElapsedTime timer){
         hardwareMap = opMode.hardwareMap;
@@ -97,9 +101,7 @@ public class Robot {
 
         //Subsystems
         drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, timer);
-//        glyft = new Glyft(leftSqueezerServo, rightSqueezerServo, leftGlyftMotor, rightGlyftMotor, timer);
-//        relicRecovery = new RelicRecovery(relicWristServo, relicClawServo, relicMotor, timer);
-//        jewel = new Jewel(jewelServo, colorSensor, timer);
+        vision = new Vision(hardwareMap);
     }
 }
 
