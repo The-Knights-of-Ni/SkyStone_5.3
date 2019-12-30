@@ -104,6 +104,10 @@ public class Drive extends Subsystem {
         return TILT_MAX_SPEED_TICK_PER_SEC;
     }
 
+    public double getAngularVMaxNeverrest20(){
+        return ANGULAR_V_MAX_NEVERREST_20;
+    }
+
 
     /**
      * Stops all drive motors
