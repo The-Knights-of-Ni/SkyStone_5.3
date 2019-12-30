@@ -93,9 +93,11 @@ public class AutoEncoder extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        robot.drive.moveForward(1000);
+        robot.drive.moveLeft(1000);
         sleep(1000);
-        robot.drive.moveBackward(1000);
+        while(robot.drive.rearLeft.isBusy()){
+
+        }
     }
 
     public void driveForwardDistance(double power, int distance) {
