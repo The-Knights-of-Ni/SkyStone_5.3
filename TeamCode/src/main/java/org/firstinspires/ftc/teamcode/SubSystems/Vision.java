@@ -60,7 +60,7 @@ public class Vision {
 
     // IMPORTANT: If you are using a USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    //private static final boolean PHONE_IS_PORTRAIT = false  ;
+    private static final boolean PHONE_IS_PORTRAIT = false  ;
 
     private List<VuforiaTrackable> allTrackables;
     private VuforiaTrackables targetsSkyStone;
