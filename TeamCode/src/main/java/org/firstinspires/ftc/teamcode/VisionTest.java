@@ -60,8 +60,8 @@ public class VisionTest extends LinearOpMode {
             if (robot.vision.isTargetVisible()) {
                 // express position (translation) of robot in inches.
                 VectorF translation = robot.vision.getLastLocation().getTranslation();
-                telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
-                        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+                telemetry.addData("Pos (mm)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                        translation.get(0), translation.get(1), translation.get(2));
 
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(robot.vision.getLastLocation(), EXTRINSIC, XYZ, DEGREES);
