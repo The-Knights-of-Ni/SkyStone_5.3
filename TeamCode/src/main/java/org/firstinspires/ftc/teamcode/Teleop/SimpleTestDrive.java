@@ -79,7 +79,7 @@ public class SimpleTestDrive extends LinearOpMode {
             timeCurrent = timer.nanoseconds();
 
             double[] motorPowers = calcMotorPowers(leftStickX);
-            robot.rearLeftDriveMotor.setPower(motorPowers[0]);
+            robot.rearLeftDriveMotor.setVelocity(motorPowers[0]);
             robot.frontLeftDriveMotor.setPower(motorPowers[1]);
             robot.rearRightDriveMotor.setPower(motorPowers[2]);
             robot.frontRightDriveMotor.setPower(motorPowers[3]);
@@ -102,6 +102,11 @@ public class SimpleTestDrive extends LinearOpMode {
         //Initialize DC motor objects
         timer = new ElapsedTime();
         robot = new Robot(this, timer);
+
+        robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.drive.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.drive.rearLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.drive.rearRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
