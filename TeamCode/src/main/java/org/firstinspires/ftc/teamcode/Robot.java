@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 public class Robot {
     public String name;
     private HardwareMap hardwareMap;
+    private OpMode opMode;
     public ElapsedTime timer;
 
     //DC Motors
@@ -72,6 +73,7 @@ public class Robot {
 
     public Robot(OpMode opMode, ElapsedTime timer){
         hardwareMap = opMode.hardwareMap;
+        this.opMode = opMode;
         this.timer = timer;
         init();
     }
@@ -125,7 +127,7 @@ public class Robot {
         imu.initialize(parameters);
 
         //Subsystems
-        drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, timer);
+        drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, timer, opMode);
         vision = new Vision(hardwareMap);
     }
 }
