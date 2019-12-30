@@ -84,14 +84,9 @@ public class AutoEncoder extends LinearOpMode {
     public void runOpMode() {
 
         robot.drive.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         robot.drive.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         robot.drive.rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         robot.drive.rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        int TICKS_PER_REV = 1120;
 
         // Wait for the robot driver to start the autonomous mode
         telemetry.addData(">", "Press Play to start tracking");
@@ -102,81 +97,6 @@ public class AutoEncoder extends LinearOpMode {
         robot.drive.rearLeft.setTargetPosition(500);
         robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.drive.rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-
-//        robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER); // find what out this is doing
-//        robot.drive.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        robot.drive.frontLeft.setPower(0.2);
-        robot.drive.frontRight.setPower(0.2);
-        robot.drive.rearLeft.setPower(0.2);
-        robot.drive.rearRight.setPower(0.2);
-
-        while (opModeIsActive() && robot.drive.frontLeft.isBusy())
-        {
-            idle();
-        }
-//        while (opModeIsActive() && stoneListener.getRawPose() == null) {
-//            idle();
-//        }
-
-        robot.drive.frontLeft.setPower(0);
-        robot.drive.frontRight.setPower(0);
-        robot.drive.rearLeft.setPower(0);
-        robot.drive.rearRight.setPower(0);
-
-        // wait 5 sec so you can observe the final encoder position.
-        resetStartTime();
-
-        while (opModeIsActive() && getRuntime() < 5)
-        {
-            telemetry.addData("encoder-fwd-end", robot.drive.frontLeft.getCurrentPosition() + "  busy=" + robot.drive.frontLeft.isBusy());
-            telemetry.update();
-            idle();
-        }
-
-        // Now back up to starting point. In this example instead of
-        // having the motor monitor the encoder, we will monitor the encoder ourselves.
-        robot.drive.frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.drive.rearLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        robot.drive.frontLeft.setPower(-0.25);
-        robot.drive.frontRight.setPower(-0.25);
-        robot.drive.rearLeft.setPower(-0.25);
-        robot.drive.rearRight.setPower(-0.25);
-
-        while (opModeIsActive() && robot.drive.frontLeft.getCurrentPosition() > 0)
-        {
-            telemetry.addData("encoder-back", robot.drive.frontLeft.getCurrentPosition());
-            telemetry.update();
-            idle();
-        }
-
-        // set motor power to zero to stop motors.
-
-        robot.drive.frontLeft.setPower(0);
-        robot.drive.frontRight.setPower(0);
-        robot.drive.rearLeft.setPower(0);
-        robot.drive.rearRight.setPower(0);
-
-        // wait 5 sec so you can observe the final encoder position.
-        resetStartTime();
-
-        while (opModeIsActive() && getRuntime() < 5)
-        {
-            telemetry.addData("encoder-back-end", robot.drive.frontLeft.getCurrentPosition());
-            telemetry.update();
-            idle();
-        }
-
-        // analyze skystone
-
-        robot.drive.frontLeft.setPower(0);
-        robot.drive.frontRight.setPower(0);
-        robot.drive.rearLeft.setPower(0);
-        robot.drive.rearRight.setPower(0);
-
-
 
         driveForwardDistance(0.2,200);
         sleep(500);
