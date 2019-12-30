@@ -51,9 +51,9 @@ public class Vision {
     private static final float halfField = 72 * mmPerInch;
     private static final float quadField  = 36 * mmPerInch;
 
-    final int CAMERA_FORWARD_DISPLACEMENT  = 110;   // eg: Camera is 110 mm in front of robot center
+    final int CAMERA_FORWARD_DISPLACEMENT  = 150;   // eg: Camera is 150 mm in front of robot center
     final int CAMERA_VERTICAL_DISPLACEMENT = 200;   // eg: Camera is 200 mm above ground
-    final int CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
+    final int CAMERA_LEFT_DISPLACEMENT     = 118;     // eg: Camera is 118 mm left of the robot's center line
 
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
