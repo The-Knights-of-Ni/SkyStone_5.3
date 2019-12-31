@@ -13,10 +13,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Robot;
-//>>>>>>> d827f8fea88cc58a3af4d5b4c9f323b732e67b7d
 
+/**
+ * Created by Elijah Rowe
+ */
 
-@TeleOp(name="OmniDirectionalDrive", group="Exercises")
+@TeleOp(name="OmniDirectionalDrive")
 public class omniDirectionalDrive extends LinearOpMode {
     private Robot robot;
     private BNO055IMU imu;
@@ -51,6 +53,11 @@ public class omniDirectionalDrive extends LinearOpMode {
 
         imu.initialize(parameters);
 
+        double goalAngle;
+        double robotAngle360;
+        double goalAngle360;
+
+
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
 
@@ -78,8 +85,8 @@ public class omniDirectionalDrive extends LinearOpMode {
         while (opModeIsActive())
         {
 //            //Get gamepad inputs
-//            double leftStickX = gamepad1.left_stick_x;
-//            double leftStickY = -gamepad1.left_stick_y;
+            double leftStickX = gamepad1.left_stick_x;
+            double leftStickY = -gamepad1.left_stick_y;
 //            double rightStickX = gamepad1.right_stick_x;
 //            boolean aButton = gamepad1.a;
 //            boolean bButton = gamepad1.b;
@@ -101,27 +108,44 @@ public class omniDirectionalDrive extends LinearOpMode {
 //            boolean bumperLeft2 = gamepad2.left_bumper;
 //            boolean bumperRight2 = gamepad2.right_bumper;
 
+            goalAngle = Math.toDegrees(Math.atan2(gamepad1.left_stick_x,gamepad1.left_stick_y));
+            robotAngle360 = to360(robotAngle);
+            goalAngle360 = to360(goalAngle);
+
             robotAngle = imu.getAngularOrientation().firstAngle;
 
-            if (robotAngle > 0){
-                if (robotAngle < 7){
-                    stopMotor();
-                    telemetry.addData("Stopped", robotAngle);
-                    telemetry.update();
+            if (robotAngle360 <= 180) {
+                if (goalAngle360 < robotAngle360 || goalAngle360 > robotAngle360 + 180) {
+                    rotate(-0.3);
                 } else {
                     rotate(0.3);
                 }
-
             } else {
-                if (robotAngle > -7){
-                    stopMotor();
-                    telemetry.addData("Stopped", robotAngle);
-                    telemetry.update();
+                if (goalAngle360 > robotAngle360 || goalAngle360 < robotAngle360 - 180) {
+                    rotate(0.3);
                 } else {
                     rotate(-0.3);
                 }
-
             }
+//            if (robotAngle > 0){
+//                if (robotAngle < 7){
+//                    stopMotor();
+//                    telemetry.addData("Stopped", robotAngle);
+//                    telemetry.update();
+//                } else {
+//                    rotate(0.3);
+//                }
+//
+//            } else {
+//                if (robotAngle > -7){
+//                    stopMotor();
+//                    telemetry.addData("Stopped", robotAngle);
+//                    telemetry.update();
+//                } else {
+//                    rotate(-0.3);
+//                }
+//
+//            }
             telemetry.addData("Robot Angle", robotAngle);
             telemetry.update();
 
@@ -148,6 +172,8 @@ public class omniDirectionalDrive extends LinearOpMode {
     }
 
     private void rotate(double speed) {
+        //Turns the robot to the right
+        //Speed Range is 0 to 1
         robot.drive.frontLeft.setPower(speed);
         robot.drive.rearLeft.setPower(speed);
         robot.drive.frontRight.setPower(-speed);
@@ -155,9 +181,32 @@ public class omniDirectionalDrive extends LinearOpMode {
     }
 
     private void stopMotor() {
+        //Stops the motor
         robot.frontLeftDriveMotor.setPower(0);
         robot.frontRightDriveMotor.setPower(0);
         robot.rearLeftDriveMotor.setPower(0);
         robot.rearRightDriveMotor.setPower(0);
+    }
+
+    private double to360(double angle) {
+        //Converts from euler units to 360 degrees
+        //Goes from 0 to 360 in a counter-clockwise fasion
+        //Accepts numbers between -180 and 180
+        if (angle >= 0) {
+            return angle;
+        } else {
+            return angle + 360;
+        }
+    }
+
+    private double smallestAngleBetween(double angle1, double angle2) {
+        //Returns the smallest angle between angle1 and angle 2
+        //Accepts the range 0 - 360 for both angles
+        double distanceBetween = angle2 - angle1;
+        if ((360 - distanceBetween) < distanceBetween) {
+            return 360 - distanceBetween;
+        } else {
+            return distanceBetween;
+        }
     }
 }
