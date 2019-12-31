@@ -105,22 +105,23 @@ public class omniDirectionalDrive extends LinearOpMode {
 
             if (robotAngle > 0){
                 if (robotAngle < 7){
-                    telemetry.addData("Robot Angle", robotAngle);
+                    telemetry.addData("Stopped", robotAngle);
                     telemetry.update();
                 } else {
-                    rotate(0.1);
+                    rotate(0.3);
                 }
 
             } else {
                 if (robotAngle > -7){
-                    telemetry.addData("Robot Angle", robotAngle);
+                    telemetry.addData("Stopped", robotAngle);
                     telemetry.update();
                 } else {
-                    rotate(-0.1);
+                    rotate(-0.3);
                 }
 
             }
-
+            telemetry.addData("Robot Angle", robotAngle);
+            telemetry.update();
 
             resetAngle();
         }
