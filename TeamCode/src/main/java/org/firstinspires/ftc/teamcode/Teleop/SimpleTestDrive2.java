@@ -76,16 +76,14 @@ public class SimpleTestDrive2 extends LinearOpMode {
 
             timeCurrent = timer.nanoseconds();
 
-            double[] motorPowers = calcMotorPowers(leftStickX);
-            double multiplier = 793.33;
-            double powerX = leftStickY;
-            robot.rearLeftDriveMotor.setPower(powerX);
-            robot.frontLeftDriveMotor.setPower(powerX);
-            robot.rearRightDriveMotor.setPower(powerX);
-            robot.frontRightDriveMotor.setPower(powerX);
-
+            double[] motorPowers = calcMotorPowers(leftStickY);
+            robot.rearLeftDriveMotor.setVelocity(motorPowers[0]);
+            robot.frontLeftDriveMotor.setVelocity(motorPowers[1]);
+            robot.rearRightDriveMotor.setVelocity(motorPowers[2]);
+            robot.frontRightDriveMotor.setVelocity(motorPowers[3]);
 
             deltaT = timeCurrent - timePre;
+            telemetry.addData("power", leftStickY);
             telemetry.addData("Rear Left V", robot.rearLeftDriveMotor.getVelocity());
             telemetry.addData("Front Left V", robot.frontLeftDriveMotor.getVelocity());
             telemetry.addData("Rear Right V", robot.rearRightDriveMotor.getVelocity());
