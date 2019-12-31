@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Robot;
 
 
-@TeleOp(name = "Strafe Program2")
+@TeleOp(name = "SimpleTestDrive2")
 public class SimpleTestDrive2 extends LinearOpMode {
     //Declare DC motor objects
     private Robot robot;
@@ -76,11 +76,11 @@ public class SimpleTestDrive2 extends LinearOpMode {
 
             timeCurrent = timer.nanoseconds();
 
-            double[] motorPowers = calcMotorPowers(leftStickY);
-            robot.rearLeftDriveMotor.setVelocity(motorPowers[0]);
-            robot.frontLeftDriveMotor.setVelocity(motorPowers[1]);
-            robot.rearRightDriveMotor.setVelocity(motorPowers[2]);
-            robot.frontRightDriveMotor.setVelocity(motorPowers[3]);
+            double[] motorPowers = calcMotorPowers(leftStickX);
+            robot.rearLeftDriveMotor.setPower(motorPowers[0] + leftStickY);
+            robot.frontLeftDriveMotor.setPower(motorPowers[1] + leftStickY);
+            robot.rearRightDriveMotor.setPower(motorPowers[2] + leftStickY);
+            robot.frontRightDriveMotor.setPower(motorPowers[3]+ leftStickY);
 
             deltaT = timeCurrent - timePre;
             telemetry.addData("power", leftStickY);
