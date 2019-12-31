@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -64,16 +65,28 @@ public class AutoEncoder extends LinearOpMode {
         robot.drive.rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.drive.rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        robot.drive.frontLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.drive.frontRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.drive.rearLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.drive.rearRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
         // Wait for the robot driver to start the autonomous mode
 
         telemetry.addLine("Wait For Start");
         telemetry.update();
         waitForStart();
 
-        robot.drive.moveLeft(1500);
-        while(robot.drive.rearLeft.isBusy()){
+        double ratio = 0.2;
 
-        }
+        robot.drive.frontLeft.setVelocity(robot.drive.getAngularVMaxNeverrest20() * ratio);
+        robot.drive.rearLeft.setVelocity((-robot.drive.getAngularVMaxNeverrest20() * ratio));
+        robot.drive.frontRight.setVelocity((-robot.drive.getAngularVMaxNeverrest20()) * ratio);
+        robot.drive.rearRight.setVelocity((robot.drive.getAngularVMaxNeverrest20()) * ratio);
+        sleep(10000);
+
+
+
+
     }
 
     public void setAllModes(DcMotor.RunMode mode) {

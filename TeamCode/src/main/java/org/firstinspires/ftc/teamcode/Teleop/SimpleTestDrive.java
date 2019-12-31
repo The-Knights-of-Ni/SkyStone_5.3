@@ -79,21 +79,24 @@ public class SimpleTestDrive extends LinearOpMode {
             timeCurrent = timer.nanoseconds();
 
             double[] motorPowers = calcMotorPowers(leftStickX);
-            double multiplier = 0.8*793.33;
+            double multiplier = 793.33;
             robot.rearLeftDriveMotor.setVelocity(motorPowers[0]*multiplier);
-            robot.frontLeftDriveMotor.setPower(motorPowers[1]*multiplier);
-            robot.rearRightDriveMotor.setPower(motorPowers[2]*multiplier);
-            robot.frontRightDriveMotor.setPower(motorPowers[3]*multiplier);
+            robot.frontLeftDriveMotor.setVelocity(motorPowers[1]*multiplier);
+            robot.rearRightDriveMotor.setVelocity(motorPowers[2]*multiplier);
+            robot.frontRightDriveMotor.setVelocity(motorPowers[3]*multiplier);
+
 
             deltaT = timeCurrent - timePre;
 
+            telemetry.addData("Rear Left", motorPowers[0]*multiplier);
+            telemetry.addData("Front Left", motorPowers[1]*multiplier);
+            telemetry.addData("Rear Right", motorPowers[2]*multiplier);
+            telemetry.addData("Front Right", motorPowers[3]*multiplier);
 
-            telemetry.addData("Left Stick Y2", leftStickY2);
-            telemetry.addData("Right Stick Y2", rightStickY2);
-            telemetry.addData("Right Stick X", rightStickX);
-            telemetry.addData("deltaT", deltaT);
-
-
+            telemetry.addData("Rear Left V", robot.rearLeftDriveMotor.getVelocity());
+            telemetry.addData("Front Left V", robot.frontLeftDriveMotor.getVelocity());
+            telemetry.addData("Rear Right V", robot.rearRightDriveMotor.getVelocity());
+            telemetry.addData("Front Right V", robot.frontRightDriveMotor.getVelocity());
 
             telemetry.update();
             timePre = timeCurrent;
