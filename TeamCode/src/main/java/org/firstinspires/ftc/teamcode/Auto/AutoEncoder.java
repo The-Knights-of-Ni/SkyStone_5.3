@@ -76,13 +76,13 @@ public class AutoEncoder extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        double ratio = 0.2;
-
-        robot.drive.frontLeft.setVelocity(robot.drive.getAngularVMaxNeverrest20() * ratio);
-        robot.drive.rearLeft.setVelocity((-robot.drive.getAngularVMaxNeverrest20() * ratio));
-        robot.drive.frontRight.setVelocity((-robot.drive.getAngularVMaxNeverrest20()) * ratio);
-        robot.drive.rearRight.setVelocity((robot.drive.getAngularVMaxNeverrest20()) * ratio);
-        sleep(10000);
+//        double ratio = 0.2;
+//
+//        robot.drive.frontLeft.setVelocity(robot.drive.getAngularVMaxNeverrest20() * ratio);
+//        robot.drive.rearLeft.setVelocity((-robot.drive.getAngularVMaxNeverrest20() * ratio));
+//        robot.drive.frontRight.setVelocity((-robot.drive.getAngularVMaxNeverrest20()) * ratio);
+//        robot.drive.rearRight.setVelocity((robot.drive.getAngularVMaxNeverrest20()) * ratio);
+//        sleep(10000);
 
 
 
