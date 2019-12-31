@@ -105,6 +105,7 @@ public class omniDirectionalDrive extends LinearOpMode {
 
             if (robotAngle > 0){
                 if (robotAngle < 7){
+                    stopMotor();
                     telemetry.addData("Stopped", robotAngle);
                     telemetry.update();
                 } else {
@@ -113,6 +114,7 @@ public class omniDirectionalDrive extends LinearOpMode {
 
             } else {
                 if (robotAngle > -7){
+                    stopMotor();
                     telemetry.addData("Stopped", robotAngle);
                     telemetry.update();
                 } else {
@@ -150,5 +152,12 @@ public class omniDirectionalDrive extends LinearOpMode {
         robot.drive.rearLeft.setPower(speed);
         robot.drive.frontRight.setPower(-speed);
         robot.drive.rearRight.setPower(-speed);
+    }
+
+    private void stopMotor() {
+        robot.frontLeftDriveMotor.setPower(0);
+        robot.frontRightDriveMotor.setPower(0);
+        robot.rearLeftDriveMotor.setPower(0);
+        robot.rearRightDriveMotor.setPower(0);
     }
 }
