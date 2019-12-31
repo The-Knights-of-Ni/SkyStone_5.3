@@ -73,6 +73,9 @@ public class Drive extends Subsystem {
     private static final double     ROBOT_INIT_ANGLE    = 45.0;
     private static final float      mmPerInch        = 25.4f;
 
+    // Servos
+    private static final double fClawLFoundation = 0.45;
+    private static final double fClawRFoundation = 0.56;
 
     private boolean allianceRed = false;
 
@@ -341,5 +344,9 @@ public class Drive extends Subsystem {
         opMode.telemetry.addData("moveRight",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
         opMode.telemetry.update();
 //        sleep(100);
+    }
+
+    public void lowerToFoundation() {
+
     }
 }

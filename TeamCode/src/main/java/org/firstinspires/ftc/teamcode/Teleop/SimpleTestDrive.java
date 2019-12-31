@@ -92,6 +92,12 @@ public class SimpleTestDrive extends LinearOpMode {
             telemetry.addData("Front Left", motorPowers[1]*multiplier);
             telemetry.addData("Rear Right", motorPowers[2]*multiplier);
             telemetry.addData("Front Right", motorPowers[3]*multiplier);
+
+            telemetry.addData("Rear Left V", robot.rearLeftDriveMotor.getVelocity());
+            telemetry.addData("Front Left V", robot.frontLeftDriveMotor.getVelocity());
+            telemetry.addData("Rear Right V", robot.rearRightDriveMotor.getVelocity());
+            telemetry.addData("Front Right V", robot.frontRightDriveMotor.getVelocity());
+
             telemetry.update();
             timePre = timeCurrent;
         }

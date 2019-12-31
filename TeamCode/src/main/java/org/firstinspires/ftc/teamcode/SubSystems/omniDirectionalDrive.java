@@ -103,13 +103,24 @@ public class omniDirectionalDrive extends LinearOpMode {
 
             robotAngle = imu.getAngularOrientation().firstAngle;
 
-            double r = 0.3;
-            double goalAngle = 0;
-            double correctionAmount = robotAngle - goalAngle;
+            if (robotAngle > 0){
+                if (robotAngle < 7){
+                    telemetry.addData("Robot Angle", robotAngle);
+                    telemetry.update();
+                } else {
+                    rotate(0.1);
+                }
 
+            } else {
+                if (robotAngle > -7){
+                    telemetry.addData("Robot Angle", robotAngle);
+                    telemetry.update();
+                } else {
+                    rotate(-0.1);
+                }
 
-            telemetry.addData("Robot Angle: ", robotAngle );
-            telemetry.update();
+            }
+
 
             resetAngle();
         }
@@ -133,10 +144,10 @@ public class omniDirectionalDrive extends LinearOpMode {
         globalAngle = 0;
     }
 
-    private void turn(double speed) {
+    private void rotate(double speed) {
         robot.drive.frontLeft.setPower(speed);
         robot.drive.rearLeft.setPower(speed);
-        robot.drive.frontRight.setPower(speed);
-        robot.drive.rearRight.setPower(speed);
+        robot.drive.frontRight.setPower(-speed);
+        robot.drive.rearRight.setPower(-speed);
     }
 }
