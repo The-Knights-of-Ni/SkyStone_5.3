@@ -111,6 +111,13 @@ public class Robot {
         fClawL = hardwareMap.servo.get("fL");
         fClawR = hardwareMap.servo.get("fR");
 
+        // Set servo scale ranges
+        mainArm.scaleRange(0,1);
+        mainRotation.scaleRange(0,1);
+        mainClaw.scaleRange(0,1);
+        fClawL.scaleRange(0.36,0.8);
+        fClawR.scaleRange(0.11,0.63);
+
         //Sensors
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 //        colorSensor = hardwareMap.colorSensor.get("color");
