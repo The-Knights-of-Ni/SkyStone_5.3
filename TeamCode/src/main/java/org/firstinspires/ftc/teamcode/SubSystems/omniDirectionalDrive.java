@@ -147,7 +147,7 @@ public class omniDirectionalDrive extends LinearOpMode {
     private void rotate(double speed) {
         robot.drive.frontLeft.setPower(speed);
         robot.drive.rearLeft.setPower(speed);
-        robot.drive.frontRight.setPower(speed);
-        robot.drive.rearRight.setPower(speed);
+        robot.drive.frontRight.setPower(-speed);
+        robot.drive.rearRight.setPower(-speed);
     }
 }
