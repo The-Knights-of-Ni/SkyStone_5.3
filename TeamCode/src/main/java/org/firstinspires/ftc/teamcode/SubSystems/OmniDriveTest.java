@@ -149,7 +149,8 @@ public class OmniDriveTest extends LinearOpMode {
 //
 //            }
             telemetry.addData("Robot Angle", robotAngle360);
-            telemetry.addData("Goal Angle",  goalAngle360);
+            telemetry.addData("Goal Angle",  goalAngle);
+            telemetry.addData("Goal Angle 360",  goalAngle360);
             telemetry.addData("Speed", speed);
             telemetry.update();
 
