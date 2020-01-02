@@ -102,7 +102,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
             //Determines if the robot turns left or right and at what speed
             double rotationDirection = findRotationDirection(robotAngle360, goalAngle360);
-            double rotationSpeed = 0.3;
+            double rotationSpeed = 0.3*magnitude;
 
             //Decides whether to stop the robot to turn or turn while the robot is moving
             if (smallestAngleBetween(robotAngle360, goalAngle360) < 20) {
