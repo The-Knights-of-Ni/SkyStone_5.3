@@ -112,19 +112,21 @@ public class OmniDriveTest extends LinearOpMode {
             robotAngle360 = to360(robotAngle);
             goalAngle360 = to360(goalAngle);
 
+            double speed = smallestAngleBetween(robotAngle360, goalAngle360)/180;
+
             robotAngle = imu.getAngularOrientation().firstAngle;
 
             if (robotAngle360 <= 180) {
                 if (goalAngle360 < robotAngle360 || goalAngle360 > robotAngle360 + 180) {
-                    rotate(-0.3);
+                    rotate(-speed);
                 } else {
-                    rotate(0.3);
+                    rotate(speed);
                 }
             } else {
                 if (goalAngle360 > robotAngle360 || goalAngle360 < robotAngle360 - 180) {
-                    rotate(0.3);
+                    rotate(speed);
                 } else {
-                    rotate(-0.3);
+                    rotate(-speed);
                 }
             }
 //            if (robotAngle > 0){
@@ -146,7 +148,9 @@ public class OmniDriveTest extends LinearOpMode {
 //                }
 //
 //            }
-            telemetry.addData("Robot Angle", robotAngle);
+            telemetry.addData("Robot Angle", robotAngle360);
+            telemetry.addData("Goal Angle",  goalAngle360);
+            telemetry.addData("Speed", speed);
             telemetry.update();
 
             resetAngle();
