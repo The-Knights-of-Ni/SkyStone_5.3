@@ -105,25 +105,27 @@ public class MultipleCameraTest_Vuforia extends LinearOpMode
         /*
          * Setup OpenCV on the phone camera
          */
-telemetry.addLine("Test1");
-telemetry.update();
-sleep(1000);
-        webcam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[1]);
-telemetry.addLine("Test2");
-telemetry.update();
-sleep(1000);
+//telemetry.addLine("Test1");
+//telemetry.update();
+//sleep(1000);
+
+        webcam1 = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[1]);
+//        webcam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[1]);
+//telemetry.addLine("Test2");
+//telemetry.update();
+//sleep(1000);
         webcam1.openCameraDevice();
-telemetry.addLine("Test3");
-telemetry.update();
-sleep(1000);
+//telemetry.addLine("Test3");
+//telemetry.update();
+//sleep(1000);
         webcam1.setPipeline(new SamplePipeline());
-telemetry.addLine("Test4");
-telemetry.update();
-sleep(1000);
+//telemetry.addLine("Test4");
+//telemetry.update();
+//sleep(1000);
         webcam1.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
-telemetry.addLine("Test5");
-telemetry.update();
-sleep(1000);
+//telemetry.addLine("Test5");
+//telemetry.update();
+//sleep(1000);
 
         waitForStart();
 
