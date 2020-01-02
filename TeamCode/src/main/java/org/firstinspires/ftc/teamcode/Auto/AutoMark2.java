@@ -187,7 +187,7 @@ public class AutoMark2 extends LinearOpMode {
 
         // check all the trackable target to see which one (if any) is visible.
         targetVisible = false;
-        for (VuforiaTrackable trackable : allTrackables) {
+        for (VuforiaTrackable trackable : robot.vision.getAllTrackables()) {
             if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
                 telemetry.addData("Visible Target", trackable.getName());
                 targetVisible = true;
