@@ -99,6 +99,7 @@ public class Robot {
         xRailWinch = (DcMotorEx) hardwareMap.dcMotor.get("winch");
         armTilt = (DcMotorEx) hardwareMap.dcMotor.get("tilt");
 
+
         xRailWinch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armTilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -111,12 +112,12 @@ public class Robot {
         fClawL = hardwareMap.servo.get("fL");
         fClawR = hardwareMap.servo.get("fR");
 
-        // Set servo scale ranges
-        mainArm.scaleRange(0,1);
-        mainRotation.scaleRange(0,1);
-        mainClaw.scaleRange(0,1);
-        fClawL.scaleRange(0.36,0.8);
-        fClawR.scaleRange(0.11,0.63);
+//        // Set servo scale ranges
+//        mainArm.scaleRange(0,1);
+//        mainRotation.scaleRange(0,1);
+//        mainClaw.scaleRange(0,1);
+//        fClawL.scaleRange(0.36,0.8);
+//        fClawR.scaleRange(0.11,0.63);
 
         //Sensors
         imu = hardwareMap.get(BNO055IMU.class, "imu");

@@ -98,7 +98,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
 
             //Find the speed for the robot to go at.
-            double magnitude = Math.hypot(leftStickX, leftStickY);
+            double magnitude = Math.hypot(leftStickX, leftStickY)*0.5;
 
             //Determines if the robot turns left or right and at what speed
             double rotationDirection = findRotationDirection(robotAngle360, goalAngle360);

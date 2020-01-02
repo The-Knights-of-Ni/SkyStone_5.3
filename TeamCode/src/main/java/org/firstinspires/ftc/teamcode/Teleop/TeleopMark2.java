@@ -14,6 +14,8 @@ import org.firstinspires.ftc.teamcode.Robot;
  * Created by AndrewChiang on 12/27/19.
  */
 
+//Message from Elijah, please comment your code
+
 @TeleOp(name = "TeleopMark2")
 public class TeleopMark2 extends LinearOpMode {
     //Declare DC motor objects
@@ -54,6 +56,12 @@ public class TeleopMark2 extends LinearOpMode {
     int tiltPosError = 300;
     int tiltMax = 1200;
 
+//    int clawTiltCurrentPosition = 0;
+//    int clawTiltTargetPositionCurrent = 0;
+//    int clawTiltTargetPositionPre = 0;
+//    int clawTiltPosError = 300;
+//    int clawTiltMax = 1200;
+
     double timePre;
     double timeCurrent;
     double winchSpeed;
@@ -77,6 +85,7 @@ public class TeleopMark2 extends LinearOpMode {
 
         telemetry.clearAll();
         while(opModeIsActive()) {
+
             //Get gamepad inputs
             leftStickX = gamepad1.left_stick_x;
             leftStickY = -gamepad1.left_stick_y;
@@ -87,7 +96,6 @@ public class TeleopMark2 extends LinearOpMode {
             dPadDown = gamepad1.dpad_down;
             dPadLeft = gamepad1.dpad_left;
             dPadRight = gamepad1.dpad_right;
-
             leftStickX2 = gamepad2.left_stick_x;
             leftStickY2 = -gamepad2.left_stick_y;
             rightStickX2 = gamepad2.right_stick_x;
@@ -101,9 +109,10 @@ public class TeleopMark2 extends LinearOpMode {
             bumperLeft2 = gamepad2.left_bumper;
             bumperRight2 = gamepad2.right_bumper;
 
-
+            //Get the current time
             timeCurrent = timer.nanoseconds();
 
+            //Drive the motors
             double[] motorPowers = calcMotorPowers(leftStickX, leftStickY, rightStickX);
             robot.rearLeftDriveMotor.setPower(motorPowers[0]);
             robot.frontLeftDriveMotor.setPower(motorPowers[1]);
@@ -136,9 +145,17 @@ public class TeleopMark2 extends LinearOpMode {
             else{
                 winchSpeed = 0.0;
             }
+
+            //Get winch's current position
             winchCurrentPosition = robot.xRailWinch.getCurrentPosition();
+
+            //Determine the speed of the winch
             winchIncrement = (winchSpeed * deltaT) / Math.pow(10.0,9);
+
+            //Determine winch target position
             winchTargetPositionCurrent = (int) (winchTargetPositionPre + winchIncrement);
+
+            //Make sure the winch is still in the boundries
             if((winchTargetPositionCurrent <= winchMax) && (winchTargetPositionCurrent >= 0)
                     && ( Math.abs(winchTargetPositionCurrent - winchCurrentPosition) < winchPosError)){
                 robot.xRailWinch.setTargetPosition(winchTargetPositionCurrent);
@@ -168,14 +185,41 @@ public class TeleopMark2 extends LinearOpMode {
             else{
                 tiltSpeed = 0.0;
             }
+
+            //Find how much the arm is tilted
             tiltCurrentPosition = robot.armTilt.getCurrentPosition();
+
+            //Determines the speed of the tilt
             tiltIncrement = (tiltSpeed * deltaT) / Math.pow(10.0,9);
+
+            //Determines the target tilt position
             tiltTargetPositionCurrent = (int) (tiltTargetPositionPre + tiltIncrement);
+
+            //Make sure the tilt is tilt in bounds
             if((tiltTargetPositionCurrent <= tiltMax) && (tiltTargetPositionCurrent >= 0)
                     && ( Math.abs(tiltTargetPositionCurrent - tiltCurrentPosition) < tiltPosError)){
                 robot.armTilt.setTargetPosition(tiltTargetPositionCurrent);
                 tiltTargetPositionPre = tiltTargetPositionCurrent;
             }
+
+//            //Find how much the claw is tilted
+//            clawTiltCurrentPosition = (int) robot.mainArm.getPosition();
+//
+//            //Determines the speed of the winch
+//            tiltIncrement = (tiltSpeed * deltaT) / Math.pow(10.0,9);
+//
+//            //Determines the target tilt position
+//            tiltTargetPositionCurrent = (int) (tiltTargetPositionPre + tiltIncrement);
+//
+//            //Make sure the tilt is tilt in bounds
+//            if((tiltTargetPositionCurrent <= tiltMax) && (tiltTargetPositionCurrent >= 0)
+//                    && ( Math.abs(tiltTargetPositionCurrent - tiltCurrentPosition) < tiltPosError)){
+//                robot.armTilt.setTargetPosition(tiltTargetPositionCurrent);
+//                tiltTargetPositionPre = tiltTargetPositionCurrent;
+//            }
+
+
+
 
             telemetry.addData("Left Stick Y2", leftStickY2);
             telemetry.addData("Right Stick Y2", rightStickY2);
