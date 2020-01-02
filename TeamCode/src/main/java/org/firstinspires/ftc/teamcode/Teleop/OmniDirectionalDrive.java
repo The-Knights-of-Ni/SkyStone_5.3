@@ -93,7 +93,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
 
             //Determines the angle of the joystick and converts it out of euler angle form
-            goalAngle = Math.toDegrees(Math.atan2(gamepad1.left_stick_x,gamepad1.left_stick_y));
+            goalAngle = Math.toDegrees(Math.atan2(gamepad1.left_stick_y,gamepad1.left_stick_x) - Math.PI / 2);
             goalAngle360 = to360(goalAngle);
 
 
@@ -102,7 +102,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
             //Determines if the robot turns left or right and at what speed
             double rotationDirection = findRotationDirection(robotAngle360, goalAngle360);
-            double rotationSpeed = 0.3*magnitude;
+            double rotationSpeed = smallestAngleBetween(robotAngle360, goalAngle360)/180;
 
             //Decides whether to stop the robot to turn or turn while the robot is moving
             if (smallestAngleBetween(robotAngle360, goalAngle360) < 20) {

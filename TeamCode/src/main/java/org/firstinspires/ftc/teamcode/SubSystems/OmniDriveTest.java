@@ -108,7 +108,8 @@ public class OmniDriveTest extends LinearOpMode {
 //            boolean bumperLeft2 = gamepad2.left_bumper;
 //            boolean bumperRight2 = gamepad2.right_bumper;
 
-            goalAngle = Math.toDegrees(Math.atan2(gamepad1.left_stick_y,gamepad1.left_stick_x) - Math.PI / 4);
+
+            goalAngle = Math.toDegrees(Math.atan2(gamepad1.left_stick_y,gamepad1.left_stick_x) + Math.PI / 2);
             robotAngle360 = to360(robotAngle);
             goalAngle360 = to360(goalAngle);
 
@@ -151,6 +152,7 @@ public class OmniDriveTest extends LinearOpMode {
             telemetry.addData("Robot Angle", robotAngle360);
             telemetry.addData("Goal Angle",  goalAngle);
             telemetry.addData("Goal Angle 360",  goalAngle360);
+            telemetry.addData("Angle Between",  smallestAngleBetween(goalAngle360,robotAngle360));
             telemetry.addData("Speed", speed);
             telemetry.update();
 
@@ -195,7 +197,7 @@ public class OmniDriveTest extends LinearOpMode {
 
     private double to360(double angle) {
         //Converts from euler units to 360 degrees
-        //Goes from 0 to 360 in a counter-clockwise fasion
+        //Goes from 0 to 360 in a clockwise fasion
         //Accepts numbers between -180 and 180
         if (angle >= 0) {
             return angle;
@@ -207,7 +209,7 @@ public class OmniDriveTest extends LinearOpMode {
     private double smallestAngleBetween(double angle1, double angle2) {
         //Returns the smallest angle between angle1 and angle 2
         //Accepts the range 0 - 360 for both angles
-        double distanceBetween = angle2 - angle1;
+        double distanceBetween = Math.abs(angle2 - angle1);
         if ((360 - distanceBetween) < distanceBetween) {
             return 360 - distanceBetween;
         } else {
