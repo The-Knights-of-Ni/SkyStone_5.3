@@ -6,11 +6,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Robot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +59,7 @@ public class Vision {
 
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
+    private Robot robot;
 
     // IMPORTANT: If you are using a USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
@@ -67,6 +70,12 @@ public class Vision {
 
     public Vision(HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
+        initVuforiaEngine();
+    }
+
+    public Vision(HardwareMap hardwareMap, Robot robot){
+        this.hardwareMap = hardwareMap;
+        this.robot = robot;
         initVuforiaEngine();
     }
 
@@ -244,5 +253,38 @@ public class Vision {
 
     public void changeIsTargetVisible(boolean value){
         targetVisible = value;
+    }
+
+    public void vuMarkScan(){
+        robot.vision.changeIsTargetVisible(false);
+        for (VuforiaTrackable trackable : robot.vision.getAllTrackables()) {
+            if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
+                robot.getOpmode().telemetry.addData("Visible Target", trackable.getName());
+                robot.vision.changeIsTargetVisible(true);
+
+                // getUpdatedRobotLocation() will return null if no new information is available since
+                // the last time that call was made, or if the trackable is not currently visible.
+                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
+                if (robotLocationTransform != null) {
+                    robot.vision.changeLastLocation(robotLocationTransform);
+                }
+                break;
+            }
+        }
+        // Provide feedback as to where the robot is located (if we know).
+        if (robot.vision.isTargetVisible()) {
+            // express position (translation) of robot in inches.
+            VectorF translation = robot.vision.getLastLocation().getTranslation();
+            robot.getOpmode().telemetry.addData("Pos (mm)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                    translation.get(0), translation.get(1), translation.get(2));
+
+            // express the rotation of the robot in degrees.
+            Orientation rotation = Orientation.getOrientation(robot.vision.getLastLocation(), EXTRINSIC, XYZ, DEGREES);
+            robot.getOpmode().telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+        }
+        else {
+            robot.getOpmode().telemetry.addData("Visible Target", "none");
+        }
+        robot.getOpmode().telemetry.update();
     }
 }
