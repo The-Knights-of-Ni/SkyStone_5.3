@@ -18,6 +18,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.Robot;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,13 +101,6 @@ public class AutoMark2 extends LinearOpMode {
 
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
-
-    // IMPORTANT: If you are using a USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
-    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    private static final boolean PHONE_IS_PORTRAIT = false  ;
-
-    private List<VuforiaTrackable> allTrackables;
-    private VuforiaTrackables targetsSkyStone;
 
 
     @Override
@@ -341,4 +339,23 @@ public class AutoMark2 extends LinearOpMode {
         sleep(100);
     }
 
+}
+
+class SamplePipeline extends OpenCvPipeline
+{
+    @Override
+    public Mat processFrame(Mat input)
+    {
+        Imgproc.rectangle(
+                input,
+                new Point(
+                        input.cols()/4,
+                        input.rows()/4),
+                new Point(
+                        input.cols()*(3f/4f),
+                        input.rows()*(3f/4f)),
+                new Scalar(0, 255, 0), 4);
+
+        return input;
+    }
 }
