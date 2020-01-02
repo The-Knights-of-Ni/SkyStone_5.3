@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Robot;
 
 
-@TeleOp(name = "Strafe Program")
+@TeleOp(name = "Strafe Program", group = "Drive Tests")
 public class SimpleTestDrive extends LinearOpMode {
     //Declare DC motor objects
     private Robot robot;
