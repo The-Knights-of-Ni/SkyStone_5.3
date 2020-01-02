@@ -109,6 +109,7 @@ public class OmniDriveTest extends LinearOpMode {
 //            boolean bumperRight2 = gamepad2.right_bumper;
 
             goalAngle = Math.toDegrees(Math.atan2(gamepad1.left_stick_y,gamepad1.left_stick_x));
+            double goalAngle2 = Math.toDegrees(Math.atan2(gamepad1.left_stick_y,gamepad1.left_stick_x) - Math.PI / 4);
             robotAngle360 = to360(robotAngle);
             goalAngle360 = to360(goalAngle);
 
