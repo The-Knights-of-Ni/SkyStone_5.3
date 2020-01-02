@@ -185,18 +185,21 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
     private double findRotationDirection(double robot, double goal) {
         //Determines the shortest way to rotate to goal angle
+        double i;
         if (robot <= 180) {
             if (goal < robot || goal > robot + 180) {
-                return -1;
+                i= -1;
             } else {
-                return 1;
+                i = 1;
             }
         } else {
             if (goal > robot || goal < robot - 180) {
-                return 1;
+                i = 1;
             } else {
-                return -1;
+                i = -1;
             }
         }
+
+        return i;
     }
 }
