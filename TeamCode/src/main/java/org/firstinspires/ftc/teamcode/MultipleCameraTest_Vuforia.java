@@ -122,7 +122,7 @@ public class MultipleCameraTest_Vuforia extends LinearOpMode
 //telemetry.addLine("Test4");
 //telemetry.update();
 //sleep(1000);
-        webcam1.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
+        webcam1.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
 //telemetry.addLine("Test5");
 //telemetry.update();
 //sleep(1000);
