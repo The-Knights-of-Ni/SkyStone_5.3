@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.Robot;
  */
 
 @TeleOp(name="OmniDirectionalDrive")
-public class omniDirectionalDrive extends LinearOpMode {
+public class OmniDriveTest extends LinearOpMode {
     private Robot robot;
     private BNO055IMU imu;
     double robotAngle;
