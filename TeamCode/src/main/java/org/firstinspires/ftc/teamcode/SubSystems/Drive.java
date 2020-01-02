@@ -77,6 +77,11 @@ public class Drive extends Subsystem {
     private static final double fClawLFoundation = 0.45;
     private static final double fClawRFoundation = 0.56;
 
+    private static final double fClawLDown = 0.36;
+    private static final double fClawLUp = 0.8;
+    private static final double fClawRUp = 0.11;
+    private static final double fClawRDown = 0.63;
+
     private boolean allianceRed = false;
 
 
