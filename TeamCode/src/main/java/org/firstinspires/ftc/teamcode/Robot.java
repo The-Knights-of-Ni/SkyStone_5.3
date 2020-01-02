@@ -99,6 +99,7 @@ public class Robot {
         xRailWinch = (DcMotorEx) hardwareMap.dcMotor.get("winch");
         armTilt = (DcMotorEx) hardwareMap.dcMotor.get("tilt");
 
+
         xRailWinch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armTilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 

@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Robot;
  * Created by Elijah Rowe
  */
 
-@TeleOp(name="OmniDirectionalDrive")
+@TeleOp(name="OmniDriveTest")
 public class OmniDriveTest extends LinearOpMode {
     private Robot robot;
     private BNO055IMU imu;
