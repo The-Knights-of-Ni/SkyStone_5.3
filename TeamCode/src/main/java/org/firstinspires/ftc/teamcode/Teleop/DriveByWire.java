@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Robot;
 
 
-@TeleOp(name="Drive by Wire", group="Exercises")
+@TeleOp(name="Drive by Wire", group="Assisted Driving")
 public class DriveByWire extends LinearOpMode {
     private Robot robot;
     private BNO055IMU imu;

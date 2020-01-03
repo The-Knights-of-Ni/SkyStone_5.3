@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryImpl;
+import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.SubSystems.Subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
@@ -24,6 +25,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 
 /** Mecanum drivetrain subsystem */
 public class Drive extends Subsystem {
+
+    private Robot robot;
     //DC Motors
     public DcMotorEx frontLeft;
     public DcMotorEx frontRight;
@@ -76,11 +79,15 @@ public class Drive extends Subsystem {
     // Servos
     private static final double fClawLFoundation = 0.45;
     private static final double fClawRFoundation = 0.56;
-
     private static final double fClawLDown = 0.36;
     private static final double fClawLUp = 0.8;
     private static final double fClawRUp = 0.11;
     private static final double fClawRDown = 0.63;
+
+    private static final double mainArmDown = 0.5; // TEMPORARY
+    private static final double mainClawOpen = 0.5; // TEMPORARY
+    private static final double mainClawClosed = 0.5; // TEMPORARY
+    private static final double mainClawStone = 0.5; // TEMPORARY
 
     private boolean allianceRed = false;
 
@@ -351,7 +358,17 @@ public class Drive extends Subsystem {
 //        sleep(100);
     }
 
-    public void lowerToFoundation() {
+    public void lowerClawsToFoundation() {
+        robot.fClawL.setPosition(fClawLDown);
+        robot.fClawR.setPosition(fClawRDown);
+    }
 
+    public void pickUpStone() {
+        // Lower arm
+        // need to add rotation, arm claw synchronization
+        robot.mainArm.setPosition(mainArmDown);
+        robot.mainClaw.setPosition(mainClawOpen);
+        robot.mainClaw.setPosition(mainClawStone);
+        robot.mainArm.setPosition(0.5);
     }
 }
