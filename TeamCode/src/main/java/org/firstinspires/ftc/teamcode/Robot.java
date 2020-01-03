@@ -135,7 +135,7 @@ public class Robot {
 
         //Subsystems
         drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, timer, opMode);
-        vision = new Vision(hardwareMap);
+        vision = new Vision(hardwareMap, this);
     }
 
     public OpMode getOpmode(){
