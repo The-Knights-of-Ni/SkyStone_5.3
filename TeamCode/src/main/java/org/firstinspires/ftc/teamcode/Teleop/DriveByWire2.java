@@ -1,11 +1,8 @@
-package org.firstinspires.ftc.teamcode.SubSystems;
+package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -18,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Robot;
  * Created by Elijah Rowe
  */
 
-@TeleOp(name="OmniDriveTest")
-public class OmniDriveTest extends LinearOpMode {
+@TeleOp(name="Drive By Wire 2", group="Assisted Driving")
+public class DriveByWire2 extends LinearOpMode {
     private Robot robot;
     private BNO055IMU imu;
     double robotAngle;
@@ -73,87 +70,55 @@ public class OmniDriveTest extends LinearOpMode {
         telemetry.update();
 
         // wait for start button.
-
         waitForStart();
 
         telemetry.addData("Mode", "running");
         telemetry.update();
 
+        // wait for 1 second
         sleep(1000);
 
 
         while (opModeIsActive())
         {
-//            //Get gamepad inputs
+            //Get gamepad inputs
             double leftStickX = gamepad1.left_stick_x;
             double leftStickY = -gamepad1.left_stick_y;
-//            double rightStickX = gamepad1.right_stick_x;
-//            boolean aButton = gamepad1.a;
-//            boolean bButton = gamepad1.b;
-//            boolean dPadUp = gamepad1.dpad_up;
-//            boolean dPadDown = gamepad1.dpad_down;
-//            boolean dPadLeft = gamepad1.dpad_left;
-//            boolean dPadRight = gamepad1.dpad_right;
-//
-//            double leftStickX2 = gamepad2.left_stick_x;
-//            double leftStickY2 = -gamepad2.left_stick_y;
-//            double rightStickX2 = gamepad2.right_stick_x;
-//            double rightStickY2 = gamepad2.right_stick_y;
-//            boolean aButton2 = gamepad2.a;
-//            boolean bButton2 = gamepad2.b;
-//            boolean dPadUp2 = gamepad2.dpad_up;
-//            boolean dPadDown2 = gamepad2.dpad_down;
-//            boolean dPadLeft2 = gamepad2.dpad_left;
-//            boolean dPadRight2 = gamepad2.dpad_right;
-//            boolean bumperLeft2 = gamepad2.left_bumper;
-//            boolean bumperRight2 = gamepad2.right_bumper;
+            double rightStickX = gamepad1.right_stick_x;
 
 
-            goalAngle = Math.toDegrees(Math.atan2(gamepad1.left_stick_y,gamepad1.left_stick_x) + Math.PI / 2);
+            //Find the angle of the robot and convert it out of euler angle form
+            robotAngle = imu.getAngularOrientation().firstAngle;
             robotAngle360 = to360(robotAngle);
+
+
+            //Determines the angle of the joystick and converts it out of euler angle form
+            goalAngle = Math.toDegrees(Math.atan2(gamepad1.left_stick_y,gamepad1.left_stick_x) + Math.PI / 2);
             goalAngle360 = to360(goalAngle);
 
-            double speed = smallestAngleBetween(robotAngle360, goalAngle360)/180;
 
-            robotAngle = imu.getAngularOrientation().firstAngle;
+            //Find the speed for the robot to go at.
+            double magnitude = Math.hypot(leftStickX, leftStickY)*0.5;
 
-            if (robotAngle360 <= 180) {
-                if (goalAngle360 < robotAngle360 || goalAngle360 > robotAngle360 + 180) {
-                    rotate(-speed);
-                } else {
-                    rotate(speed);
-                }
+            //Determines if the robot turns left or right and at what speed
+            double rotationDirection = findRotationDirection(robotAngle360, goalAngle360);
+            double rotationSpeed = smallestAngleBetween(robotAngle360, goalAngle360)/180;
+
+            //Decides whether to stop the robot to turn or turn while the robot is moving
+            if (smallestAngleBetween(robotAngle360, goalAngle360) < 20) {
+                drive(magnitude,rotationSpeed*rotationDirection*0.5,rightStickX*0.5);
             } else {
-                if (goalAngle360 > robotAngle360 || goalAngle360 < robotAngle360 - 180) {
-                    rotate(speed);
-                } else {
-                    rotate(-speed);
-                }
+                stopMotors();
+                drive(0,rotationSpeed*rotationDirection*0.5,rightStickX*0.5);
             }
-//            if (robotAngle > 0){
-//                if (robotAngle < 7){
-//                    stopMotor();
-//                    telemetry.addData("Stopped", robotAngle);
-//                    telemetry.update();
-//                } else {
-//                    rotate(0.3);
-//                }
-//
-//            } else {
-//                if (robotAngle > -7){
-//                    stopMotor();
-//                    telemetry.addData("Stopped", robotAngle);
-//                    telemetry.update();
-//                } else {
-//                    rotate(-0.3);
-//                }
-//
-//            }
+
+
             telemetry.addData("Robot Angle", robotAngle360);
             telemetry.addData("Goal Angle",  goalAngle);
             telemetry.addData("Goal Angle 360",  goalAngle360);
             telemetry.addData("Angle Between",  smallestAngleBetween(goalAngle360,robotAngle360));
-            telemetry.addData("Speed", speed);
+            telemetry.addData("Speed", magnitude);
+            telemetry.addData("Rotation Speed", rotationSpeed);
             telemetry.update();
 
             resetAngle();
@@ -162,10 +127,7 @@ public class OmniDriveTest extends LinearOpMode {
 
 
         // turn the motors off.
-        robot.frontLeftDriveMotor.setPower(0);
-        robot.frontRightDriveMotor.setPower(0);
-        robot.rearLeftDriveMotor.setPower(0);
-        robot.rearRightDriveMotor.setPower(0);
+        stopMotors();
     }
 
     /**
@@ -187,7 +149,16 @@ public class OmniDriveTest extends LinearOpMode {
         robot.drive.rearRight.setPower(-speed);
     }
 
-    private void stopMotor() {
+    private void drive(double speed, double rotate, double rightStickX) {
+        //Calculates and applies the powers for the motors
+        //Accepts inputs of (0-1,0-1, gamepad input)
+        robot.drive.frontLeft.setPower(speed + rightStickX + rotate);
+        robot.drive.rearLeft.setPower(speed - rightStickX + rotate);
+        robot.drive.frontRight.setPower(speed - rightStickX - rotate);
+        robot.drive.rearRight.setPower(speed + rightStickX - rotate);
+    }
+
+    private void stopMotors() {
         //Stops the motor
         robot.frontLeftDriveMotor.setPower(0);
         robot.frontRightDriveMotor.setPower(0);
@@ -215,5 +186,26 @@ public class OmniDriveTest extends LinearOpMode {
         } else {
             return distanceBetween;
         }
+    }
+
+    private double findRotationDirection(double robot, double goal) {
+        //Determines the shortest way to rotate to goal angle
+        //Accepts angles from 0 - 360 for both inputs
+        double i;
+        if (robot <= 180) {
+            if (goal < robot || goal > robot + 180) {
+                i= -1;
+            } else {
+                i = 1;
+            }
+        } else {
+            if (goal > robot || goal < robot - 180) {
+                i = 1;
+            } else {
+                i = -1;
+            }
+        }
+
+        return i;
     }
 }
