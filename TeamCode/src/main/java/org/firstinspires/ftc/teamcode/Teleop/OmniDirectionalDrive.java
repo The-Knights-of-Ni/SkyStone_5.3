@@ -50,7 +50,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
         imu.initialize(parameters);
 
-        double robotAngle360;
+        double robotAngle;
 
 
         telemetry.addData("Mode", "calibrating...");
@@ -85,10 +85,20 @@ public class OmniDirectionalDrive extends LinearOpMode {
             double rightStickX = gamepad1.right_stick_x;
             double rightStickY = gamepad1.right_stick_y;
 
+            //Find the goal angle from the controller
+            double goalAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
 
             //Find the angle of the robot and convert it out of euler angle form
             robotAngle = imu.getAngularOrientation().firstAngle;
-            robotAngle360 = to360(robotAngle);
+            double robotAngle360 = to360(robotAngle);
+            double correction = smallestAngleBetween(robotAngle360,goalAngle);
+
+            //Drive the robot
+            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,rightStickY, correction);
+            robot.rearLeftDriveMotor.setPower(motorPowers[0]);
+            robot.frontLeftDriveMotor.setPower(motorPowers[1]);
+            robot.rearRightDriveMotor.setPower(motorPowers[2]);
+            robot.frontRightDriveMotor.setPower(motorPowers[3]);
 
 
             resetAngle();
@@ -100,11 +110,9 @@ public class OmniDirectionalDrive extends LinearOpMode {
         stopMotors();
     }
 
-    /**
-     * Resets the cumulative angle tracking to zero.
-     */
-    private void resetAngle()
-    {
+
+    private void resetAngle() {
+        //Resets the global angle
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         globalAngle = 0;
@@ -116,6 +124,19 @@ public class OmniDirectionalDrive extends LinearOpMode {
         robot.frontRightDriveMotor.setPower(0);
         robot.rearLeftDriveMotor.setPower(0);
         robot.rearRightDriveMotor.setPower(0);
+    }
+
+    private double[] calcMotorPowers(double leftStickX, double leftStickY, double rightStickX, double rightStickY, double correction) {
+        //Calculates the powers of each motor based on the controller input
+        //Accepts controller inputs from xbox joystick
+        //LeftStickX - strafe, LeftStickY - forward/backwards, rightStickJoystick controls turn angle
+        double r = Math.hypot(leftStickX, leftStickY);
+        double turnAngle = Math.atan2(rightStickY, rightStickX) - Math.PI / 4 + correction;
+        double rearLeftPower = r * Math.sin(turnAngle) + leftStickX;
+        double frontLeftPower = r * Math.cos(turnAngle) + leftStickX;
+        double rearRightPower = r * Math.cos(turnAngle) - leftStickX;
+        double frontRightPower = r * Math.sin(turnAngle) - leftStickX;
+        return new double[]{rearLeftPower, frontLeftPower, rearRightPower, frontRightPower};
     }
 
     private double to360(double angle) {
@@ -130,14 +151,34 @@ public class OmniDirectionalDrive extends LinearOpMode {
     }
 
     private double smallestAngleBetween(double angle1, double angle2) {
-        //Returns the smallest angle between angle1 and angle 2
-        //Accepts the range 0 - 360 for both angles
+        //Returns the smallest angle between angle1 and angle 2 and whether angle2 is to the left or right of angle 1
+        //Negative is counter-clockwise or to the left
+        //Accepts the range 0 - 360 for both angles, no euler units
+        double i;
+        double smallestAngleBetween;
         double distanceBetween = Math.abs(angle2 - angle1);
-        if ((360 - distanceBetween) < distanceBetween) {
-            return 360 - distanceBetween;
+
+        if (angle1 <= 180) {
+            if (angle2 < angle1 || angle2 > angle1 + 180) {
+                i= -1;
+            } else {
+                i = 1;
+            }
         } else {
-            return distanceBetween;
+            if (angle2 < angle1 || angle2 > angle1 - 180) {
+                i = -1;
+            } else {
+                i = 1;
+            }
         }
+
+        if ((360 - distanceBetween) < distanceBetween) {
+            smallestAngleBetween = 360 - distanceBetween;
+        } else {
+            smallestAngleBetween = distanceBetween;
+        }
+
+        return smallestAngleBetween*i;
     }
 }
 
