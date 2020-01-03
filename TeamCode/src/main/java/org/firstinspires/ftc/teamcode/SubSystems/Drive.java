@@ -371,4 +371,8 @@ public class Drive extends Subsystem {
         robot.mainClaw.setPosition(mainClawStone);
         robot.mainArm.setPosition(0.5);
     }
+
+    public void park() {
+        moveToPos2D(0.25,15,15); //temp position
+    }
 }
