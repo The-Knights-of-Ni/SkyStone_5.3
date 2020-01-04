@@ -97,9 +97,9 @@ public class TeleopMark2 extends LinearOpMode {
             dPadLeft = gamepad1.dpad_left;
             dPadRight = gamepad1.dpad_right;
             leftStickX2 = gamepad2.left_stick_x;
-            leftStickY2 = -gamepad2.left_stick_y;
+            leftStickY2 = gamepad2.left_stick_y;
             rightStickX2 = gamepad2.right_stick_x;
-            rightStickY2 = -gamepad2.right_stick_y;
+            rightStickY2 = gamepad2.right_stick_y;
             aButton2 = gamepad2.a;
             bButton2 = gamepad2.b;
             dPadUp2 = gamepad2.dpad_up;
