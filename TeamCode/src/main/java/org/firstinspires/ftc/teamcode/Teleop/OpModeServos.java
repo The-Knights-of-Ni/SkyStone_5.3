@@ -86,26 +86,35 @@ public class OpModeServos extends LinearOpMode {
 
             timeCurrent = timer.nanoseconds();
 
-            //Servos
-            if(aButton) {
-                robot.mainClaw.setPosition(robot.mainClaw.getPosition()+0.05);
+//            //Servos
+//            if(aButton) {
+//                robot.mainClaw.setPosition(robot.mainClaw.getPosition()+0.005);
+//
+//            }
+//
+//            if(bButton) {
+//                robot.mainClaw.setPosition(robot.mainClaw.getPosition()-0.005);
+//            }
+//
+//            if(aButton2) {
+//                robot.mainRotation.setPosition(robot.mainRotation.getPosition()+0.005);
+//            }
+//
+//            if(bButton2) {
+//                robot.mainRotation.setPosition(robot.mainRotation.getPosition()-0.005);
+//            }
+
+            if(gamepad1.a) {
+                robot.mainClaw.setPosition(0.3);
             }
 
-            if(bButton) {
-                robot.mainClaw.setPosition(robot.mainClaw.getPosition()-0.05);
-            }
-
-            if(aButton2) {
-                robot.mainRotation.setPosition(robot.mainRotation.getPosition()+0.05);
-            }
-
-            if(bButton2) {
-                robot.mainRotation.setPosition(robot.mainRotation.getPosition()-0.05);
+            if(gamepad1.b) {
+                robot.mainClaw.setPosition(0.8);
             }
 
 //            robot.mainClaw.setPosition(this.gamepad1.left_stick_x*0.5+0.5);
 //            robot.mainArm.setPosition(this.gamepad1.right_stick_x*0.5+0.5);
-//            robot.mainRotation.setPosition(this.gamepad2.left_stick_x*0.5+0.5);
+            robot.mainRotation.setPosition(this.gamepad2.left_stick_x*0.5+0.5);
 
             telemetry.addData("Main Claw Servo Position", robot.mainClaw.getPosition());
             telemetry.addData("Status", "Running");

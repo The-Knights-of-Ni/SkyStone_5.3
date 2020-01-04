@@ -86,26 +86,31 @@ public class OmniDirectionalDrive extends LinearOpMode {
             double rightStickY = gamepad1.right_stick_y;
 
             //Find the goal angle from the controller
-            double goalAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+            double goalAngle = Math.toDegrees(Math.atan2(leftStickY, leftStickX) - Math.PI / 4);
+            double goalAngle360 = to360(goalAngle);
 
             //Find the angle of the robot and convert it out of euler angle form
-            robotAngle = imu.getAngularOrientation().firstAngle;
+            robotAngle = Math.toDegrees(imu.getAngularOrientation().firstAngle);
             double robotAngle360 = to360(robotAngle);
-            //double correction = smallestAngleBetween(robotAngle360,goalAngle);
-             double correction = 0;
+            double correction = smallestAngleBetween(robotAngle360,goalAngle);
 
-            //Drive the robot
-            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,rightStickY, correction);
-            robot.rearLeftDriveMotor.setPower(motorPowers[0]);
-            robot.frontLeftDriveMotor.setPower(motorPowers[1]);
-            robot.rearRightDriveMotor.setPower(motorPowers[2]);
-            robot.frontRightDriveMotor.setPower(motorPowers[3]);
 
+//            //Drive the robot
+//            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,correction);
+//            robot.rearLeftDriveMotor.setPower(motorPowers[0]);
+//            robot.frontLeftDriveMotor.setPower(motorPowers[1]);
+//            robot.rearRightDriveMotor.setPower(motorPowers[2]);
+//            robot.frontRightDriveMotor.setPower(motorPowers[3]);
+
+
+            telemetry.addData("Correction", correction);
+            telemetry.addData("Goal angle", goalAngle);
+            telemetry.update();
 
             resetAngle();
-        }
 
 
+    }
 
         // turn the motors off.
         stopMotors();
@@ -127,16 +132,16 @@ public class OmniDirectionalDrive extends LinearOpMode {
         robot.rearRightDriveMotor.setPower(0);
     }
 
-    private double[] calcMotorPowers(double leftStickX, double leftStickY, double rightStickX, double rightStickY, double correction) {
+    private double[] calcMotorPowers(double leftStickX, double leftStickY, double rightStickX, double correction) {
         //Calculates the powers of each motor based on the controller input
         //Accepts controller inputs from xbox joystick
         //LeftStickX - strafe, LeftStickY - forward/backwards, rightStickJoystick controls turn angle
         double r = Math.hypot(leftStickX, leftStickY);
-        double turnAngle = Math.atan2(rightStickY, rightStickX) - Math.PI / 4 + correction;
-        double rearLeftPower = r * Math.sin(turnAngle) + leftStickX;
-        double frontLeftPower = r * Math.cos(turnAngle) + leftStickX;
-        double rearRightPower = r * Math.cos(turnAngle) - leftStickX;
-        double frontRightPower = r * Math.sin(turnAngle) - leftStickX;
+        double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double rearLeftPower = r * Math.sin(robotAngle) + rightStickX;
+        double frontLeftPower = r * Math.cos(robotAngle) + rightStickX;
+        double rearRightPower = r * Math.cos(robotAngle) - rightStickX;
+        double frontRightPower = r * Math.sin(robotAngle) - rightStickX;
         return new double[]{rearLeftPower, frontLeftPower, rearRightPower, frontRightPower};
     }
 
