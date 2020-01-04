@@ -85,8 +85,8 @@ public class Drive extends Subsystem {
     private static final double fClawRDown = 0.63;
 
     private static final double mainArmDown = 0.5; // TEMPORARY
-    private static final double mainClawOpen = 0.5; // TEMPORARY
-    private static final double mainClawClosed = 0.5; // TEMPORARY
+    private static final double mainClawOpen = 0.8; // TEMPORARY
+    private static final double mainClawClosed = 0.3; // TEMPORARY
     private static final double mainClawStone = 0.5; // TEMPORARY
 
     private boolean allianceRed = false;
