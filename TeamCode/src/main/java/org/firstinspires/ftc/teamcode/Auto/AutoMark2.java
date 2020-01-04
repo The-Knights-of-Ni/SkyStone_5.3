@@ -154,6 +154,19 @@ public class AutoMark2 extends LinearOpMode {
 //                telemetry.addData("Visible Target", "none");
 //            }
 //            telemetry.update();
+
+            robot.drive.moveForward(750); //move to foundation
+            robot.drive.lowerClawsToFoundation();
+            robot.drive.moveBackward(650); //move foundation back
+
+            // foundation claws back to original positions
+            robot.fClawL.setPosition(0.5);
+            robot.fClawL.setPosition(0.5);
+
+            robot.drive.moveRight(100);
+
+            //deliver stones
+
             robot.vision.vuMarkScan();
         }
 //
