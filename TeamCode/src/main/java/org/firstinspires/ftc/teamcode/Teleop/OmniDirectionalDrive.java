@@ -102,6 +102,9 @@ public class OmniDirectionalDrive extends LinearOpMode {
             robot.frontRightDriveMotor.setPower(motorPowers[3]);
 
 
+            telemetry.addData("Correction", correction);
+            telemetry.update();
+
             resetAngle();
         }
 
