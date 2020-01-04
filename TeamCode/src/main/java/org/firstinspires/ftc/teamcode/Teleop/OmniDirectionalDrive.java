@@ -101,7 +101,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
 
             //Drive the robot
-            double motorPowers[] = calcMotorPowers(leftStickX + correctionX,leftStickY + correctionY,rightStickX);
+            double motorPowers[] = calcMotorPowers(correctionX,correctionY,rightStickX);
             robot.rearLeftDriveMotor.setPower(motorPowers[0]);
             robot.frontLeftDriveMotor.setPower(motorPowers[1]);
             robot.rearRightDriveMotor.setPower(motorPowers[2]);

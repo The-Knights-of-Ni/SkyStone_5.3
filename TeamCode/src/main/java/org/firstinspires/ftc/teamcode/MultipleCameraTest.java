@@ -22,8 +22,8 @@ import org.openftc.easyopencv.OpenCvPipeline;
 @TeleOp (name = "MCT1")
 public class MultipleCameraTest extends LinearOpMode
 {
-    OpenCvCamera phoneCam;
-    OpenCvCamera webcam;
+    OpenCvCamera webCam1;
+    OpenCvCamera webCam2;
 
     @Override
     public void runOpMode()
@@ -51,25 +51,25 @@ public class MultipleCameraTest extends LinearOpMode
                         OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY); //Whether to split the container vertically or horizontally
 
 //        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[0]);
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
-        phoneCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[0]);
+        webCam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[0]);
+        webCam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
 
 
-        phoneCam.openCameraDevice();
-        webcam.openCameraDevice();
+        webCam1.openCameraDevice();
+        webCam2.openCameraDevice();
 
-        phoneCam.setPipeline(new UselessGreenBoxDrawingPipeline());
-        webcam.setPipeline(new UselessGreenBoxDrawingPipeline());
+        webCam1.setPipeline(new UselessGreenBoxDrawingPipeline());
+        webCam2.setPipeline(new UselessGreenBoxDrawingPipeline());
 
-        phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-        webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+        webCam1.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+        webCam2.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
 
         waitForStart();
 
         while (opModeIsActive())
         {
-            telemetry.addData("Internal cam FPS", phoneCam.getFps());
-            telemetry.addData("Webcam FPS", webcam.getFps());
+            telemetry.addData("WebCam 1 FPS", webCam1.getFps());
+            telemetry.addData("Webcam 2 FPS", webCam2.getFps());
             telemetry.update();
 
             sleep(100);
