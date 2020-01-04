@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -96,7 +95,6 @@ public class MultipleCameraTest extends LinearOpMode
         }
     }
 }
-=======
 //package org.firstinspires.ftc.teamcode;
 //
 //import android.graphics.Camera;
@@ -197,4 +195,3 @@ public class MultipleCameraTest extends LinearOpMode
 //        }
 //    }
 //}
->>>>>>> 0f69391fcb593606012c5f09b36ad61d70407357
