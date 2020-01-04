@@ -95,12 +95,12 @@ public class OmniDirectionalDrive extends LinearOpMode {
             double correction = smallestAngleBetween(robotAngle360,goalAngle);
 
 
-//            //Drive the robot
-//            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,correction);
-//            robot.rearLeftDriveMotor.setPower(motorPowers[0]);
-//            robot.frontLeftDriveMotor.setPower(motorPowers[1]);
-//            robot.rearRightDriveMotor.setPower(motorPowers[2]);
-//            robot.frontRightDriveMotor.setPower(motorPowers[3]);
+            //Drive the robot
+            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,correction);
+            robot.rearLeftDriveMotor.setPower(motorPowers[0]);
+            robot.frontLeftDriveMotor.setPower(motorPowers[1]);
+            robot.rearRightDriveMotor.setPower(motorPowers[2]);
+            robot.frontRightDriveMotor.setPower(motorPowers[3]);
 
 
             telemetry.addData("Correction", correction);
@@ -140,7 +140,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
         //Accepts controller inputs from xbox joystick
         //LeftStickX - strafe, LeftStickY - forward/backwards, rightStickJoystick controls turn angle
         double r = Math.hypot(leftStickX, leftStickY);
-        double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double robotAngle = correction + Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
         double rearLeftPower = r * Math.sin(robotAngle) + rightStickX;
         double frontLeftPower = r * Math.cos(robotAngle) + rightStickX;
         double rearRightPower = r * Math.cos(robotAngle) - rightStickX;
