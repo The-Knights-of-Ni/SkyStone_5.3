@@ -17,6 +17,7 @@ public class EncoderTest extends LinearOpMode {
     private static final int targetPosition = 315;
     private static final double maxPower = 0;
     private Robot robot;
+    private double currentPos;
 
     public void initOpMode(){
         ElapsedTime timer = new ElapsedTime();
@@ -39,7 +40,10 @@ public class EncoderTest extends LinearOpMode {
 
 //
         while (opModeIsActive()) {
-            telemetry.addData("tilt", robot.armTilt.getCurrentPosition());
+            currentPos = robot.armTilt.getCurrentPosition();
+            telemetry.addData("tilt", currentPos);
+            telemetry.addData("tiltAngle", (currentPos / robot.drive.getMotorTickPerRevYellojacket223()) * 360.0);
+
             telemetry.update();
         }
 //        robot.xRailWinch.setPower(0.5);

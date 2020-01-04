@@ -123,6 +123,10 @@ public class Drive extends Subsystem {
         return ANGULAR_V_MAX_NEVERREST_20;
     }
 
+    public double getMotorTickPerRevYellojacket223(){
+        return MOTOR_TICK_PER_REV_YELLOJACKET223;
+    }
+
 
     /**
      * Stops all drive motors
