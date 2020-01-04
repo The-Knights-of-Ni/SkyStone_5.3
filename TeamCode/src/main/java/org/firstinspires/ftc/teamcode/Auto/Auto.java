@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode.Auto;
 
+import org.firstinspires.ftc.teamcode.Robot;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -55,6 +57,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 @Autonomous(name = "Auto", group = "Concept")
 
 public class Auto extends LinearOpMode {
+    private Robot robot;
+
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
@@ -131,6 +135,13 @@ public class Auto extends LinearOpMode {
                         telemetry.update();
                     }
                 }
+                robot.drive.moveForward(750); //move to foundation
+                robot.drive.lowerClawsToFoundation();
+                robot.drive.moveBackward(750);
+
+                // foundation claws back to original positions
+                robot.fClawL.setPosition(0.5);
+                robot.fClawL.setPosition(0.5);
             }
         }
 
