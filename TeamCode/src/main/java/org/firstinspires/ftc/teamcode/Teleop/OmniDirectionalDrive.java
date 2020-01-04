@@ -106,6 +106,8 @@ public class OmniDirectionalDrive extends LinearOpMode {
             telemetry.addData("Correction", correction);
             telemetry.addData("Goal angle", goalAngle);
             telemetry.addData("Goal angle 360", goalAngle360);
+            telemetry.addData("Robot angle", robotAngle);
+            telemetry.addData("Robot angle 360", robotAngle360);
             telemetry.update();
 
             resetAngle();
