@@ -42,7 +42,7 @@ public class EncoderTest extends LinearOpMode {
         while (opModeIsActive()) {
             currentPos = robot.armTilt.getCurrentPosition();
             telemetry.addData("tilt", currentPos);
-            telemetry.addData("tiltAngle", (currentPos / robot.drive.getMotorTickPerRevYellojacket223()) * 360.0);
+            telemetry.addData("tiltAngle", (currentPos / 2510.0) * 90.0);
 
             telemetry.update();
         }

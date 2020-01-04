@@ -55,6 +55,7 @@ public class TeleopMark2 extends LinearOpMode {
     int tiltTargetPositionPre = 0;
     int tiltPosError = 300;
     int tiltMax = 1200;
+    double tiltCurrentAngle;
 
 //    int clawTiltCurrentPosition = 0;
 //    int clawTiltTargetPositionCurrent = 0;

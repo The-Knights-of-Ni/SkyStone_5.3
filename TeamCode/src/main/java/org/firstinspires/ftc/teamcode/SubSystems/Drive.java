@@ -67,6 +67,7 @@ public class Drive extends Subsystem {
     private static final double     WINCH_MAX_SPEED_MM_PER_SEC          = (160.0 * WINCH_DIAMETER_MM * Math.PI) / 60.0;
     private static final double     WINCH_MAX_SPEED_TICK_PER_SEC        = (MOTOR_TICK_PER_REV_NEVERREST40 * 160.0) / 60.0;
     private static final double     TILT_MAX_SPEED_TICK_PER_SEC         = (MOTOR_TICK_PER_REV_YELLOJACKET223 * REV_PER_MIN_YELLOJACKET223) / 60.0;
+    private static final double     TILT_TICK_PER_90_DEGREE             = 2510.0;
 
     private static final double     DRIVE_SPEED             = 0.4;
     private static final double     TURN_SPEED              = 0.3;
@@ -110,22 +111,22 @@ public class Drive extends Subsystem {
     public double getWinchMaxSpeedMMpSec(){
         return WINCH_MAX_SPEED_MM_PER_SEC;
     }
-
     public double getWinchMaxSpeedTickPerSec(){
         return WINCH_MAX_SPEED_TICK_PER_SEC;
     }
-
     public double getTiltMaxSpeedTickPerSec(){
         return TILT_MAX_SPEED_TICK_PER_SEC;
     }
-
     public double getAngularVMaxNeverrest20(){
         return ANGULAR_V_MAX_NEVERREST_20;
     }
-
     public double getMotorTickPerRevYellojacket223(){
         return MOTOR_TICK_PER_REV_YELLOJACKET223;
     }
+    public double getTiltTickPer90Degree(){
+        return TILT_TICK_PER_90_DEGREE;
+    }
+
 
 
     /**
