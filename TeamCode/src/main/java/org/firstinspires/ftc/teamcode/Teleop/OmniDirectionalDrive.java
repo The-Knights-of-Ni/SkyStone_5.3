@@ -86,7 +86,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
             double rightStickY = gamepad1.right_stick_y;
 
             //Find the goal angle from the controller
-            double goalAngle = Math.toDegrees(Math.atan2(leftStickY, leftStickX) - Math.PI / 4);
+            double goalAngle = -Math.toDegrees(Math.atan2(leftStickY, leftStickX) - Math.PI / 2);
             double goalAngle360 = to360(goalAngle);
 
             //Find the angle of the robot and convert it out of euler angle form
@@ -105,6 +105,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
             telemetry.addData("Correction", correction);
             telemetry.addData("Goal angle", goalAngle);
+            telemetry.addData("Goal angle 360", goalAngle360);
             telemetry.update();
 
             resetAngle();
