@@ -29,6 +29,12 @@ public class ServoTest extends LinearOpMode {
 
     private Robot robot;
 
+    boolean aButton;
+    boolean isaButtonPressedPrev =false;
+    boolean bButton;
+    boolean isbButtonPressedPrev = false;
+
+
     public void initOpMode(){
         ElapsedTime timer = new ElapsedTime();
         this.robot = new Robot(this, timer);
@@ -36,20 +42,37 @@ public class ServoTest extends LinearOpMode {
     }
     public void runOpMode() {
         initOpMode();
+        aButton = gamepad1.a;
+        bButton = gamepad1.b;
         telemetry.addLine("Wait For Start");
         telemetry.update();
         waitForStart();
-        robot.fClawL.setPosition(0.5);
-        robot.fClawR.setPosition(0.5);
+//        robot.fClawL.setPosition(0.5);
+//        robot.fClawR.setPosition(0.5);
+//
+//        robot.mainArm.setPosition(1.0);
+//        robot.mainClaw.setPosition(0.5);
 
-        robot.mainArm.setPosition(1.0);
-        robot.mainClaw.setPosition(0.5);
+        while(opModeIsActive()){
+            if (!isaButtonPressedPrev) {
+                robot.mainArm.setPosition(robot.mainArm.getPosition() + 0.05);
+                isaButtonPressedPrev = true;
+            }
+            if(!isbButtonPressedPrev){
+                robot.mainArm.setPosition(robot.mainArm.getPosition() - 0.05);
+                isbButtonPressedPrev = true;
+            }
+            if (isaButtonPressedPrev) {
+                isaButtonPressedPrev = false;
+            }
+            if(isbButtonPressedPrev){
+                isbButtonPressedPrev = false;
+            }
 
-//        while(opModeIsActive()){
-//            telemetry.addData("fClawR", robot.fClawR.getPosition());
-//            telemetry.addData("fClawL", robot.fClawL.getPosition());
-//            telemetry.update();
-//        }
+            telemetry.addData("fClawR", robot.fClawR.getPosition());
+            telemetry.addData("fClawL", robot.fClawL.getPosition());
+            telemetry.update();
+        }
 
     }
 }
