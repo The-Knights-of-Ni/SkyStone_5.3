@@ -40,7 +40,7 @@ public class OpenCVTest extends LinearOpMode {
     public void runOpMode() {
         initOpMode();
         waitForStart();
-        int maxID = 100;
+        int maxID = 500;
         Mat frame = new Mat();
 
         for (int idx = 0; idx < maxID; idx++) {
@@ -54,10 +54,13 @@ public class OpenCVTest extends LinearOpMode {
                     telemetry.addData("id %d opens: OK grabs: OK", idx);
                 }
             }
+            else {
+                telemetry.addData("id %d opens: FAIL", idx);
+            }
 
             telemetry.update();
             camera.release();
-            sleep(1000);
+            sleep(400);
         }
 
     }
