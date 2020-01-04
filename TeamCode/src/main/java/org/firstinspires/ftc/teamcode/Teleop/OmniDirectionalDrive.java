@@ -20,6 +20,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
     private Robot robot;
     private BNO055IMU imu;
     double robotAngle;
+    double turnAngle;
     Orientation lastAngles = new Orientation();
     double                  globalAngle, power = .30;
 
@@ -51,6 +52,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
         imu.initialize(parameters);
 
         double robotAngle;
+
 
 
         telemetry.addData("Mode", "calibrating...");
@@ -108,6 +110,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
             telemetry.addData("Goal angle 360", goalAngle360);
             telemetry.addData("Robot angle", robotAngle);
             telemetry.addData("Robot angle 360", robotAngle360);
+            telemetry.addData("Corrected Angle", turnAngle);
             telemetry.update();
 
             resetAngle();
@@ -140,13 +143,11 @@ public class OmniDirectionalDrive extends LinearOpMode {
         //Accepts controller inputs from xbox joystick
         //LeftStickX - strafe, LeftStickY - forward/backwards, rightStickJoystick controls turn angle
         double r = Math.hypot(leftStickX, leftStickY);
-        double robotAngle = correction + Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
-        telemetry.addData("corrected angle",robotAngle);
-        telemetry.update();
-        double rearLeftPower = r * Math.sin(robotAngle) + rightStickX;
-        double frontLeftPower = r * Math.cos(robotAngle) + rightStickX;
-        double rearRightPower = r * Math.cos(robotAngle) - rightStickX;
-        double frontRightPower = r * Math.sin(robotAngle) - rightStickX;
+        turnAngle = correction + Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double rearLeftPower = r * Math.sin(turnAngle) + rightStickX;
+        double frontLeftPower = r * Math.cos(turnAngle) + rightStickX;
+        double rearRightPower = r * Math.cos(turnAngle) - rightStickX;
+        double frontRightPower = r * Math.sin(turnAngle) - rightStickX;
         return new double[]{rearLeftPower, frontLeftPower, rearRightPower, frontRightPower};
     }
 
