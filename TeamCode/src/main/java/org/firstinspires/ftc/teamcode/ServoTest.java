@@ -47,6 +47,7 @@ public class ServoTest extends LinearOpMode {
         telemetry.addLine("Wait For Start");
         telemetry.update();
         waitForStart();
+        robot.mainArm.setPosition(0);
 //        robot.fClawL.setPosition(0.5);
 //        robot.fClawR.setPosition(0.5);
 //
@@ -54,6 +55,8 @@ public class ServoTest extends LinearOpMode {
 //        robot.mainClaw.setPosition(0.5);
 
         while(opModeIsActive()){
+            aButton = gamepad1.a;
+            bButton = gamepad1.b;
             if (!isaButtonPressedPrev) {
                 robot.mainArm.setPosition(robot.mainArm.getPosition() + 0.05);
                 isaButtonPressedPrev = true;
@@ -69,9 +72,9 @@ public class ServoTest extends LinearOpMode {
                 isbButtonPressedPrev = false;
             }
 
-            telemetry.addData("fClawR", robot.fClawR.getPosition());
-            telemetry.addData("fClawL", robot.fClawL.getPosition());
+            telemetry.addData("mainArm", robot.mainArm.getPosition());
             telemetry.update();
+            sleep(10);
         }
 
     }
