@@ -55,7 +55,7 @@ public class TeleopMark2 extends LinearOpMode {
     int tiltTargetPositionPre = 0;
     int tiltPosError = 300;
     int tiltMax = 1200;
-    double tiltCurrentAngle;
+    double tiltCurrentAngle = 0;
 
 //    int clawTiltCurrentPosition = 0;
 //    int clawTiltTargetPositionCurrent = 0;
@@ -202,6 +202,8 @@ public class TeleopMark2 extends LinearOpMode {
                 robot.armTilt.setTargetPosition(tiltTargetPositionCurrent);
                 tiltTargetPositionPre = tiltTargetPositionCurrent;
             }
+
+            tiltCurrentAngle = ((tiltCurrentPosition / 2510.0) * 90.0);
 
 //            //Find how much the claw is tilted
 //            clawTiltCurrentPosition = (int) robot.mainArm.getPosition();
