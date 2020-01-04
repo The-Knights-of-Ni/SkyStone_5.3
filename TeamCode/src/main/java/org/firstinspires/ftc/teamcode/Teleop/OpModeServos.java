@@ -84,7 +84,6 @@ public class OpModeServos extends LinearOpMode {
             bumperLeft2 = gamepad2.left_bumper;
             bumperRight2 = gamepad2.right_bumper;
 
-
             timeCurrent = timer.nanoseconds();
 
             //Servos
@@ -97,19 +96,11 @@ public class OpModeServos extends LinearOpMode {
             }
 
             if(aButton2) {
-                robot.mainArm.setPosition(robot.mainArm.getPosition()+0.05);
+                robot.mainRotation.setPosition(robot.mainRotation.getPosition()+0.05);
             }
 
             if(bButton2) {
-                robot.mainArm.setPosition(robot.mainArm.getPosition()-0.05);
-            }
-
-            if(gamepad1.x) {
-                robot.mainArm.setPosition(robot.mainArm.getPosition()+0.05);
-            }
-
-            if(gamepad1.y) {
-                robot.mainArm.setPosition(robot.mainArm.getPosition()-0.05);
+                robot.mainRotation.setPosition(robot.mainRotation.getPosition()-0.05);
             }
 
 //            robot.mainClaw.setPosition(this.gamepad1.left_stick_x*0.5+0.5);
