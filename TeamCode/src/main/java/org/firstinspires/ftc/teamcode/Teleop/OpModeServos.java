@@ -88,27 +88,27 @@ public class OpModeServos extends LinearOpMode {
             timeCurrent = timer.nanoseconds();
 
             //Servos
-            if(dPadUp) {
+            if(aButton) {
                 robot.mainClaw.setPosition(robot.mainClaw.getPosition()+0.05);
             }
 
-            if(dPadDown) {
+            if(bButton) {
                 robot.mainClaw.setPosition(robot.mainClaw.getPosition()-0.05);
             }
 
-            if(dPadUp2) {
+            if(aButton2) {
                 robot.mainArm.setPosition(robot.mainArm.getPosition()+0.05);
             }
 
-            if(dPadDown2) {
+            if(bButton2) {
                 robot.mainArm.setPosition(robot.mainArm.getPosition()-0.05);
             }
 
-            if(aButton) {
+            if(gamepad1.x) {
                 robot.mainArm.setPosition(robot.mainArm.getPosition()+0.05);
             }
 
-            if(bButton) {
+            if(gamepad1.y) {
                 robot.mainArm.setPosition(robot.mainArm.getPosition()-0.05);
             }
 
