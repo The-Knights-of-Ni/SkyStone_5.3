@@ -104,8 +104,12 @@ public class OpModeServos extends LinearOpMode {
 //                robot.mainRotation.setPosition(robot.mainRotation.getPosition()-0.005);
 //            }
 
-            robot.mainClaw.setPosition(this.gamepad1.left_stick_x*0.5+0.5);
-            robot.mainArm.setPosition(this.gamepad1.right_stick_x*0.5+0.5);
+            if(gamepad1.a) {
+                robot.mainClaw.setPosition(0.3);
+            }
+
+//            robot.mainClaw.setPosition(this.gamepad1.left_stick_x*0.5+0.5);
+//            robot.mainArm.setPosition(this.gamepad1.right_stick_x*0.5+0.5);
             robot.mainRotation.setPosition(this.gamepad2.left_stick_x*0.5+0.5);
 
             telemetry.addData("Main Claw Servo Position", robot.mainClaw.getPosition());
