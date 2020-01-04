@@ -64,7 +64,7 @@ public class MultipleCameraTest extends LinearOpMode
         phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
         webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
 
-        waitForStart(); 
+        waitForStart();
 
         while (opModeIsActive())
         {
