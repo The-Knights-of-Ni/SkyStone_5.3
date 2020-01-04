@@ -81,11 +81,11 @@ public class ServoTest extends LinearOpMode {
             }
 
             if (xButton && !isxButtonPressedPrev) {
-                robot.mainArm.setPosition(0.83);
+                robot.mainArm.setPosition(0.85);
                 isxButtonPressedPrev = true;
             }
             if(yButton && !isyButtonPressedPrev){
-                robot.mainArm.setPosition(0.05);
+                robot.mainArm.setPosition(0.08);
                 isyButtonPressedPrev = true;
             }
             if (!xButton) {
