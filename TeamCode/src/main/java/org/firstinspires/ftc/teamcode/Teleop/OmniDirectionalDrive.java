@@ -92,10 +92,10 @@ public class OmniDirectionalDrive extends LinearOpMode {
             robotAngle = imu.getAngularOrientation().firstAngle;
             double robotAngle360 = to360(robotAngle);
             //double correction = smallestAngleBetween(robotAngle360,goalAngle);
-             double correction = 0;
+            double correction = 0;
 
             //Drive the robot
-            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,rightStickY, correction);
+            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,correction);
             robot.rearLeftDriveMotor.setPower(motorPowers[0]);
             robot.frontLeftDriveMotor.setPower(motorPowers[1]);
             robot.rearRightDriveMotor.setPower(motorPowers[2]);
@@ -127,16 +127,16 @@ public class OmniDirectionalDrive extends LinearOpMode {
         robot.rearRightDriveMotor.setPower(0);
     }
 
-    private double[] calcMotorPowers(double leftStickX, double leftStickY, double rightStickX, double rightStickY, double correction) {
+    private double[] calcMotorPowers(double leftStickX, double leftStickY, double rightStickX, double correction) {
         //Calculates the powers of each motor based on the controller input
         //Accepts controller inputs from xbox joystick
         //LeftStickX - strafe, LeftStickY - forward/backwards, rightStickJoystick controls turn angle
         double r = Math.hypot(leftStickX, leftStickY);
-        double turnAngle = Math.atan2(rightStickY, rightStickX) - Math.PI / 4 + correction;
-        double rearLeftPower = r * Math.sin(turnAngle) + leftStickX;
-        double frontLeftPower = r * Math.cos(turnAngle) + leftStickX;
-        double rearRightPower = r * Math.cos(turnAngle) - leftStickX;
-        double frontRightPower = r * Math.sin(turnAngle) - leftStickX;
+        double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double rearLeftPower = r * Math.sin(robotAngle) + rightStickX;
+        double frontLeftPower = r * Math.cos(robotAngle) + rightStickX;
+        double rearRightPower = r * Math.cos(robotAngle) - rightStickX;
+        double frontRightPower = r * Math.sin(robotAngle) - rightStickX;
         return new double[]{rearLeftPower, frontLeftPower, rearRightPower, frontRightPower};
     }
 
