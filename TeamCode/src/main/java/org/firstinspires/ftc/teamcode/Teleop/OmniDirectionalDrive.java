@@ -89,13 +89,13 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
             //Find the goal angle from the controller
             double goalAngle = -Math.toDegrees(Math.atan2(leftStickY, leftStickX) - Math.PI / 2);
-            double goalAngle360 = to360(goalAngle);
+            double goalAngle360 = to360(goalAngle); 
 
             //Find the angle of the robot and convert it out of euler angle form
             robotAngle = imu.getAngularOrientation().firstAngle;
             double robotAngle360 = to360(robotAngle);
-            double correction = smallestAngleBetween(robotAngle360,goalAngle);
-            double corrected = goalAngle + correction;
+            double correction = smallestAngleBetween(robotAngle360,goalAngle360);
+            double corrected = goalAngle360 + correction;
             double correctionX = toXY(corrected)[0];
             double correctionY = toXY(corrected)[1];
 
@@ -112,9 +112,10 @@ public class OmniDirectionalDrive extends LinearOpMode {
             telemetry.addData("Correction", correction);
             telemetry.addData("Robot angle 360", robotAngle360);
             telemetry.addData("CorrectionsX", toXY(correction)[0]);
-            telemetry.addData("CorrectionsY", toXY(correction)[1]);
             telemetry.addData("GoalX", toXY(goalAngle360)[0]);
+            telemetry.addData("CorrectionsY", toXY(correction)[1]);
             telemetry.addData("GoalY", toXY(goalAngle360)[1]);
+
 
             telemetry.update();
 
