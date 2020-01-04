@@ -94,15 +94,16 @@ public class OmniDirectionalDrive extends LinearOpMode {
             double correction = smallestAngleBetween(robotAngle360,goalAngle);
 
 
-            //Drive the robot
-            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,correction);
-            robot.rearLeftDriveMotor.setPower(motorPowers[0]);
-            robot.frontLeftDriveMotor.setPower(motorPowers[1]);
-            robot.rearRightDriveMotor.setPower(motorPowers[2]);
-            robot.frontRightDriveMotor.setPower(motorPowers[3]);
+//            //Drive the robot
+//            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,correction);
+//            robot.rearLeftDriveMotor.setPower(motorPowers[0]);
+//            robot.frontLeftDriveMotor.setPower(motorPowers[1]);
+//            robot.rearRightDriveMotor.setPower(motorPowers[2]);
+//            robot.frontRightDriveMotor.setPower(motorPowers[3]);
 
 
             telemetry.addData("Correction", correction);
+            telemetry.addData("Goal angle", goalAngle);
             telemetry.update();
 
             resetAngle();
