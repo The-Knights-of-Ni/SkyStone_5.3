@@ -95,6 +95,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
 
 
 
+
             resetAngle();
 
 
@@ -125,7 +126,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
         //Accepts controller inputs from xbox joystick
         //LeftStickX - strafe, LeftStickY - forward/backwards, rightStickJoystick controls turn angle
         double r = Math.hypot(leftStickX, leftStickY);
-        turnAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double turnAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
         double rearLeftPower = r * Math.sin(turnAngle) + rightStickX;
         double frontLeftPower = r * Math.cos(turnAngle) + rightStickX;
         double rearRightPower = r * Math.cos(turnAngle) - rightStickX;
