@@ -141,6 +141,8 @@ public class OmniDirectionalDrive extends LinearOpMode {
         //LeftStickX - strafe, LeftStickY - forward/backwards, rightStickJoystick controls turn angle
         double r = Math.hypot(leftStickX, leftStickY);
         double robotAngle = correction + Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        telemetry.addData("corrected angle",robotAngle);
+        telemetry.update();
         double rearLeftPower = r * Math.sin(robotAngle) + rightStickX;
         double frontLeftPower = r * Math.cos(robotAngle) + rightStickX;
         double rearRightPower = r * Math.cos(robotAngle) - rightStickX;
