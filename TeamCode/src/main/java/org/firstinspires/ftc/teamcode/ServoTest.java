@@ -33,6 +33,10 @@ public class ServoTest extends LinearOpMode {
     boolean isaButtonPressedPrev =false;
     boolean bButton;
     boolean isbButtonPressedPrev = false;
+    boolean xButton;
+    boolean isxButtonPressedPrev =false;
+    boolean yButton;
+    boolean isyButtonPressedPrev = false;
 
 
     public void initOpMode(){
@@ -59,6 +63,8 @@ public class ServoTest extends LinearOpMode {
         while(opModeIsActive()){
             aButton = gamepad1.a;
             bButton = gamepad1.b;
+            xButton = gamepad1.x;
+            yButton = gamepad1.y;
             if (aButton && !isaButtonPressedPrev && ((robot.mainArm.getPosition()+0.05) < 1.0)) {
                 robot.mainArm.setPosition(robot.mainArm.getPosition() + 0.05);
                 isaButtonPressedPrev = true;
@@ -73,6 +79,22 @@ public class ServoTest extends LinearOpMode {
             if(!bButton){
                 isbButtonPressedPrev = false;
             }
+
+            if (xButton && !isxButtonPressedPrev) {
+                robot.mainArm.setPosition(0.83);
+                isxButtonPressedPrev = true;
+            }
+            if(yButton && !isyButtonPressedPrev){
+                robot.mainArm.setPosition(0.05);
+                isyButtonPressedPrev = true;
+            }
+            if (!xButton) {
+                isxButtonPressedPrev = false;
+            }
+            if(!yButton){
+                isyButtonPressedPrev = false;
+            }
+
 
             telemetry.addData("mainArm", robot.mainArm.getPosition());
             telemetry.update();
