@@ -95,8 +95,9 @@ public class OmniDirectionalDrive extends LinearOpMode {
             robotAngle = imu.getAngularOrientation().firstAngle;
             double robotAngle360 = to360(robotAngle);
             double correction = smallestAngleBetween(robotAngle360,goalAngle);
-            double correctionX = toXY(correction)[0];
-            double correctionY = toXY(correction)[1];
+            double corrected = goalAngle + correction;
+            double correctionX = toXY(corrected)[0];
+            double correctionY = toXY(corrected)[1];
 
 
             //Drive the robot
