@@ -90,7 +90,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
             double goalAngle360 = to360(goalAngle);
 
             //Find the angle of the robot and convert it out of euler angle form
-            robotAngle = Math.toDegrees(imu.getAngularOrientation().firstAngle);
+            robotAngle = imu.getAngularOrientation().firstAngle;
             double robotAngle360 = to360(robotAngle);
             double correction = smallestAngleBetween(robotAngle360,goalAngle);
 
