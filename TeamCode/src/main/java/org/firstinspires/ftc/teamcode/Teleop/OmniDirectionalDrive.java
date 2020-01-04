@@ -95,22 +95,27 @@ public class OmniDirectionalDrive extends LinearOpMode {
             robotAngle = imu.getAngularOrientation().firstAngle;
             double robotAngle360 = to360(robotAngle);
             double correction = smallestAngleBetween(robotAngle360,goalAngle);
+            double correctionX = toXY(correction)[0];
+            double correctionY = toXY(correction)[1];
 
 
             //Drive the robot
-            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX,correction);
+            double motorPowers[] = calcMotorPowers(leftStickX + correctionX,leftStickY + correctionY,rightStickX);
             robot.rearLeftDriveMotor.setPower(motorPowers[0]);
             robot.frontLeftDriveMotor.setPower(motorPowers[1]);
             robot.rearRightDriveMotor.setPower(motorPowers[2]);
             robot.frontRightDriveMotor.setPower(motorPowers[3]);
 
 
+            telemetry.addData("Goal angle 360", goalAngle360);
             telemetry.addData("Correction", correction);
             telemetry.addData("Goal angle", goalAngle);
-            telemetry.addData("Goal angle 360", goalAngle360);
             telemetry.addData("Robot angle", robotAngle);
             telemetry.addData("Robot angle 360", robotAngle360);
             telemetry.addData("Corrected Angle", turnAngle);
+            telemetry.addData("CorrectionsX", toXY(correction)[0]);
+            telemetry.addData("CorrectionsY", toXY(correction)[1]);
+
             telemetry.update();
 
             resetAngle();
@@ -138,12 +143,12 @@ public class OmniDirectionalDrive extends LinearOpMode {
         robot.rearRightDriveMotor.setPower(0);
     }
 
-    private double[] calcMotorPowers(double leftStickX, double leftStickY, double rightStickX, double correction) {
+    private double[] calcMotorPowers(double leftStickX, double leftStickY, double rightStickX) {
         //Calculates the powers of each motor based on the controller input
         //Accepts controller inputs from xbox joystick
         //LeftStickX - strafe, LeftStickY - forward/backwards, rightStickJoystick controls turn angle
         double r = Math.hypot(leftStickX, leftStickY);
-        turnAngle = correction + Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        turnAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
         double rearLeftPower = r * Math.sin(turnAngle) + rightStickX;
         double frontLeftPower = r * Math.cos(turnAngle) + rightStickX;
         double rearRightPower = r * Math.cos(turnAngle) - rightStickX;
@@ -160,6 +165,12 @@ public class OmniDirectionalDrive extends LinearOpMode {
         } else {
             return angle + 360;
         }
+    }
+
+    private double[] toXY(double angle) {
+        double y = Math.sin(angle);
+        double x = Math.cos(angle);
+        return new double[]{x,y};
     }
 
     private double smallestAngleBetween(double angle1, double angle2) {
