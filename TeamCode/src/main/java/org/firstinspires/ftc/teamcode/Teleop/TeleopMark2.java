@@ -205,6 +205,8 @@ public class TeleopMark2 extends LinearOpMode {
 
             tiltCurrentAngle = ((tiltCurrentPosition / 2510.0) * 90.0);
 
+            robot.mainArm.setPosition(robot.drive.mainArmAngletoPos(tiltCurrentAngle));
+
 //            //Find how much the claw is tilted
 //            clawTiltCurrentPosition = (int) robot.mainArm.getPosition();
 //

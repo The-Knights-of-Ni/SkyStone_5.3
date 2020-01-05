@@ -389,4 +389,8 @@ public class Drive extends Subsystem {
     public void park() {
         moveToPos2D(0.25,15,15); //temp position
     }
+
+    public double mainArmAngletoPos(double angle){
+        return ((angle / 180.0) * (this.getClawArmPos180Deg() - this.getClawArmPos0Deg()));
+    }
 }
