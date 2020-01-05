@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCharacteristics;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -24,6 +25,10 @@ public class MultipleCameraTest extends LinearOpMode
 {
     OpenCvCamera webCam1;
     OpenCvCamera webCam2;
+
+    CameraCharacteristics webCam1Characteristics;
+    CameraCharacteristics webCam2Characteristics;
+
 
     @Override
     public void runOpMode()
@@ -57,6 +62,8 @@ public class MultipleCameraTest extends LinearOpMode
 
         webCam1.openCameraDevice();
         webCam2.openCameraDevice();
+
+        webCam1Characteristics = webCam1.
 
         webCam1.setPipeline(new UselessGreenBoxDrawingPipeline());
         webCam2.setPipeline(new UselessGreenBoxDrawingPipeline());
