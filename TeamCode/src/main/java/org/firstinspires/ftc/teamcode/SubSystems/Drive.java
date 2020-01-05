@@ -388,6 +388,16 @@ public class Drive extends Subsystem {
 
     public void park() {
         moveToPos2D(0.25,15,15); //temp position
+        // change to where the tape is
+    }
+
+    public void dropStone() {
+        // lower arm
+        // rotate?
+        robot.mainArm.setPosition(mainArmDown);
+        robot.mainClaw.setPosition(mainClawOpen);
+        robot.mainArm.setPosition(0.5);
+        robot.mainClaw.setPosition(0);
     }
 
     public double mainArmAngletoPos(double angle){
