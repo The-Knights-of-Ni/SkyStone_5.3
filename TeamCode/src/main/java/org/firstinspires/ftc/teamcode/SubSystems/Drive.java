@@ -69,6 +69,9 @@ public class Drive extends Subsystem {
     private static final double     TILT_MAX_SPEED_TICK_PER_SEC         = (MOTOR_TICK_PER_REV_YELLOJACKET223 * REV_PER_MIN_YELLOJACKET223) / 60.0;
     private static final double     TILT_TICK_PER_90_DEGREE             = 2510.0;
 
+    private static final double     CLAW_ARM_POS_0_DEG                  = 0.08; // xRail horizontal and main claw facing down
+    private static final double     CLAW_ARM_POS_180_DEG                = 0.85;
+
     private static final double     DRIVE_SPEED             = 0.4;
     private static final double     TURN_SPEED              = 0.3;
 
@@ -125,6 +128,12 @@ public class Drive extends Subsystem {
     }
     public double getTiltTickPer90Degree(){
         return TILT_TICK_PER_90_DEGREE;
+    }
+    public double getClawArmPos0Deg(){
+        return CLAW_ARM_POS_0_DEG;
+    }
+    public double getClawArmPos180Deg(){
+        return CLAW_ARM_POS_180_DEG;
     }
 
 

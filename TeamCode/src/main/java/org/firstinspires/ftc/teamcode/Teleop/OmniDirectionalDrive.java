@@ -20,7 +20,6 @@ public class OmniDirectionalDrive extends LinearOpMode {
     private Robot robot;
     private BNO055IMU imu;
     double robotAngle;
-    double turnAngle;
     Orientation lastAngles = new Orientation();
     double                  globalAngle, power = .30;
 
@@ -50,8 +49,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         imu.initialize(parameters);
-
-        double robotAngle;
+        
 
 
 
@@ -87,36 +85,16 @@ public class OmniDirectionalDrive extends LinearOpMode {
             double rightStickX = gamepad1.right_stick_x;
             double rightStickY = gamepad1.right_stick_y;
 
-            //Find the goal angle from the controller
-            double goalAngle = -Math.toDegrees(Math.atan2(leftStickY, leftStickX) - Math.PI / 2);
-            double goalAngle360 = to360(goalAngle);
-
-            //Find the angle of the robot and convert it out of euler angle form
-            robotAngle = imu.getAngularOrientation().firstAngle;
-            double robotAngle360 = to360(robotAngle);
-            double correction = smallestAngleBetween(robotAngle360,goalAngle);
-            double corrected = goalAngle + correction;
-            double correctionX = toXY(corrected)[0];
-            double correctionY = toXY(corrected)[1];
-
 
             //Drive the robot
-            double motorPowers[] = calcMotorPowers(leftStickX + correctionX,leftStickY + correctionY,rightStickX);
+            double motorPowers[] = calcMotorPowers(leftStickX,leftStickY,rightStickX);
             robot.rearLeftDriveMotor.setPower(motorPowers[0]);
             robot.frontLeftDriveMotor.setPower(motorPowers[1]);
             robot.rearRightDriveMotor.setPower(motorPowers[2]);
             robot.frontRightDriveMotor.setPower(motorPowers[3]);
 
 
-            telemetry.addData("Goal angle 360", goalAngle360);
-            telemetry.addData("Correction", correction);
-            telemetry.addData("Robot angle 360", robotAngle360);
-            telemetry.addData("CorrectionsX", toXY(correction)[0]);
-            telemetry.addData("CorrectionsY", toXY(correction)[1]);
-            telemetry.addData("GoalX", toXY(goalAngle360)[0]);
-            telemetry.addData("GoalY", toXY(goalAngle360)[1]);
 
-            telemetry.update();
 
             resetAngle();
 
@@ -148,7 +126,7 @@ public class OmniDirectionalDrive extends LinearOpMode {
         //Accepts controller inputs from xbox joystick
         //LeftStickX - strafe, LeftStickY - forward/backwards, rightStickJoystick controls turn angle
         double r = Math.hypot(leftStickX, leftStickY);
-        turnAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double turnAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
         double rearLeftPower = r * Math.sin(turnAngle) + rightStickX;
         double frontLeftPower = r * Math.cos(turnAngle) + rightStickX;
         double rearRightPower = r * Math.cos(turnAngle) - rightStickX;

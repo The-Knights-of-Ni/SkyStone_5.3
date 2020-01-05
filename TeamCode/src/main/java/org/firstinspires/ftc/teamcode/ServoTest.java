@@ -33,6 +33,10 @@ public class ServoTest extends LinearOpMode {
     boolean isaButtonPressedPrev =false;
     boolean bButton;
     boolean isbButtonPressedPrev = false;
+    boolean xButton;
+    boolean isxButtonPressedPrev =false;
+    boolean yButton;
+    boolean isyButtonPressedPrev = false;
 
 
     public void initOpMode(){
@@ -47,7 +51,9 @@ public class ServoTest extends LinearOpMode {
         telemetry.addLine("Wait For Start");
         telemetry.update();
         waitForStart();
-        robot.mainArm.setPosition(0);
+        robot.mainArm.setPosition(0.5);
+        telemetry.addData("mainArm", robot.mainArm.getPosition());
+        telemetry.update();
 //        robot.fClawL.setPosition(0.5);
 //        robot.fClawR.setPosition(0.5);
 //
@@ -57,20 +63,38 @@ public class ServoTest extends LinearOpMode {
         while(opModeIsActive()){
             aButton = gamepad1.a;
             bButton = gamepad1.b;
-            if (!isaButtonPressedPrev) {
+            xButton = gamepad1.x;
+            yButton = gamepad1.y;
+            if (aButton && !isaButtonPressedPrev && ((robot.mainArm.getPosition()+0.05) < 1.0)) {
                 robot.mainArm.setPosition(robot.mainArm.getPosition() + 0.05);
                 isaButtonPressedPrev = true;
             }
-            if(!isbButtonPressedPrev){
+            if(bButton && !isbButtonPressedPrev && ((robot.mainArm.getPosition()-0.05) > 0.0)){
                 robot.mainArm.setPosition(robot.mainArm.getPosition() - 0.05);
                 isbButtonPressedPrev = true;
             }
-            if (isaButtonPressedPrev) {
+            if (!aButton) {
                 isaButtonPressedPrev = false;
             }
-            if(isbButtonPressedPrev){
+            if(!bButton){
                 isbButtonPressedPrev = false;
             }
+
+            if (xButton && !isxButtonPressedPrev) {
+                robot.mainArm.setPosition(0.85);
+                isxButtonPressedPrev = true;
+            }
+            if(yButton && !isyButtonPressedPrev){
+                robot.mainArm.setPosition(0.08);
+                isyButtonPressedPrev = true;
+            }
+            if (!xButton) {
+                isxButtonPressedPrev = false;
+            }
+            if(!yButton){
+                isyButtonPressedPrev = false;
+            }
+
 
             telemetry.addData("mainArm", robot.mainArm.getPosition());
             telemetry.update();
