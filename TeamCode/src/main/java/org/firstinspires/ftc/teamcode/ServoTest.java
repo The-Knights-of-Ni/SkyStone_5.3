@@ -51,8 +51,8 @@ public class ServoTest extends LinearOpMode {
         telemetry.addLine("Wait For Start");
         telemetry.update();
         waitForStart();
-        robot.mainArm.setPosition(0.5);
-        telemetry.addData("mainArm", robot.mainArm.getPosition());
+        robot.mainClaw.setPosition(0.5);
+        telemetry.addData("mainArm", robot.mainClaw.getPosition());
         telemetry.update();
 //        robot.fClawL.setPosition(0.5);
 //        robot.fClawR.setPosition(0.5);
@@ -65,12 +65,12 @@ public class ServoTest extends LinearOpMode {
             bButton = gamepad1.b;
             xButton = gamepad1.x;
             yButton = gamepad1.y;
-            if (aButton && !isaButtonPressedPrev && ((robot.mainArm.getPosition()+0.05) < 1.0)) {
-                robot.mainArm.setPosition(robot.mainArm.getPosition() + 0.05);
+            if (aButton && !isaButtonPressedPrev && ((robot.mainClaw.getPosition()+0.05) < 1.0)) {
+                robot.mainClaw.setPosition(robot.mainClaw.getPosition() + 0.05);
                 isaButtonPressedPrev = true;
             }
-            if(bButton && !isbButtonPressedPrev && ((robot.mainArm.getPosition()-0.05) > 0.0)){
-                robot.mainArm.setPosition(robot.mainArm.getPosition() - 0.05);
+            if(bButton && !isbButtonPressedPrev && ((robot.mainClaw.getPosition()-0.05) > 0.0)){
+                robot.mainClaw.setPosition(robot.mainClaw.getPosition() - 0.05);
                 isbButtonPressedPrev = true;
             }
             if (!aButton) {
@@ -81,11 +81,11 @@ public class ServoTest extends LinearOpMode {
             }
 
             if (xButton && !isxButtonPressedPrev) {
-                robot.mainArm.setPosition(0.85);
+                robot.mainClaw.setPosition(0.88);
                 isxButtonPressedPrev = true;
             }
             if(yButton && !isyButtonPressedPrev){
-                robot.mainArm.setPosition(0.08);
+                robot.mainClaw.setPosition(0.13);
                 isyButtonPressedPrev = true;
             }
             if (!xButton) {
@@ -96,7 +96,7 @@ public class ServoTest extends LinearOpMode {
             }
 
 
-            telemetry.addData("mainArm", robot.mainArm.getPosition());
+            telemetry.addData("mainClaw", robot.mainClaw.getPosition());
             telemetry.update();
             sleep(10);
         }

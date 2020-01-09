@@ -44,6 +44,9 @@ public class TeleopMark2 extends LinearOpMode {
     boolean bumperLeft2;
     boolean bumperRight2;
 
+    boolean isaButton2PressedPrev = false;
+    boolean isbButton2PressedPrev = false;
+
     int winchCurrentPosition = 0;
     int winchTargetPositionCurrent = 0;
     int winchTargetPositionPre = 0;
@@ -114,7 +117,7 @@ public class TeleopMark2 extends LinearOpMode {
             timeCurrent = timer.nanoseconds();
 
             //Drive the motors
-            double[] motorPowers = calcMotorPowers(leftStickX, leftStickY, rightStickX);
+            double[] motorPowers = calcMotorPowers2(leftStickX, leftStickY, rightStickX);
             robot.rearLeftDriveMotor.setPower(motorPowers[0]);
             robot.frontLeftDriveMotor.setPower(motorPowers[1]);
             robot.rearRightDriveMotor.setPower(motorPowers[2]);
@@ -207,6 +210,21 @@ public class TeleopMark2 extends LinearOpMode {
 
             robot.mainArm.setPosition(robot.drive.mainArmAngletoPos(tiltCurrentAngle));
 
+            if (aButton2 && !isaButton2PressedPrev) {
+                robot.mainClaw.setPosition(robot.drive.getMainClawPosClosedStone());
+                isaButton2PressedPrev = true;
+            }
+            if(bButton2 && !isbButton2PressedPrev){
+                robot.mainClaw.setPosition(robot.drive.getMainClawPosOpen());
+                isbButton2PressedPrev = true;
+            }
+            if (!aButton2) {
+                isaButton2PressedPrev = false;
+            }
+            if(!bButton2){
+                isbButton2PressedPrev = false;
+            }
+
 //            //Find how much the claw is tilted
 //            clawTiltCurrentPosition = (int) robot.mainArm.getPosition();
 //
@@ -229,15 +247,16 @@ public class TeleopMark2 extends LinearOpMode {
             telemetry.addData("Left Stick Y2", leftStickY2);
             telemetry.addData("Right Stick Y2", rightStickY2);
             telemetry.addData("Right Stick X", rightStickX);
-            telemetry.addData("deltaT", deltaT);
+            telemetry.addData("currentPosTilt", tiltCurrentPosition);
+            telemetry.addData("mainArm", robot.mainArm.getPosition());
+
 
 //            telemetry.addData("currentPosWinch", winchCurrentPosition);
 //            telemetry.addData("targetPosWinch", winchTargetPositionCurrent);
 //            telemetry.addData("incrementWinch", winchIncrement);
-
-            telemetry.addData("currentPosTilt", tiltCurrentPosition);
-            telemetry.addData("targetPosTilt", tiltTargetPositionCurrent);
-            telemetry.addData("incrementTilt", tiltIncrement);
+//
+//            telemetry.addData("targetPosTilt", tiltTargetPositionCurrent);
+//            telemetry.addData("incrementTilt", tiltIncrement);
 
 
 //            telemetry.addData("", "");
@@ -297,6 +316,16 @@ public class TeleopMark2 extends LinearOpMode {
         double lfPower = r * Math.cos(robotAngle) + rightStickX;
         double rrPower = r * Math.cos(robotAngle) - rightStickX;
         double rfPower = r * Math.sin(robotAngle) - rightStickX;
+        return new double[]{lrPower, lfPower, rrPower, rfPower};
+    }
+
+    private double[] calcMotorPowers2(double leftStickX, double leftStickY, double rightStickX) {
+        double r = Math.hypot(leftStickX, leftStickY);
+        double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double lrPower = rightStickX;
+        double lfPower = rightStickX;
+        double rrPower = -rightStickX;
+        double rfPower = -rightStickX;
         return new double[]{lrPower, lfPower, rrPower, rfPower};
     }
 

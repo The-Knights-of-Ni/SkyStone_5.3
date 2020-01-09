@@ -12,6 +12,7 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 //import org.openftc.easyopencv.OpenCvWebcam;
 
@@ -23,6 +24,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 @TeleOp (name = "MCT1")
 public class MultipleCameraTest extends LinearOpMode
 {
+    OpenCvCamera phoneCam;
     OpenCvCamera webCam1;
     OpenCvCamera webCam2;
 
@@ -60,27 +62,40 @@ public class MultipleCameraTest extends LinearOpMode
         webCam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
 
 
+//        phoneCam.openCameraDevice();
         webCam1.openCameraDevice();
         webCam2.openCameraDevice();
 
-        webCam1Characteristics = webCam1.
-
+//        phoneCam.setPipeline(new UselessGreenBoxDrawingPipeline());
         webCam1.setPipeline(new UselessGreenBoxDrawingPipeline());
         webCam2.setPipeline(new UselessGreenBoxDrawingPipeline());
 
-        webCam1.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-        webCam2.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+        webCam1.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        webCam2.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
         waitForStart();
 
         while (opModeIsActive())
         {
+//            telemetry.addData("PhoneCam FPS", phoneCam.getFps());
             telemetry.addData("WebCam 1 FPS", webCam1.getFps());
             telemetry.addData("Webcam 2 FPS", webCam2.getFps());
             telemetry.update();
+//            phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+//            sleep(500);
+//            phoneCam.stopStreaming();
+//            webCam1.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+//            sleep(500);
+//            webCam1.stopStreaming();
+//            webCam2.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+//            sleep(500);
+//            webCam2.stopStreaming();
 
             sleep(100);
         }
+//        phoneCam.closeCameraDevice();
+        webCam1.closeCameraDevice();
+        webCam2.closeCameraDevice();
     }
 
     class UselessGreenBoxDrawingPipeline extends OpenCvPipeline

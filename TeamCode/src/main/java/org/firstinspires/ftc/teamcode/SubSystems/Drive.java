@@ -69,8 +69,12 @@ public class Drive extends Subsystem {
     private static final double     TILT_MAX_SPEED_TICK_PER_SEC         = (MOTOR_TICK_PER_REV_YELLOJACKET223 * REV_PER_MIN_YELLOJACKET223) / 60.0;
     private static final double     TILT_TICK_PER_90_DEGREE             = 2510.0;
 
-    private static final double     CLAW_ARM_POS_0_DEG                  = 0.08; // xRail horizontal and main claw facing down
-    private static final double     CLAW_ARM_POS_180_DEG                = 0.85;
+    private static final double     CLAW_ARM_POS_0_DEG                  = 0.13; // xRail horizontal and main claw facing down
+    private static final double     CLAW_ARM_POS_180_DEG                = 0.88;
+    private static final double     MAIN_CLAW_POS_OPEN                  = 0.65;
+    private static final double     MAIN_CLAW_POS_CLOSED_STONE          = 0.35;
+    private static final double     MAIN_CLAW_POS_CLOSED                = 0.35;
+
 
     private static final double     DRIVE_SPEED             = 0.4;
     private static final double     TURN_SPEED              = 0.3;
@@ -134,6 +138,12 @@ public class Drive extends Subsystem {
     }
     public double getClawArmPos180Deg(){
         return CLAW_ARM_POS_180_DEG;
+    }
+    public double getMainClawPosOpen(){
+        return  MAIN_CLAW_POS_OPEN;
+    }
+    public double getMainClawPosClosedStone(){
+        return MAIN_CLAW_POS_CLOSED_STONE;
     }
 
 
@@ -401,6 +411,6 @@ public class Drive extends Subsystem {
     }
 
     public double mainArmAngletoPos(double angle){
-        return ((angle / 180.0) * (this.getClawArmPos180Deg() - this.getClawArmPos0Deg()));
+        return ((angle / 180.0) * (this.getClawArmPos180Deg() - this.getClawArmPos0Deg())) + this.getClawArmPos0Deg();
     }
 }
