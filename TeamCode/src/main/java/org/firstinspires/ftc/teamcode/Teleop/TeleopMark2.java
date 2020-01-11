@@ -30,6 +30,7 @@ public class TeleopMark2 extends LinearOpMode {
     boolean dPadDown;
     boolean dPadLeft;
     boolean dPadRight;
+    boolean bumperLeft;
 
     double leftStickX2;
     double leftStickY2;
@@ -100,6 +101,8 @@ public class TeleopMark2 extends LinearOpMode {
             dPadDown = gamepad1.dpad_down;
             dPadLeft = gamepad1.dpad_left;
             dPadRight = gamepad1.dpad_right;
+            bumperLeft = gamepad1.right_bumper;
+
             leftStickX2 = gamepad2.left_stick_x;
             leftStickY2 = -gamepad2.left_stick_y;
             rightStickX2 = gamepad2.right_stick_x;
@@ -241,7 +244,12 @@ public class TeleopMark2 extends LinearOpMode {
 //                tiltTargetPositionPre = tiltTargetPositionCurrent;
 //            }
 
-
+            if(bumperLeft){
+                robot.rearLeftDriveMotor.setPower(0);
+                robot.frontLeftDriveMotor.setPower(0);
+                robot.rearRightDriveMotor.setPower(0);
+                robot.frontRightDriveMotor.setPower(0);
+            }
 
 
             telemetry.addData("Left Stick Y2", leftStickY2);
@@ -320,14 +328,21 @@ public class TeleopMark2 extends LinearOpMode {
     }
 
     private double[] calcMotorPowers2(double leftStickX, double leftStickY, double rightStickX) {
+        if(Math.abs(leftStickX) >= Math.abs((leftStickY))){
+            leftStickY = 0;
+        }
+        else{
+            leftStickX = 0;
+        }
         double r = Math.hypot(leftStickX, leftStickY);
         double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
-        double lrPower = rightStickX;
-        double lfPower = rightStickX;
-        double rrPower = -rightStickX;
-        double rfPower = -rightStickX;
+        double lrPower = r * Math.sin(robotAngle) + rightStickX;
+        double lfPower = r * Math.cos(robotAngle) + rightStickX;
+        double rrPower = r * Math.cos(robotAngle) - rightStickX;
+        double rfPower = r * Math.sin(robotAngle) - rightStickX;
         return new double[]{lrPower, lfPower, rrPower, rfPower};
     }
+
 
     private double calcWinchPower(double leftStickY2, double maxPower){
         double power;

@@ -59,19 +59,19 @@ public class MultipleCameraTest extends LinearOpMode
 
 //        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[0]);
         webCam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[0]);
-        webCam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
+//        webCam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
 
 
 //        phoneCam.openCameraDevice();
         webCam1.openCameraDevice();
-        webCam2.openCameraDevice();
+//        webCam2.openCameraDevice();
 
 //        phoneCam.setPipeline(new UselessGreenBoxDrawingPipeline());
         webCam1.setPipeline(new UselessGreenBoxDrawingPipeline());
-        webCam2.setPipeline(new UselessGreenBoxDrawingPipeline());
+//        webCam2.setPipeline(new UselessGreenBoxDrawingPipeline());
 
-        webCam1.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-        webCam2.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        webCam1.startStreaming(640, 360, OpenCvCameraRotation.UPRIGHT);
+//        webCam2.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
         waitForStart();
 
@@ -79,7 +79,7 @@ public class MultipleCameraTest extends LinearOpMode
         {
 //            telemetry.addData("PhoneCam FPS", phoneCam.getFps());
             telemetry.addData("WebCam 1 FPS", webCam1.getFps());
-            telemetry.addData("Webcam 2 FPS", webCam2.getFps());
+//            telemetry.addData("Webcam 2 FPS", webCam2.getFps());
             telemetry.update();
 //            phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
 //            sleep(500);
@@ -95,7 +95,7 @@ public class MultipleCameraTest extends LinearOpMode
         }
 //        phoneCam.closeCameraDevice();
         webCam1.closeCameraDevice();
-        webCam2.closeCameraDevice();
+//        webCam2.closeCameraDevice();
     }
 
     class UselessGreenBoxDrawingPipeline extends OpenCvPipeline

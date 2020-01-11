@@ -65,7 +65,7 @@ public class MultipleCameraTest_Vuforia extends LinearOpMode
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(viewportContainerIds[0]);
         parameters.vuforiaLicenseKey = "AUey4R3/////AAABmbFoecjBlEnSh5usfx1hlc07SLGE4hI5MyuUAr+09rNNBp/u1d50TPc3ydiXin5F4zAvyFKEU2pnn8ffcyfP7lydQcM+S7FZ2MXu8uIaXI3X4LpocXI22NN5KnuM/DcnjZb+1GqT41lzVUz9HX2SzgztBYDBPBvYDmCo9OcMywWkCHE9QSvWt9P1J5n2uCMZc9ZClJiKaybVac39bK4dAM/yk4TxBpRdLKbRDBGKSqlhWbGsDYmkb770A5EU4aPKLKeiQ55BOaUx9OTENNbE/vvJQnmcHkl8uz1JGpAFIvE05IFQZXLOJlgm4JtueSn33cDD3F7n0wBVVB4+ztF9IetvlYZ9Tqx00pJRSiwNJcFF";
         parameters.cameraDirection   = VuforiaLocalizer.CameraDirection.BACK; //required for webcam
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 2");
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
         VuforiaTrackables targetsSkyStone = vuforia.loadTrackablesFromAsset("Skystone");
@@ -110,7 +110,7 @@ public class MultipleCameraTest_Vuforia extends LinearOpMode
 //sleep(1000);
 
 //        webcam1 = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[1]);
-        webcam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
+        webcam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[1]);
 //telemetry.addLine("Test2");
 //telemetry.update();
 //sleep(1000);
@@ -122,7 +122,7 @@ public class MultipleCameraTest_Vuforia extends LinearOpMode
 //telemetry.addLine("Test4");
 //telemetry.update();
 //sleep(1000);
-        webcam1.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+//        webcam1.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 //telemetry.addLine("Test5");
 //telemetry.update();
 //sleep(1000);
