@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.SubSystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -74,13 +74,36 @@ public class Robot {
         hardwareMap = opMode.hardwareMap;
         this.opMode = opMode;
         this.timer = timer;
-        init();
+        init(0);
+    }
+
+    /**
+     *
+     * @param opMode
+     * @param timer
+     * @param visionMode
+     *          o: no camera is initialized
+     *          1: only armWebcam is initialized for OpenCV
+     *          2: backWebcam is initialized for Vuforia
+     *          3: backWebcam is initialized for Vuforia and frontWebcam is initialized for OpenCV
+     *          4: armWebcam is initialized for OpenCV and frontWebcam is initialized for OpenCV
+     */
+    public Robot(OpMode opMode, ElapsedTime timer, int visionMode){
+        hardwareMap = opMode.hardwareMap;
+        this.opMode = opMode;
+        this.timer = timer;
+        init(visionMode);
     }
 
     public Robot (){
-        init();
+        init(0);
     }
-    public void init(){
+
+    public void init() {
+        init(0);
+    }
+
+    public void init(int visionMode){
         //DC Motors
         frontLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fl");
         frontRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fr");
@@ -139,7 +162,9 @@ public class Robot {
 
         //Subsystems
         drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, timer, opMode);
-        vision = new Vision(hardwareMap, this);
+        if (visionMode != 0) {
+            vision = new Vision(hardwareMap, this, visionMode);
+        }
     }
 
     public OpMode getOpmode(){

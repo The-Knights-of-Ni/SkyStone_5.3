@@ -12,7 +12,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.Robot;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +31,24 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 
+/**
+ * Created by AndrewC on 12/27/2019.
+ */
+
 public class Vision {
 
     private ElapsedTime timer;
     private HardwareMap hardwareMap;
 
     private VuforiaLocalizer vuforiaWebcam = null;
-    private VuforiaLocalizer vuforiaArmcam = null;
-    WebcamName webcamName = null;
-    WebcamName armWebcamName = null;
+//    private VuforiaLocalizer vuforiaFrontcam = null;
+    private WebcamName frontWebcamName = null;
+    private WebcamName backWebcamName = null;
+    private WebcamName armWebcamName = null;
+    private OpenCvCamera frontWebcam;
+    private OpenCvCamera armWebcam;
+
+    int[] viewportContainerIds;
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
@@ -70,36 +86,101 @@ public class Vision {
 
     public Vision(HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
-        initVuforiaEngine();
+        setupCameraNames();
+        setupViewports(1);
+        initVuforiaEngine(0);
     }
 
     public Vision(HardwareMap hardwareMap, Robot robot){
         this.hardwareMap = hardwareMap;
         this.robot = robot;
-        initVuforiaEngine();
+        setupCameraNames();
+        setupViewports(1);
+        initVuforiaEngine(0);
     }
 
+    /**
+     *
+     * @param hardwareMap
+     * @param robot
+     * @param visionMode
+     *          o: no camera is initialized
+     *          1: only armWebcam is initialized for OpenCV
+     *          2: backWebcam is initialized for Vuforia
+     *          3: backWebcam is initialized for Vuforia and frontWebcam is initialized for OpenCV
+     *          4: armWebcam is initialized for OpenCV and frontWebcam is initialized for OpenCV
+     */
+    public Vision(HardwareMap hardwareMap, Robot robot, int visionMode){
+        this.hardwareMap = hardwareMap;
+        this.robot = robot;
+        setupCameraNames();
+        switch (visionMode) {
+            case 0:
+                break;
+            case 1:
+                setupViewports(1);
+                initArmWebcam(0);
+                break;
+            case 2:
+                setupViewports(1);
+                initVuforiaEngine(0);
+                break;
+            case 3:
+                setupViewports(2);
+                initVuforiaEngine(0);
+                initFrontWebcam(1);
+                break;
+            case 4:
+                setupViewports(2);
+                initArmWebcam(0);
+                initFrontWebcam(1);
+                break;
+            default:
+                break;
+        }
+    }
 
-    private void initVuforiaEngine() {
-        //Vuforia initialization
+    private void setupViewports(int numViewports) {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        /**
+         * This is the only thing you need to do differently when using multiple cameras.
+         * Instead of obtaining the camera monitor view and directly passing that to the
+         * camera constructor, we invoke {@link OpenCvCameraFactory#splitLayoutForMultipleViewports(int, int)}
+         * on that view in order to split that view into multiple equal-sized child views,
+         * and then pass those child views to the constructor.
+         */
+        viewportContainerIds = OpenCvCameraFactory.getInstance().splitLayoutForMultipleViewports(cameraMonitorViewId, numViewports, OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY);
+    }
+
+    private void setupCameraNames() {
+        backWebcamName = hardwareMap.get(WebcamName.class, "Webcam 3");
+        frontWebcamName = hardwareMap.get(WebcamName.class, "Webcam 2");
         armWebcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        webcamName = hardwareMap.get(WebcamName.class, "Webcam 2");
+    }
 
-        int cameraMonitorViewIdWebcam = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parametersWebcam = new VuforiaLocalizer.Parameters(cameraMonitorViewIdWebcam);
+    private void initVuforiaEngine(int viewportID) {
+        //Vuforia initialization
+
+        /*
+         * Setup Vuforia on the webcam
+         */
+        VuforiaLocalizer.Parameters parametersWebcam = new VuforiaLocalizer.Parameters(viewportContainerIds[viewportID]);
         parametersWebcam.vuforiaLicenseKey = "AUey4R3/////AAABmbFoecjBlEnSh5usfx1hlc07SLGE4hI5MyuUAr+09rNNBp/u1d50TPc3ydiXin5F4zAvyFKEU2pnn8ffcyfP7lydQcM+S7FZ2MXu8uIaXI3X4LpocXI22NN5KnuM/DcnjZb+1GqT41lzVUz9HX2SzgztBYDBPBvYDmCo9OcMywWkCHE9QSvWt9P1J5n2uCMZc9ZClJiKaybVac39bK4dAM/yk4TxBpRdLKbRDBGKSqlhWbGsDYmkb770A5EU4aPKLKeiQ55BOaUx9OTENNbE/vvJQnmcHkl8uz1JGpAFIvE05IFQZXLOJlgm4JtueSn33cDD3F7n0wBVVB4+ztF9IetvlYZ9Tqx00pJRSiwNJcFF";
-
-        parametersWebcam.cameraName = webcamName;
-
+        parametersWebcam.cameraDirection   = VuforiaLocalizer.CameraDirection.BACK; //required for webcam
+        parametersWebcam.cameraName = backWebcamName;
         //  Instantiate the Vuforia engine
         vuforiaWebcam = ClassFactory.getInstance().createVuforia(parametersWebcam);
-        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
 
-//        int cameraMonitorViewIdArm = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        VuforiaLocalizer.Parameters parametersArmcam = new VuforiaLocalizer.Parameters(cameraMonitorViewIdArm);
-//        parametersArmcam.vuforiaLicenseKey = "AQUqdRj/////AAABmbnChT8nw00Hua9Tp40md6UO4SwfTRAlB4qfR4ZYJYiwGGuzzTBJFyhHc7zwSznfD23dl9RjUW81OXVyF47Hst1YYbBbNvwD/Lc96dIkzmyLqzLgN9rYtrIQf8rbsV0wo71Xuz92SjPv46VI5TBHB5WeW0Cq8/V3nn+Exu7uQkBnTjolq56Sif2+ZiyWZJbhGlZL/MSUAEvrkzgp6Mupsi5t38vSxwQY8c8abpECV5uoUv9OJtU+2qQZHzxTq6aYoha9G0U+boREFW3NUt/cNDYnp05Y0HXUsdGMl8/5eUjlapWfNRivGnFW/r5GkFGzAM548t9WD5BiH7JZSrqBx5tXw2uVmeFQrrqwe20Y2Bep";
-//        parametersArmcam.cameraName = armWebcamName;
-//        vuforiaArmcam = ClassFactory.getInstance().createVuforia(parametersArmcam);
+//        VuforiaLocalizer.Parameters parametersFrontcam = new VuforiaLocalizer.Parameters(viewportContainerIds[1]);
+//        parametersFrontcam.vuforiaLicenseKey = "AQUqdRj/////AAABmbnChT8nw00Hua9Tp40md6UO4SwfTRAlB4qfR4ZYJYiwGGuzzTBJFyhHc7zwSznfD23dl9RjUW81OXVyF47Hst1YYbBbNvwD/Lc96dIkzmyLqzLgN9rYtrIQf8rbsV0wo71Xuz92SjPv46VI5TBHB5WeW0Cq8/V3nn+Exu7uQkBnTjolq56Sif2+ZiyWZJbhGlZL/MSUAEvrkzgp6Mupsi5t38vSxwQY8c8abpECV5uoUv9OJtU+2qQZHzxTq6aYoha9G0U+boREFW3NUt/cNDYnp05Y0HXUsdGMl8/5eUjlapWfNRivGnFW/r5GkFGzAM548t9WD5BiH7JZSrqBx5tXw2uVmeFQrrqwe20Y2Bep";
+//        parametersFrontcam.cameraDirection   = VuforiaLocalizer.CameraDirection.BACK; //required for webcam
+//        parametersFrontcam.cameraName = frontWebcamName;
+//        //  Instantiate the Vuforia engine
+//        vuforiaFrontcam = ClassFactory.getInstance().createVuforia(parametersFrontcam);
+
+
+        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
 
 
         //Vuforia Navigation Init
@@ -287,4 +368,48 @@ public class Vision {
         }
         robot.getOpmode().telemetry.update();
     }
+
+    public void initFrontWebcam(int viewportID) {
+        frontWebcam = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName, viewportContainerIds[viewportID]);
+        frontWebcam.openCameraDevice();
+        frontWebcam.setPipeline(new SamplePipeline());
+        frontWebcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+    }
+
+    public void closeFrontWebcam() {
+        frontWebcam.stopStreaming();
+        frontWebcam.closeCameraDevice();
+    }
+
+    public void initArmWebcam(int viewportID) {
+        armWebcam = OpenCvCameraFactory.getInstance().createWebcam(armWebcamName, viewportContainerIds[viewportID]);
+        armWebcam.openCameraDevice();
+        armWebcam.setPipeline(new SamplePipeline());
+        armWebcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+    }
+
+    public void closeArmWebcam() {
+        armWebcam.stopStreaming();
+        armWebcam.closeCameraDevice();
+    }
+
+    class SamplePipeline extends OpenCvPipeline
+    {
+        @Override
+        public Mat processFrame(Mat input)
+        {
+            Imgproc.rectangle(
+                    input,
+                    new Point(
+                            input.cols()/4,
+                            input.rows()/4),
+                    new Point(
+                            input.cols()*(3f/4f),
+                            input.rows()*(3f/4f)),
+                    new Scalar(0, 255, 0), 4);
+
+            return input;
+        }
+    }
+
 }

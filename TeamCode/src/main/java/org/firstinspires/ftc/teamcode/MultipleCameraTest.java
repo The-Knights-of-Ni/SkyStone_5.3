@@ -27,6 +27,7 @@ public class MultipleCameraTest extends LinearOpMode
     OpenCvCamera phoneCam;
     OpenCvCamera webCam1;
     OpenCvCamera webCam2;
+    OpenCvCamera webCam3;
 
     CameraCharacteristics webCam1Characteristics;
     CameraCharacteristics webCam2Characteristics;
@@ -54,24 +55,28 @@ public class MultipleCameraTest extends LinearOpMode
         int[] viewportContainerIds = OpenCvCameraFactory.getInstance()
                 .splitLayoutForMultipleViewports(
                         cameraMonitorViewId, //The container we're splitting
-                        2, //The number of sub-containers to create
+                        3, //The number of sub-containers to create
                         OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY); //Whether to split the container vertically or horizontally
 
 //        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, viewportContainerIds[0]);
         webCam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[0]);
-//        webCam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
+        webCam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
+        webCam3 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 3"), viewportContainerIds[2]);
 
 
 //        phoneCam.openCameraDevice();
         webCam1.openCameraDevice();
-//        webCam2.openCameraDevice();
+        webCam2.openCameraDevice();
+        webCam3.openCameraDevice();
 
 //        phoneCam.setPipeline(new UselessGreenBoxDrawingPipeline());
         webCam1.setPipeline(new UselessGreenBoxDrawingPipeline());
-//        webCam2.setPipeline(new UselessGreenBoxDrawingPipeline());
+        webCam2.setPipeline(new UselessGreenBoxDrawingPipeline());
+        webCam3.setPipeline(new UselessGreenBoxDrawingPipeline());
 
-        webCam1.startStreaming(640, 360, OpenCvCameraRotation.UPRIGHT);
-//        webCam2.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        webCam1.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        webCam2.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        webCam3.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
         waitForStart();
 
@@ -79,7 +84,8 @@ public class MultipleCameraTest extends LinearOpMode
         {
 //            telemetry.addData("PhoneCam FPS", phoneCam.getFps());
             telemetry.addData("WebCam 1 FPS", webCam1.getFps());
-//            telemetry.addData("Webcam 2 FPS", webCam2.getFps());
+            telemetry.addData("Webcam 2 FPS", webCam2.getFps());
+            telemetry.addData("Webcam 3 FPS", webCam3.getFps());
             telemetry.update();
 //            phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
 //            sleep(500);
