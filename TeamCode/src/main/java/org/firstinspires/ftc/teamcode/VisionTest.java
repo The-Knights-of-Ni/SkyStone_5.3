@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
+import org.opencv.imgproc.Imgproc;
 
 /**
  * Created by tarunsingh on 12/5/17.
@@ -19,15 +20,22 @@ public class VisionTest extends LinearOpMode {
 
     private Robot robot;
 
+    boolean aButton2;
+    boolean isaButton2PressedPrev = false;
+
+    double timeCurrent;
+
     public void initOpMode(){
         ElapsedTime timer = new ElapsedTime();
         this.robot = new Robot(this, timer, 3);
 
     }
     public void runOpMode() {
+        ElapsedTime timer = new ElapsedTime();
         initOpMode();
         waitForStart();
         robot.vision.getTargetsSkyStone().activate();
+        isaButton2PressedPrev = false;
         while (!isStopRequested()) {
 
 //            // check all the trackable targets to see which one (if any) is visible.
@@ -63,6 +71,28 @@ public class VisionTest extends LinearOpMode {
 //            telemetry.update();
 
             robot.vision.vuMarkScan();
+            robot.getOpmode().telemetry.addData("Threshold", "{r, b, y1, y2} = %d, %d, %d, %d",
+                    robot.vision.getRedColorThreshold(),robot.vision.getBlueColorThreshold(),
+                    robot.vision.getYellowColorThreshold1(), robot.vision.getYellowColorThreshold2());
+
+            timeCurrent = timer.nanoseconds();
+            aButton2 = gamepad2.a;
+
+            // save images
+            if (aButton2 && !isaButton2PressedPrev) {
+                robot.getOpmode().telemetry.addData("saving ", "images...");
+                robot.vision.saveImage("VisionTest", robot.vision.frameBuffer1, Imgproc.COLOR_RGBA2BGR, "original", (long) timeCurrent);
+                robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan1Mat, Imgproc.COLOR_RGBA2BGR, "CbImage", (long) timeCurrent);
+                robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan2Mat, Imgproc.COLOR_RGBA2BGR, "CrImage", (long) timeCurrent);
+                robot.vision.saveImage("VisionTest", robot.vision.thresholdMat, Imgproc.COLOR_RGBA2BGR, "threshold", (long) timeCurrent);
+                robot.vision.saveImage("VisionTest", robot.vision.contoursOnFrameMat, Imgproc.COLOR_RGBA2BGR, "contours", (long) timeCurrent);
+                isaButton2PressedPrev = true;
+            }
+            if (!aButton2) {
+                isaButton2PressedPrev = false;
+            }
+            robot.getOpmode().telemetry.update();
+
         }
 
         // Disable Tracking when we are done;

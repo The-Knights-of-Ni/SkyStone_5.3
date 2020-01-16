@@ -167,6 +167,14 @@ public class Robot {
         }
     }
 
+    public void initServosAuto() {
+        this.drive.raiseClawsFromFoundation();
+    }
+
+    public void initServosTeleop() {
+        this.drive.raiseClawsFromFoundation();
+    }
+
     public OpMode getOpmode(){
         return this.opMode;
     }
