@@ -134,12 +134,11 @@ public class Auto extends LinearOpMode {
                     }
                 }
                 robot.drive.moveForward(750); //move to foundation
-                robot.drive.lowerClawsToFoundation();
+                robot.control.lowerClawsToFoundation();
                 robot.drive.moveBackward(750);
 
                 // foundation claws back to original positions
-                robot.fClawL.setPosition(0.5);
-                robot.fClawL.setPosition(0.5);
+                robot.control.raiseClawsFromFoundation();
             }
         }
 
