@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Vision;
  * Created by AndrewC on 12/27/2019.
  */
 
-public class Robot {
+public class Robot extends Subsystem {
     public String name;
     private HardwareMap hardwareMap;
     private OpMode opMode;
@@ -159,7 +159,7 @@ public class Robot {
         armTilt = (DcMotorEx) hardwareMap.dcMotor.get("tilt");
 
         xRailWinch.setDirection(DcMotorSimple.Direction.REVERSE);
-        armTilt.setDirection(DcMotorSimple.Direction.REVERSE);
+        armTilt.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
 
@@ -198,8 +198,8 @@ public class Robot {
         imu.initialize(parameters);
 
         //Subsystems
-        drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, timer, opMode);
-        control = new Control(xRailWinch, armTilt, mainClaw, mainClawRotation, mainClawArm, csClaw, csArm, fClawL, fClawR, imu, timer, opMode);
+        drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, opMode, timer);
+        control = new Control(xRailWinch, armTilt, mainClaw, mainClawRotation, mainClawArm, csClaw, csArm, fClawL, fClawR, imu, opMode, timer);
         if (visionMode != 0) {
             vision = new Vision(hardwareMap, this, visionMode);
         }
@@ -209,15 +209,15 @@ public class Robot {
         this.control.closeMainClaw();
         this.control.closeCSClaw();
         this.control.setMainClawRotationDegrees(180.0);
-        this.control.setMainClawArmDegrees(180.0);
-        this.control.setCSClawArmDegrees(180.0);
+        this.control.setMainClawArmDegrees(-180.0);
+        this.control.setCSClawArmDegrees(-175.0);
         this.control.raiseClawsFromFoundation();
     }
 
     public void initServosTeleop() {
         this.control.closeMainClaw();
         this.control.closeCSClaw();
-        this.control.setCSClawArmDegrees(180.0);
+        this.control.setCSClawArmDegrees(-175.0);
         this.control.raiseClawsFromFoundation();
     }
 

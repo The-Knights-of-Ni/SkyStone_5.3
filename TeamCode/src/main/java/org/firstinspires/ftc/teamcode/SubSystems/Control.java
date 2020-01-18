@@ -13,8 +13,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Created by AndrewC on 1/17/2020
  */
 public class Control extends Subsystem {
-    private OpMode opMode;
     private HardwareMap hardwareMap;
+    private OpMode opMode;
     //DC Motors
     private DcMotorEx xRailWinch;
     private DcMotorEx armTilt;
@@ -36,8 +36,17 @@ public class Control extends Subsystem {
      * The TILT_TABLE_SIZE records the number of entries in the TILT_TABLE
      * The TILT_TABLE consists of TILT_TABLE_SIZE pairs of data. Each pair is (tilt angle, arm tilt motor tick).
      */
-    private static final int        TILT_TABLE_SIZE                     = 50;
-    private static final double[]   TILT_TABLE = {0.0, 10, 1.2, 20};
+    private static final int        TILT_TABLE_SIZE                     = 83;
+    private static final double[]   TILT_TABLE = {
+            0.0, 0, 0.6, 88, 1.5, 131, 2.2, 160, 2.9, 200, 3.4, 223, 4.1, 257, 5.0, 301, 5.8, 350, 6.7, 392,
+            7.3, 432, 8.2, 479, 9.1, 535, 9.7, 571, 10.5, 617, 11.2, 658, 11.7, 686, 12.2, 716, 12.7, 748, 13.2, 781,
+            13.6, 810, 14.1, 838, 14.7, 880, 15.2, 918, 15.8, 951, 16.1, 972, 16.9, 1023, 17.9, 1093, 18.5, 1131, 18.9, 1158,
+            19.5, 1205, 20.2, 1252, 20.9, 1300, 21.3, 1333, 21.9, 1376, 22.7, 1428, 23.3, 1473, 23.9, 1518, 25.0, 1602, 25.9, 1666,
+            26.9, 1736, 27.8, 1801, 28.5, 1854, 29.5, 1932, 30.3, 1997, 31.2, 2067, 32.0, 2120, 33.0, 2199, 34.0, 2269, 34.7, 2336,
+            35.5, 2391, 36.5, 2470, 37.2, 2534, 38.2, 2608, 38.9, 2661, 40.1, 2750, 40.8, 2812, 41.4, 2862, 42.2, 2923, 43.1, 3000,
+            44.0, 3060, 45.1, 3152, 45.9, 3210, 46.7, 3284, 47.8, 3372, 48.7, 3444, 49.4, 3501, 50.5, 3584, 51.0, 3630, 51.9, 3700,
+            53.3, 3804, 54.4, 3893, 55.5, 3987, 57.0, 4106, 58.1, 4186, 59.6, 4301, 61.0, 4414, 62.0, 4491, 63.0, 4564, 63.7, 4615,
+            64.7, 4688, 65.9, 4771, 67.5, 4889 };
 
     //DO WITH ENCODERS
     private static final double     TICKS_PER_MOTOR_REV_40          = 1120;    // AM Orbital 20 motor
@@ -51,12 +60,12 @@ public class Control extends Subsystem {
     private static final double     MOTOR_TICK_PER_REV_NEVERREST40      = 1120.0;
     private static final double     MOTOR_TICK_PER_REV_YELLOJACKET223   = 188.3;
     private static final double     REV_PER_MIN_YELLOJACKET223          = 223.0;
-    private static final double     MOTOR_TICK_PER_REV_YELLOJACKET1620   = 25.9;
+    private static final double     MOTOR_TICK_PER_REV_YELLOJACKET1620   = 103.6;
     private static final double     REV_PER_MIN_YELLOJACKET1620          = 1620.0;
-    private static final double     WINCH_MAX_SPEED_MM_PER_SEC          = (160.0 * WINCH_DIAMETER_MM * Math.PI) / 60.0;
-    private static final double     WINCH_MAX_SPEED_TICK_PER_SEC        = (MOTOR_TICK_PER_REV_NEVERREST40 * 160.0) / 60.0;
-    private static final double     TILT_MAX_SPEED_TICK_PER_SEC         = (MOTOR_TICK_PER_REV_YELLOJACKET223 * REV_PER_MIN_YELLOJACKET223) / 60.0;
-    private static final double     TILT_TICK_PER_90_DEGREE             = 2510.0;
+    private static final double     WINCH_MAX_SPEED_MM_PER_SEC          = (RPM_MAX_NEVERREST_40 * WINCH_DIAMETER_MM * Math.PI) / 60.0;
+    private static final double     WINCH_MAX_SPEED_TICK_PER_SEC        = (MOTOR_TICK_PER_REV_NEVERREST40 * RPM_MAX_NEVERREST_40) / 60.0;
+    private static final double     TILT_MAX_SPEED_TICK_PER_SEC         = (MOTOR_TICK_PER_REV_YELLOJACKET1620 * REV_PER_MIN_YELLOJACKET1620) / 60.0;
+//    private static final double     TILT_TICK_PER_90_DEGREE             = 2510.0;
 
     // Servos
     private static final double     fClawLFoundation = 0.45;
@@ -66,21 +75,25 @@ public class Control extends Subsystem {
     private static final double     fClawRUp = 0.21;
     private static final double     fClawRDown = 0.63;
 
-    private static final double     CLAW_ARM_POS_0_DEG                  = 0.13; // xRail horizontal and main claw facing down
-    private static final double     CLAW_ARM_POS_180_DEG                = 0.88;
+    private static final double     CLAW_ARM_POS_ANGLE                  = 71.3; // most positive angle
+    private static final double     CLAW_ARM_POS_VALUE                  = 0.953; // servo setting at most positive angle
+    private static final double     CLAW_ARM_POS_0_DEG                  = 0.664; // xRail horizontal and main claw facing down
+    private static final double     CLAW_ARM_POS_N180_DEG                = 0.04;
     private static final double     CLAW_ARM_ROT_0_DEG                  = 0.046;
     private static final double     CLAW_ARM_ROT_180_DEG                = 0.796;
     private static final double     MAIN_CLAW_POS_OPEN                  = 0.65;
     private static final double     MAIN_CLAW_POS_CLOSED_STONE          = 0.35;
     private static final double     MAIN_CLAW_POS_CLOSED                = 0.35;
 
-    private static final double     CS_ARM_POS_0_DEG                  = 0.833; // xRail horizontal and cs claw facing down
-    private static final double     CS_ARM_POS_180_DEG                = 0.142;
+    private static final double     CS_ARM_POS_ANGLE                  = 68.5; // most positive angle
+    private static final double     CS_ARM_POS_VALUE                  = 0.038; // servo setting at most positive angle
+    private static final double     CS_ARM_POS_0_DEG                  = 0.301; // xRail horizontal and cs claw facing down
+    private static final double     CS_ARM_POS_N180_DEG                = 0.939;
     private static final double     CS_CLAW_POS_OPEN                  = 0.66;
     private static final double     CS_CLAW_POS_CLOSED                = 0.43;
 
     public Control(DcMotorEx xRailWinch, DcMotorEx armTilt, Servo mainClaw, Servo mainClawRotation, Servo mainClawArm,
-                   Servo csClaw, Servo csArm, Servo fClawL, Servo fClawR, BNO055IMU imu, ElapsedTime timer, OpMode opMode) {
+                   Servo csClaw, Servo csArm, Servo fClawL, Servo fClawR, BNO055IMU imu, OpMode opMode, ElapsedTime timer) {
         this.xRailWinch = xRailWinch;
         this.armTilt = armTilt;
         this.mainClaw = mainClaw;
@@ -121,14 +134,14 @@ public class Control extends Subsystem {
     public double getMotorTickPerRevYellojacket223(){
         return MOTOR_TICK_PER_REV_YELLOJACKET223;
     }
-    public double getTiltTickPer90Degree(){
-        return TILT_TICK_PER_90_DEGREE;
-    }
+//    public double getTiltTickPer90Degree(){
+//        return TILT_TICK_PER_90_DEGREE;
+//    }
     public double getClawArmPos0Deg(){
         return CLAW_ARM_POS_0_DEG;
     }
-    public double getClawArmPos180Deg(){
-        return CLAW_ARM_POS_180_DEG;
+    public double getClawArmPosN180Deg(){
+        return CLAW_ARM_POS_N180_DEG;
     }
     public double getClawArmRot0Deg(){
         return CLAW_ARM_ROT_0_DEG;
@@ -148,8 +161,8 @@ public class Control extends Subsystem {
     public double getCSArmPos0Deg(){
         return CS_ARM_POS_0_DEG;
     }
-    public double getCSArmPos180Deg(){
-        return CS_ARM_POS_180_DEG;
+    public double getCSArmPosN180Deg(){
+        return CS_ARM_POS_N180_DEG;
     }
     public double getCSClawPosOpen(){
         return  CS_CLAW_POS_OPEN;
@@ -199,13 +212,25 @@ public class Control extends Subsystem {
         mainClawArm.setPosition(this.mainClawArmAngleToPos(angle));
     }
     public double mainClawArmAngleToPos(double angle){
-        return ((angle / 180.0) * (this.getClawArmPos180Deg() - this.getClawArmPos0Deg())) + this.getClawArmPos0Deg();
+        double value;
+        if (angle < 0.0) {
+            value = ((angle / 180.0) * (CLAW_ARM_POS_0_DEG - CLAW_ARM_POS_N180_DEG)) + CLAW_ARM_POS_0_DEG;
+        }
+        else {
+            value = ((angle / CLAW_ARM_POS_ANGLE) * (CLAW_ARM_POS_VALUE - CLAW_ARM_POS_0_DEG)) + CLAW_ARM_POS_0_DEG;
+        }
+        if (value > 1.0) value = 1.0;
+        if (value < 0.0) value = 0.0;
+        return value;
     }
     public void setMainClawRotationDegrees(double angle) {
         mainClawArm.setPosition(this.mainClawRotationAngleToPos(angle));
     }
     public double mainClawRotationAngleToPos(double angle){
-        return ((angle / 180.0) * (this.getClawArmRot180Deg() - this.getClawArmRot0Deg())) + this.getClawArmRot0Deg();
+        double value = ((angle / 180.0) * (this.getClawArmRot180Deg() - this.getClawArmRot0Deg())) + this.getClawArmRot0Deg();
+        if (value > 1.0) value = 1.0;
+        if (value < 0.0) value = 0.0;
+        return value;
     }
 
     public void openCSClaw() {
@@ -218,7 +243,16 @@ public class Control extends Subsystem {
         csArm.setPosition(this.CSClawArmAngleToPos(angle));
     }
     public double CSClawArmAngleToPos(double angle){
-        return ((angle / 180.0) * (this.getCSArmPos180Deg() - this.getCSArmPos0Deg())) + this.getCSArmPos0Deg();
+        double value;
+        if (angle < 0.0) {
+            value = ((angle / 180.0) * (CS_ARM_POS_0_DEG - CS_ARM_POS_N180_DEG)) + CS_ARM_POS_0_DEG;
+        }
+        else {
+            value = ((angle / CS_ARM_POS_ANGLE) * (CS_ARM_POS_VALUE - CS_ARM_POS_0_DEG)) + CS_ARM_POS_0_DEG;
+        }
+        if (value > 1.0) value = 1.0;
+        if (value < 0.0) value = 0.0;
+        return value;
     }
 
     public void modifyServo(Servo servo, double value) {

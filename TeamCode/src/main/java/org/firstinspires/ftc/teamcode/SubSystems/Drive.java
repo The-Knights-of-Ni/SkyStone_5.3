@@ -12,9 +12,8 @@ import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 
 /** Mecanum drivetrain subsystem */
 public class Drive extends Subsystem {
-
-    private OpMode opMode;
     private HardwareMap hardwareMap;
+    private OpMode opMode;
     //DC Motors
     public DcMotorEx frontLeft;
     public DcMotorEx frontRight;
@@ -58,7 +57,7 @@ public class Drive extends Subsystem {
     private boolean targetVisible = false;
 
 
-    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, ElapsedTime timer, OpMode opMode) {
+    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, OpMode opMode, ElapsedTime timer) {
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
         this.rearLeft = rearLeft;
