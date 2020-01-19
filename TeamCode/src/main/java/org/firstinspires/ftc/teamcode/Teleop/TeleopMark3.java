@@ -126,9 +126,9 @@ public class TeleopMark3 extends LinearOpMode {
             }
 
             // control main claw
-            if ((robot.triggerLeft > 0.5) && (robot.triggerRight < 0.5)) { // main claw open
+            if ((robot.triggerLeft2 > 0.5) && (robot.triggerRight2 < 0.5)) { // main claw open
                 robot.control.openMainClaw();
-            } else if ((robot.triggerRight > 0.5) && (robot.triggerLeft < 0.5)) { // main claw close
+            } else if ((robot.triggerRight2 > 0.5) && (robot.triggerLeft2 < 0.5)) { // main claw close
                 robot.control.closeMainClawStone();
             }
 
@@ -183,6 +183,13 @@ public class TeleopMark3 extends LinearOpMode {
             }
             robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
 
+            if(mainClawArmControlDigital && mainClawArmDeployed){
+                robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+            }
+            if(csClawArmDeployed && csClawArmControlDigital){
+                robot.control.setCSClawArmDegrees(robot.control.getMainArmTargetAngle());
+            }
+
 
 
 //            tiltCurrentAngle = ((tiltCurrentPosition / 2510.0) * 90.0);
@@ -235,8 +242,8 @@ public class TeleopMark3 extends LinearOpMode {
 
 
 //            telemetry.addData("", "");
-//            telemetry.addData("Left Rear Power", robot.rearLeftDriveMotor.getPower());
-//            telemetry.addData("Left Front Power", robot.frontLeftDriveMotor.getPower());
+//            telemetry.addData("Left trigger", robot);
+//            telemetry.addData("Right trigger", robot.frontLeftDriveMotor.getPower());
 //            telemetry.addData("Right Rear Power", robot.rearRightDriveMotor.getPower());
 //            telemetry.addData("Right Front Power", robot.frontRightDriveMotor.getPower());
 

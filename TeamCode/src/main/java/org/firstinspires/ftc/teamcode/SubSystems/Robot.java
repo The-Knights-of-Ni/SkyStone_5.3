@@ -71,8 +71,8 @@ public class Robot extends Subsystem {
     public double leftStickY;
     public double rightStickX;
     public double rightStickY;
-    public double triggerLeft;
-    public double triggerRight;
+    public float triggerLeft;
+    public float triggerRight;
     public boolean aButton = false;
     public boolean bButton = false;
     public boolean xButton = false;
@@ -88,8 +88,8 @@ public class Robot extends Subsystem {
     public double leftStickY2;
     public double rightStickX2;
     public double rightStickY2;
-    public double triggerLeft2;
-    public double triggerRight2;
+    public float triggerLeft2;
+    public float triggerRight2;
     public boolean aButton2 = false;
     public boolean bButton2 = false;
     public boolean xButton2 = false;
