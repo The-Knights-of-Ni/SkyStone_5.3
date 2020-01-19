@@ -112,12 +112,46 @@ public class Drive extends Subsystem {
         rearRight.setPower(-power);
     }
 
+    // robot move in all directions
+    public double[] calcMotorPowers(double leftStickX, double leftStickY, double rightStickX) {
+        double r = Math.hypot(leftStickX, leftStickY);
+        double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double lrPower = r * Math.sin(robotAngle) + rightStickX;
+        double lfPower = r * Math.cos(robotAngle) + rightStickX;
+        double rrPower = r * Math.cos(robotAngle) - rightStickX;
+        double rfPower = r * Math.sin(robotAngle) - rightStickX;
+        return new double[]{lfPower, rfPower, lrPower, rrPower};
+    }
+
+    // robot only move in forward/backward/left/right directions
+    public double[] calcMotorPowers2(double leftStickX, double leftStickY, double rightStickX) {
+        if(Math.abs(leftStickX) >= Math.abs((leftStickY))){
+            leftStickY = 0;
+        }
+        else{
+            leftStickX = 0;
+        }
+        double r = Math.hypot(leftStickX, leftStickY);
+        double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double lrPower = r * Math.sin(robotAngle) + rightStickX;
+        double lfPower = r * Math.cos(robotAngle) + rightStickX;
+        double rrPower = r * Math.cos(robotAngle) - rightStickX;
+        double rfPower = r * Math.sin(robotAngle) - rightStickX;
+        return new double[]{lfPower, rfPower, lrPower, rrPower};
+    }
 
     public void setDrivePower(double power) {
         frontLeft.setPower(power);
         frontRight.setPower(power);
         rearLeft.setPower(power);
         rearRight.setPower(power);
+    }
+
+    public void setDrivePowers(double[] powers) {
+        frontLeft.setPower(powers[0]);
+        frontRight.setPower(powers[1]);
+        rearLeft.setPower(powers[2]);
+        rearRight.setPower(powers[3]);
     }
 
     public void setTargetPosition(int targetPosition) {
