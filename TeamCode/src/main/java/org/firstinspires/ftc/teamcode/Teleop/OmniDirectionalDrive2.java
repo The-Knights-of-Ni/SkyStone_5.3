@@ -80,9 +80,14 @@ public class OmniDirectionalDrive2 extends LinearOpMode {
             double leftStickX = gamepad1.left_stick_x;
             double leftStickY = -gamepad1.left_stick_y;
             double rightStickX = gamepad1.right_stick_x;
+            double rightStickY = -gamepad1.right_stick_y;
+//
+//            //Get robot angle
+//            double robotAngle = imu.getAngularOrientation().firstAngle;
+//            double robotAngle360 = to360(robotAngle);
 
-            //Get robot angle
-            double robotAngle = imu.getAngularOrientation().firstAngle;
+            //Synthesize robot angle
+            double robotAngle = Math.atan2(rightStickY, rightStickX) - Math.PI / 2;
             double robotAngle360 = to360(robotAngle);
 
             //Get controller angle
@@ -104,6 +109,8 @@ public class OmniDirectionalDrive2 extends LinearOpMode {
             robot.drive.rearRight.setPower(powers[2]);
             robot.drive.frontRight.setPower(powers[3]);
 
+            telemetry.addData("Fake RBT Angle", robotAngle360);
+            telemetry.addData("CNTRL Angle", controllerAngle360);
 
 
             resetAngle();
