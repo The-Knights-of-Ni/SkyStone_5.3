@@ -18,33 +18,6 @@ public class TeleopMark2 extends LinearOpMode {
     //Declare DC motor objects
     private Robot robot;
 
-    double leftStickX;
-    double leftStickY;
-    double rightStickX;
-    boolean aButton;
-    boolean bButton;
-    boolean dPadUp;
-    boolean dPadDown;
-    boolean dPadLeft;
-    boolean dPadRight;
-    boolean bumperLeft;
-
-    double leftStickX2;
-    double leftStickY2;
-    double rightStickX2;
-    double rightStickY2;
-    boolean aButton2;
-    boolean bButton2;
-    boolean dPadUp2;
-    boolean dPadDown2;
-    boolean dPadLeft2;
-    boolean dPadRight2;
-    boolean bumperLeft2;
-    boolean bumperRight2;
-
-    boolean isaButton2PressedPrev = false;
-    boolean isbButton2PressedPrev = false;
-
     int winchCurrentPosition = 0;
     int winchTargetPositionCurrent = 0;
     int winchTargetPositionPre = 0;
@@ -55,7 +28,7 @@ public class TeleopMark2 extends LinearOpMode {
     int tiltTargetPositionCurrent = 0;
     int tiltTargetPositionPre = 0;
     int tiltPosError = 300;
-    int tiltMax = 1200;
+    int tiltMax = 6000;
     double tiltCurrentAngle = 0;
 
 //    int clawTiltCurrentPosition = 0;
@@ -64,24 +37,21 @@ public class TeleopMark2 extends LinearOpMode {
 //    int clawTiltPosError = 300;
 //    int clawTiltMax = 1200;
 
-    double timePre;
-    double timeCurrent;
     double winchSpeed;
     double tiltSpeed;
     double deltaT;
     double winchIncrement = 0;
     double tiltIncrement = 0;
+    double timePre;
+    double timeCurrent;
     ElapsedTime timer;
 
 
     @Override
     public void runOpMode() throws InterruptedException {
         initOpMode();
+        robot.initServosAuto();
         waitForStart();
-
-        //set foundation servo positions
-        robot.fClawL.setPosition(0.5);
-        robot.fClawR.setPosition(0.5);
 
         double tgtPower = 0;
 
@@ -89,29 +59,7 @@ public class TeleopMark2 extends LinearOpMode {
         while(opModeIsActive()) {
 
             //Get gamepad inputs
-            leftStickX = gamepad1.left_stick_x;
-            leftStickY = -gamepad1.left_stick_y;
-            rightStickX = gamepad1.right_stick_x;
-            aButton = gamepad1.a;
-            bButton = gamepad1.b;
-            dPadUp = gamepad1.dpad_up;
-            dPadDown = gamepad1.dpad_down;
-            dPadLeft = gamepad1.dpad_left;
-            dPadRight = gamepad1.dpad_right;
-            bumperLeft = gamepad1.right_bumper;
-
-            leftStickX2 = gamepad2.left_stick_x;
-            leftStickY2 = -gamepad2.left_stick_y;
-            rightStickX2 = gamepad2.right_stick_x;
-            rightStickY2 = -gamepad2.right_stick_y;
-            aButton2 = gamepad2.a;
-            bButton2 = gamepad2.b;
-            dPadUp2 = gamepad2.dpad_up;
-            dPadDown2 = gamepad2.dpad_down;
-            dPadLeft2 = gamepad2.dpad_left;
-            dPadRight2 = gamepad2.dpad_right;
-            bumperLeft2 = gamepad2.left_bumper;
-            bumperRight2 = gamepad2.right_bumper;
+            robot.getGamePadInputs();
 
             //Get the current time
             timeCurrent = timer.nanoseconds();
@@ -121,95 +69,96 @@ public class TeleopMark2 extends LinearOpMode {
 //            robot.rearLeftDriveMotor.setPower(motorPowers[0]);
 //            robot.frontLeftDriveMotor.setPower(motorPowers[1]);
 //            robot.rearRightDriveMotor.setPower(motorPowers[2]);
-//            robot.frontRightDriveMotor.setPower(motorPowers[3]);
+//                              robot.frontRightDriveMotor.setPower(motorPowers[3]);
 //
-//            deltaT = timeCurrent - timePre;
-//
-//            //Winch
-//            //930mm, 8400 encoder count
-//            if((leftStickY2 > 0.5)){
-//                robot.xRailWinch.setPower(1.0);
-//            }
-//            else if(leftStickY2 > 0.1){
-//                robot.xRailWinch.setPower(0.5);
-//            }
-//            else if(leftStickY2 > -0.5){
-//                robot.xRailWinch.setPower(0.3);
-//            }
-//            else {
-//                robot.xRailWinch.setPower(0.7);
-//            }
-//
-//            if(leftStickY2 >= 0.1){
-//                winchSpeed = (leftStickY2 - 0.1) * (robot.drive.getWinchMaxSpeedTickPerSec() / 0.9);
-//            }
-//            else if(leftStickY2  <= -0.1){
-//                winchSpeed = (leftStickY2 + 0.1) * (robot.drive.getWinchMaxSpeedTickPerSec() / 0.9);
-//            }
-//            else{
-//                winchSpeed = 0.0;
-//            }
-//
-//            //Get winch's current position
-//            winchCurrentPosition = robot.xRailWinch.getCurrentPosition();
-//
-//            //Determine the speed of the winch
-//            winchIncrement = (winchSpeed * deltaT) / Math.pow(10.0,9);
-//
-//            //Determine winch target position
-//            winchTargetPositionCurrent = (int) (winchTargetPositionPre + winchIncrement);
-//
-//            //Make sure the winch is still in the boundries
-//            if((winchTargetPositionCurrent <= winchMax) && (winchTargetPositionCurrent >= 0)
-//                    && ( Math.abs(winchTargetPositionCurrent - winchCurrentPosition) < winchPosError)){
-//                robot.xRailWinch.setTargetPosition(winchTargetPositionCurrent);
-//                winchTargetPositionPre = winchTargetPositionCurrent;
-//            }
-//
-//            //Tilt
-//            if((rightStickY2 > 0.5)){
+            deltaT = timeCurrent - timePre;
+
+            //Winch
+            //930mm, 8400 encoder count
+            if((robot.leftStickY2 > 0.5)){
+                robot.xRailWinch.setPower(1.0);
+            }
+            else if(robot.leftStickY2 > 0.1){
+                robot.xRailWinch.setPower(0.5);
+            }
+            else if(robot.leftStickY2 > -0.5){
+                robot.xRailWinch.setPower(0.3);
+            }
+            else {
+                robot.xRailWinch.setPower(0.7);
+            }
+
+            if(robot.leftStickY2 >= 0.1){
+                winchSpeed = (robot.leftStickY2 - 0.1) * (robot.control.getWinchMaxSpeedTickPerSec() / 0.9);
+            }
+            else if(robot.leftStickY2  <= -0.1){
+                winchSpeed = (robot.leftStickY2 + 0.1) * (robot.control.getWinchMaxSpeedTickPerSec() / 0.9);
+            }
+            else{
+                winchSpeed = 0.0;
+            }
+
+            //Get winch's current position
+            winchCurrentPosition = robot.xRailWinch.getCurrentPosition();
+
+            //Determine the speed of the winch
+            winchIncrement = (winchSpeed * deltaT) / Math.pow(10.0,9);
+
+            //Determine winch target position
+            winchTargetPositionCurrent = (int) (winchTargetPositionPre + winchIncrement);
+
+            //Make sure the winch is still in the boundries
+            if((winchTargetPositionCurrent <= winchMax) && (winchTargetPositionCurrent >= 0)
+                    && ( Math.abs(winchTargetPositionCurrent - winchCurrentPosition) < winchPosError)){
+                robot.xRailWinch.setTargetPosition(winchTargetPositionCurrent);
+                winchTargetPositionPre = winchTargetPositionCurrent;
+            }
+
+            //Tilt
+            robot.armTilt.setPower(1.0);
+//            if((robot.rightStickY2 > 0.5)){
 //                robot.armTilt.setPower(1.0);
 //            }
-//            else if(rightStickY2 > 0.1){
+//            else if(robot.rightStickY2 > 0.1){
 //                robot.armTilt.setPower(0.7);
 //            }
-//            else if(rightStickY2 > -0.5){
+//            else if(robot.rightStickY2 > -0.5){
 //                robot.armTilt.setPower(1.0);
 //            }
 //            else{
 //                robot.armTilt.setPower(1.0);
 //            }
-//
-//            if(rightStickY2 >= 0.1){
-//                tiltSpeed = (rightStickY2 - 0.1) * (robot.drive.getTiltMaxSpeedTickPerSec() / 0.9);
-//            }
-//            else if(rightStickY2  <= -0.1){
-//                tiltSpeed = (rightStickY2 + 0.1) * (robot.drive.getTiltMaxSpeedTickPerSec() / 0.9);
-//            }
-//            else{
-//                tiltSpeed = 0.0;
-//            }
-//
-//            //Find how much the arm is tilted
-//            tiltCurrentPosition = robot.armTilt.getCurrentPosition();
-//
-//            //Determines the speed of the tilt
-//            tiltIncrement = (tiltSpeed * deltaT) / Math.pow(10.0,9);
-//
-//            //Determines the target tilt position
-//            tiltTargetPositionCurrent = (int) (tiltTargetPositionPre + tiltIncrement);
-//
-//            //Make sure the tilt is tilt in bounds
-//            if((tiltTargetPositionCurrent <= tiltMax) && (tiltTargetPositionCurrent >= 0)
-//                    && ( Math.abs(tiltTargetPositionCurrent - tiltCurrentPosition) < tiltPosError)){
-//                robot.armTilt.setTargetPosition(tiltTargetPositionCurrent);
-//                tiltTargetPositionPre = tiltTargetPositionCurrent;
-//            }
-//
+
+            if(robot.rightStickY2 >= 0.1){
+                tiltSpeed = (robot.rightStickY2 - 0.1) * (robot.control.getTiltMaxSpeedTickPerSec() / 0.9);
+            }
+            else if(robot.rightStickY2  <= -0.1){
+                tiltSpeed = (robot.rightStickY2 + 0.1) * (robot.control.getTiltMaxSpeedTickPerSec() / 0.9);
+            }
+            else{
+                tiltSpeed = 0.0;
+            }
+
+            //Find how much the arm is tilted
+            tiltCurrentPosition = robot.armTilt.getCurrentPosition();
+
+            //Determines the speed of the tilt
+            tiltIncrement = (tiltSpeed * deltaT) / Math.pow(10.0,9);
+
+            //Determines the target tilt position
+            tiltTargetPositionCurrent = (int) (tiltTargetPositionPre + tiltIncrement);
+
+            //Make sure the tilt is tilt in bounds
+            if((tiltTargetPositionCurrent <= tiltMax) && (tiltTargetPositionCurrent >= 0)
+                    && ( Math.abs(tiltTargetPositionCurrent - tiltCurrentPosition) < tiltPosError)){
+                robot.armTilt.setTargetPosition(tiltTargetPositionCurrent);
+                tiltTargetPositionPre = tiltTargetPositionCurrent;
+            }
+
 //            tiltCurrentAngle = ((tiltCurrentPosition / 2510.0) * 90.0);
 //
-//            robot.mainArm.setPosition(robot.drive.mainArmAngletoPos(tiltCurrentAngle));
-//
+//            robot.mainClawArm.setPosition(robot.control.mainClawArmAngleToPos(tiltCurrentAngle));
+
 //            if (aButton2 && !isaButton2PressedPrev) {
 //                robot.mainClaw.setPosition(robot.drive.getMainClawPosClosedStone());
 //                isaButton2PressedPrev = true;
@@ -252,16 +201,16 @@ public class TeleopMark2 extends LinearOpMode {
 //            telemetry.addData("Left Stick Y2", leftStickY2);
 //            telemetry.addData("Right Stick Y2", rightStickY2);
 //            telemetry.addData("Right Stick X", rightStickX);
-//            telemetry.addData("currentPosTilt", tiltCurrentPosition);
-//            telemetry.addData("mainArm", robot.mainArm.getPosition());
 
 
-//            telemetry.addData("currentPosWinch", winchCurrentPosition);
-//            telemetry.addData("targetPosWinch", winchTargetPositionCurrent);
-//            telemetry.addData("incrementWinch", winchIncrement);
+            telemetry.addData("currentPosWinch", winchCurrentPosition);
+            telemetry.addData("targetPosWinch", winchTargetPositionCurrent);
+            telemetry.addData("incrementWinch", winchIncrement);
 //
-//            telemetry.addData("targetPosTilt", tiltTargetPositionCurrent);
-//            telemetry.addData("incrementTilt", tiltIncrement);
+//            telemetry.addData("mainArm", robot.mainArm.getPosition());
+            telemetry.addData("currentPosTilt", tiltCurrentPosition);
+            telemetry.addData("targetPosTilt", tiltTargetPositionCurrent);
+            telemetry.addData("incrementTilt", tiltIncrement);
 
 
 //            telemetry.addData("", "");
@@ -270,41 +219,11 @@ public class TeleopMark2 extends LinearOpMode {
 //            telemetry.addData("Right Rear Power", robot.rearRightDriveMotor.getPower());
 //            telemetry.addData("Right Front Power", robot.frontRightDriveMotor.getPower());
 
-//            // test front claw servos
-//
-//            robot.fClawL.setPosition(this.gamepad2.left_stick_x*0.5+0.5);
-//            robot.fClawR.setPosition(this.gamepad2.right_stick_x*0.5+0.5);
-//
-//            telemetry.addData("LEFT Foundation Claw Servo Position", robot.fClawL.getPosition());
-//            telemetry.addData("Status", "Running");
-//
-//            telemetry.addData("RIGHT Foundation Claw Servo Position", robot.fClawR.getPosition());
-//            telemetry.addData("Status", "Running");
-
-            // test main arm servos
-
-            robot.mainArm.setPosition(this.gamepad2.left_stick_x*0.5+0.5);
-            robot.mainRotation.setPosition(this.gamepad2.right_stick_x*0.5+0.5);
-            robot.mainClaw.setPosition(this.gamepad2.right_stick_y*0.5+0.5);
-
-            telemetry.addData("Main Arm Servo Position", robot.mainArm.getPosition());
-            telemetry.addData("Main Claw Rotation Servo Position", robot.mainRotation.getPosition());
-            telemetry.addData("Main Claw Servo Position", robot.mainClaw.getPosition());
-            telemetry.addData("Status", "Running");
-
-//            // test capstone arm servos
-//
-//            robot.csArm.setPosition(this.gamepad2.left_stick_x*0.5+0.5);
-//            robot.csClaw.setPosition(this.gamepad2.right_stick_x*0.5+0.5);
-//
-//            telemetry.addData("Capstone Arm Servo Position", robot.csArm.getPosition());
-//            telemetry.addData("Capstone Claw Servo Position", robot.csClaw.getPosition());
-//            telemetry.addData("Status", "Running");
-
             telemetry.update();
             timePre = timeCurrent;
         }
     }
+
     private void initOpMode() {
         //Initialize DC motor objects
         timer = new ElapsedTime();
@@ -330,6 +249,7 @@ public class TeleopMark2 extends LinearOpMode {
 //        lfDrive.setDirection(DcMotor.Direction.REVERSE);
 //        rrDrive.setDirection(DcMotor.Direction.FORWARD);
 //        rfDrive.setDirection(DcMotor.Direction.FORWARD);
+
         telemetry.addData("Wait for start", "");
         telemetry.update();
     }

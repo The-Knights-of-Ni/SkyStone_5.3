@@ -70,7 +70,7 @@ public class Vision {
     private static int blueColorThreshold = 150;
     private static int yellowColorThreshold1 = 65;
     private static int yellowColorThreshold2 = 65;
-    enum DetectedColor {
+    public enum DetectedColor {
         RED,
         BLUE,
         YELLOW1,
@@ -78,7 +78,7 @@ public class Vision {
     }
     private static DetectedColor detectedColor = DetectedColor.YELLOW1;
 
-    enum TappingMode {
+    public enum TappingMode {
         VIEW,
         THRESHOLD,
     }

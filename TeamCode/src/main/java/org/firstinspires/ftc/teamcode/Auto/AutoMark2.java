@@ -147,12 +147,11 @@ public class AutoMark2 extends LinearOpMode {
 //            telemetry.update();
 
             robot.drive.moveForward(750); //move to foundation
-            robot.drive.lowerClawsToFoundation();
+            robot.control.lowerClawsToFoundation();
             robot.drive.moveBackward(650); //move foundation back
 
             // foundation claws back to original positions
-            robot.fClawL.setPosition(0.5);
-            robot.fClawL.setPosition(0.5);
+            robot.control.raiseClawsFromFoundation();
 
             robot.drive.moveRight(100);
 

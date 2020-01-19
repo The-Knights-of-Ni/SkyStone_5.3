@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Vision;
  * Created by AndrewC on 12/27/2019.
  */
 
-public class Robot {
+public class Robot extends Subsystem {
     public String name;
     private HardwareMap hardwareMap;
     private OpMode opMode;
@@ -33,8 +33,8 @@ public class Robot {
     public DcMotorEx armTilt;
 
     //Servos
-    public Servo mainArm;
-    public Servo mainRotation;
+    public Servo mainClawArm;
+    public Servo mainClawRotation;
     public Servo mainClaw; //0
     public Servo csClaw; //capstone claw
     public Servo csArm; //capstone arm
@@ -66,8 +66,57 @@ public class Robot {
     private BNO055IMU imu;
     private ColorSensor colorSensor;
 
+    // Declare game pad objects
+    public double leftStickX;
+    public double leftStickY;
+    public double rightStickX;
+    public double rightStickY;
+    public float triggerLeft;
+    public float triggerRight;
+    public boolean aButton = false;
+    public boolean bButton = false;
+    public boolean xButton = false;
+    public boolean yButton = false;
+    public boolean dPadUp = false;
+    public boolean dPadDown = false;
+    public boolean dPadLeft = false;
+    public boolean dPadRight = false;
+    public boolean bumperLeft = false;
+    public boolean bumperRight = false;
+
+    public double leftStickX2;
+    public double leftStickY2;
+    public double rightStickX2;
+    public double rightStickY2;
+    public float triggerLeft2;
+    public float triggerRight2;
+    public boolean aButton2 = false;
+    public boolean bButton2 = false;
+    public boolean xButton2 = false;
+    public boolean yButton2 = false;
+    public boolean dPadUp2 = false;
+    public boolean dPadDown2 = false;
+    public boolean dPadLeft2 = false;
+    public boolean dPadRight2 = false;
+    public boolean bumperLeft2 = false;
+    public boolean bumperRight2 = false;
+
+    public boolean isaButtonPressedPrev = false;
+    public boolean isbButtonPressedPrev = false;
+    public boolean isxButtonPressedPrev = false;
+    public boolean isyButtonPressedPrev = false;
+    public boolean islBumperPressedPrev = false;
+    public boolean isrBumperPressedPrev = false;
+    public boolean isaButton2PressedPrev = false;
+    public boolean isbButton2PressedPrev = false;
+    public boolean isxButton2PressedPrev = false;
+    public boolean isyButton2PressedPrev = false;
+    public boolean islBumper2PressedPrev = false;
+    public boolean isrBumper2PressedPrev = false;
+
     //Subsystems
     public Drive drive;
+    public Control control;
     public Vision vision;
 
     public Robot(OpMode opMode, ElapsedTime timer){
@@ -119,22 +168,27 @@ public class Robot {
         rearRightDriveMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         xRailWinch = (DcMotorEx) hardwareMap.dcMotor.get("winch");
-        armTilt = (DcMotorEx) hardwareMap.dcMotor.get("tilt");
-
         xRailWinch.setDirection(DcMotorSimple.Direction.REVERSE);
-        armTilt.setDirection(DcMotorSimple.Direction.REVERSE);
-
-
-
         xRailWinch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        xRailWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        xRailWinch.setTargetPosition(0);
+        xRailWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        xRailWinch.setPower(1.0);
+
+        armTilt = (DcMotorEx) hardwareMap.dcMotor.get("tilt");
+        armTilt.setDirection(DcMotorSimple.Direction.FORWARD);
         armTilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armTilt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armTilt.setTargetPosition(0);
+        armTilt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armTilt.setPower(1.0);
 
         //Servos
-        mainArm = hardwareMap.servo.get("mA");
-        mainRotation = hardwareMap.servo.get("mR");
+        mainClawArm = hardwareMap.servo.get("mA");
+        mainClawRotation = hardwareMap.servo.get("mR");
         mainClaw = hardwareMap.servo.get("mC");
-//        csClaw = hardwareMap.servo.get("csC"); //capstone claw
-//        csArm = hardwareMap.servo.get("csA"); //capstone arm
+        csClaw = hardwareMap.servo.get("csC"); //capstone claw
+        csArm = hardwareMap.servo.get("csA"); //capstone arm
         fClawL = hardwareMap.servo.get("fL");
         fClawR = hardwareMap.servo.get("fR");
 
@@ -157,26 +211,83 @@ public class Robot {
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-
         imu.initialize(parameters);
 
         //Subsystems
-        drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, timer, opMode);
+        drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, opMode, timer);
+        control = new Control(xRailWinch, armTilt, mainClaw, mainClawRotation, mainClawArm, csClaw, csArm, fClawL, fClawR, imu, opMode, timer);
         if (visionMode != 0) {
             vision = new Vision(hardwareMap, this, visionMode);
         }
     }
 
     public void initServosAuto() {
-        this.drive.raiseClawsFromFoundation();
+        this.control.closeMainClaw();
+        this.control.closeCSClaw();
+        this.control.setMainClawRotationDegrees(180.0);
+        this.control.retractMainClawArm();
+        this.control.retractCSClawArm();
+        this.control.raiseClawsFromFoundation();
     }
 
     public void initServosTeleop() {
-        this.drive.raiseClawsFromFoundation();
+        this.control.closeMainClaw();
+        this.control.closeCSClaw();
+        this.control.retractCSClawArm();
+        this.control.raiseClawsFromFoundation();
     }
 
     public OpMode getOpmode(){
         return this.opMode;
     }
+
+    public void getGamePadInputs() {
+        isaButtonPressedPrev = aButton;
+        isbButtonPressedPrev = bButton;
+        isxButtonPressedPrev = xButton;
+        isyButtonPressedPrev = yButton;
+        islBumperPressedPrev = bumperLeft;
+        isrBumperPressedPrev = bumperRight;
+        leftStickX = opMode.gamepad1.left_stick_x;
+        leftStickY = -opMode.gamepad1.left_stick_y;
+        rightStickX = opMode.gamepad1.right_stick_x;
+        rightStickY = opMode.gamepad1.right_stick_y;
+        triggerLeft = opMode.gamepad1.left_trigger;
+        triggerRight = opMode.gamepad1.right_trigger;
+        aButton = opMode.gamepad1.a;
+        bButton = opMode.gamepad1.b;
+        xButton = opMode.gamepad1.x;
+        yButton = opMode.gamepad1.y;
+        dPadUp = opMode.gamepad1.dpad_up;
+        dPadDown = opMode.gamepad1.dpad_down;
+        dPadLeft = opMode.gamepad1.dpad_left;
+        dPadRight = opMode.gamepad1.dpad_right;
+        bumperLeft = opMode.gamepad1.left_bumper;
+        bumperRight = opMode.gamepad1.right_bumper;
+
+        isaButton2PressedPrev = aButton2;
+        isbButton2PressedPrev = bButton2;
+        isxButton2PressedPrev = xButton2;
+        isyButton2PressedPrev = yButton2;
+        islBumper2PressedPrev = bumperLeft2;
+        isrBumper2PressedPrev = bumperRight2;
+        leftStickX2 = opMode.gamepad2.left_stick_x;
+        leftStickY2 = -opMode.gamepad2.left_stick_y;
+        rightStickX2 = opMode.gamepad2.right_stick_x;
+        rightStickY2 = -opMode.gamepad2.right_stick_y;
+        triggerLeft2 = opMode.gamepad2.left_trigger;
+        triggerRight2 = opMode.gamepad2.right_trigger;
+        aButton2 = opMode.gamepad2.a;
+        bButton2 = opMode.gamepad2.b;
+        xButton2 = opMode.gamepad2.x;
+        yButton2 = opMode.gamepad2.y;
+        dPadUp2 = opMode.gamepad2.dpad_up;
+        dPadDown2 = opMode.gamepad2.dpad_down;
+        dPadLeft2 = opMode.gamepad2.dpad_left;
+        dPadRight2 = opMode.gamepad2.dpad_right;
+        bumperLeft2 = opMode.gamepad2.left_bumper;
+        bumperRight2 = opMode.gamepad2.right_bumper;
+    }
+
 }
 

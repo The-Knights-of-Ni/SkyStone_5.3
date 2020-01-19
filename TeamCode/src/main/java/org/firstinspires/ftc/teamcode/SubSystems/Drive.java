@@ -12,24 +12,22 @@ import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 
 /** Mecanum drivetrain subsystem */
 public class Drive extends Subsystem {
-
-    private Robot robot;
+    private HardwareMap hardwareMap;
+    private OpMode opMode;
     //DC Motors
     public DcMotorEx frontLeft;
     public DcMotorEx frontRight;
     public DcMotorEx rearLeft;
     public DcMotorEx rearRight;
-    private OpMode opMode;
-    private HardwareMap hardwareMap;
+
+    //Sensors
+    private BNO055IMU imu;
 
     private double robotCurrentPosX;    // unit in mm
     private double robotCurrentPosY;    // unit in mm
     private double robotCurrentAngle;   // unit in degrees
 
 
-
-    //Sensors
-    public BNO055IMU imu;
 
     //DO WITH ENCODERS
     private static final double     TICKS_PER_MOTOR_REV_20          = 537.6;    // AM Orbital 20 motor
@@ -44,26 +42,6 @@ public class Drive extends Subsystem {
     private static final double     COUNTS_CORRECTION_X             = 0.939;
     private static final double     COUNTS_CORRECTION_Y             = 0.646;
 
-    private static final double     WINCH_DIAMETER_INCH                 = 1.244;  //inch original measurement
-    private static final double     WINCH_DIAMETER_MM                   = WINCH_DIAMETER_INCH * 2.54 * 10.0; //milimeters
-    private static final double     WINCH_RADIUS_MM                     = WINCH_DIAMETER_MM / 2.0;
-    private static final double     WINCH_CIRCUMFERENCE_MM              = WINCH_RADIUS_MM * 2.0 * Math.PI;
-    private static final double     MOTOR_TICK_PER_REV_NEVERREST40      = 1120.0;
-    private static final double     MOTOR_TICK_PER_REV_YELLOJACKET223   = 188.3;
-    private static final double     REV_PER_MIN_YELLOJACKET223          = 223.0;
-    private static final double     WINCH_MAX_SPEED_MM_PER_SEC          = (160.0 * WINCH_DIAMETER_MM * Math.PI) / 60.0;
-    private static final double     WINCH_MAX_SPEED_TICK_PER_SEC        = (MOTOR_TICK_PER_REV_NEVERREST40 * 160.0) / 60.0;
-    private static final double     TILT_MAX_SPEED_TICK_PER_SEC         = (MOTOR_TICK_PER_REV_YELLOJACKET223 * REV_PER_MIN_YELLOJACKET223) / 60.0;
-    private static final double     TILT_TICK_PER_90_DEGREE             = 2510.0;
-
-    /**
-     * The TILT_TABLE is a lookup table for mapping the main arm angle to the arm tilt motor tick
-     * The TILT_TABLE_SIZE records the number of entries in the TILT_TABLE
-     * The TILT_TABLE consists of TILT_TABLE_SIZE pairs of data. Each pair is (tilt angle, arm tilt motor tick).
-     */
-    private static final int        TILT_TABLE_SIZE                     = 50;
-    private static final double[]   TILT_TABLE = {0.0, 10, 1.2, 20};
-
     private static final double     DRIVE_SPEED             = 0.4;
     private static final double     TURN_SPEED              = 0.3;
 
@@ -72,28 +50,6 @@ public class Drive extends Subsystem {
     private static final double     ROBOT_INIT_ANGLE    = 45.0;
     private static final float      mmPerInch        = 25.4f;
 
-    // Servos
-    private static final double     fClawLFoundation = 0.45;
-    private static final double     fClawRFoundation = 0.56;
-    private static final double     fClawLDown = 0.36;
-    private static final double     fClawLUp = 0.795;
-    private static final double     fClawRUp = 0.21;
-    private static final double     fClawRDown = 0.63;
-
-    private static final double     CLAW_ARM_POS_0_DEG                  = 0.13; // xRail horizontal and main claw facing down
-    private static final double     CLAW_ARM_POS_180_DEG                = 0.88;
-    private static final double     MAIN_CLAW_POS_OPEN                  = 0.65;
-    private static final double     MAIN_CLAW_POS_CLOSED_STONE          = 0.35;
-    private static final double     MAIN_CLAW_POS_CLOSED                = 0.35;
-
-    private static final double mainArmDown = 0.5; // TEMPORARY
-    private static final double mainArm0 = 0.5; // TEMPORARY
-    private static final double mainArm180 = 0.5; // TEMPORARY
-
-    private static final double mainClawOpen = 0.8; // TEMPORARY
-    private static final double mainClawClosed = 0.3; // TEMPORARY
-    private static final double mainClawStone = 0.5; // TEMPORARY
-
     private boolean allianceRed = false;
 
 
@@ -101,49 +57,22 @@ public class Drive extends Subsystem {
     private boolean targetVisible = false;
 
 
-    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, ElapsedTime timer, OpMode opMode) {
+    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, OpMode opMode, ElapsedTime timer) {
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
         this.rearLeft = rearLeft;
         this.rearRight = rearRight;
+        this.opMode = opMode;
         this.hardwareMap = opMode.hardwareMap;
         this.imu = imu;
         this.timer = timer;
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public double getWinchMaxSpeedMMpSec(){
-        return WINCH_MAX_SPEED_MM_PER_SEC;
-    }
-    public double getWinchMaxSpeedTickPerSec(){
-        return WINCH_MAX_SPEED_TICK_PER_SEC;
-    }
-    public double getTiltMaxSpeedTickPerSec(){
-        return TILT_MAX_SPEED_TICK_PER_SEC;
-    }
+
     public double getAngularVMaxNeverrest20(){
         return ANGULAR_V_MAX_NEVERREST_20;
     }
-    public double getMotorTickPerRevYellojacket223(){
-        return MOTOR_TICK_PER_REV_YELLOJACKET223;
-    }
-    public double getTiltTickPer90Degree(){
-        return TILT_TICK_PER_90_DEGREE;
-    }
-    public double getClawArmPos0Deg(){
-        return CLAW_ARM_POS_0_DEG;
-    }
-    public double getClawArmPos180Deg(){
-        return CLAW_ARM_POS_180_DEG;
-    }
-    public double getMainClawPosOpen(){
-        return  MAIN_CLAW_POS_OPEN;
-    }
-    public double getMainClawPosClosedStone(){
-        return MAIN_CLAW_POS_CLOSED_STONE;
-    }
-
-
 
     /**
      * Stops all drive motors
@@ -168,7 +97,7 @@ public class Drive extends Subsystem {
     /**
      * Sets all drive motors to specified zero power behavior
      */
-    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior mode) {
+    private void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior mode) {
         frontLeft.setZeroPowerBehavior(mode);
         frontRight.setZeroPowerBehavior(mode);
         rearLeft.setZeroPowerBehavior(mode);
@@ -183,12 +112,46 @@ public class Drive extends Subsystem {
         rearRight.setPower(-power);
     }
 
+    // robot move in all directions
+    public double[] calcMotorPowers(double leftStickX, double leftStickY, double rightStickX) {
+        double r = Math.hypot(leftStickX, leftStickY);
+        double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double lrPower = r * Math.sin(robotAngle) + rightStickX;
+        double lfPower = r * Math.cos(robotAngle) + rightStickX;
+        double rrPower = r * Math.cos(robotAngle) - rightStickX;
+        double rfPower = r * Math.sin(robotAngle) - rightStickX;
+        return new double[]{lfPower, rfPower, lrPower, rrPower};
+    }
+
+    // robot only move in forward/backward/left/right directions
+    public double[] calcMotorPowers2(double leftStickX, double leftStickY, double rightStickX) {
+        if(Math.abs(leftStickX) >= Math.abs((leftStickY))){
+            leftStickY = 0;
+        }
+        else{
+            leftStickX = 0;
+        }
+        double r = Math.hypot(leftStickX, leftStickY);
+        double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+        double lrPower = r * Math.sin(robotAngle) + rightStickX;
+        double lfPower = r * Math.cos(robotAngle) + rightStickX;
+        double rrPower = r * Math.cos(robotAngle) - rightStickX;
+        double rfPower = r * Math.sin(robotAngle) - rightStickX;
+        return new double[]{lfPower, rfPower, lrPower, rrPower};
+    }
 
     public void setDrivePower(double power) {
         frontLeft.setPower(power);
         frontRight.setPower(power);
         rearLeft.setPower(power);
         rearRight.setPower(power);
+    }
+
+    public void setDrivePowers(double[] powers) {
+        frontLeft.setPower(powers[0]);
+        frontRight.setPower(powers[1]);
+        rearLeft.setPower(powers[2]);
+        rearRight.setPower(powers[3]);
     }
 
     public void setTargetPosition(int targetPosition) {
@@ -379,40 +342,9 @@ public class Drive extends Subsystem {
 //        sleep(100);
     }
 
-    public void lowerClawsToFoundation() {
-        robot.fClawL.setPosition(fClawLFoundation);
-        robot.fClawR.setPosition(fClawRFoundation);
-    }
-
-    public void raiseClawsFromFoundation() {
-        robot.fClawL.setPosition(fClawLUp);
-        robot.fClawR.setPosition(fClawRUp);
-    }
-
-    public void pickUpStone() {
-        // Lower arm
-        // need to add rotation, arm claw synchronization
-        robot.mainArm.setPosition(mainArmDown);
-        robot.mainClaw.setPosition(mainClawOpen);
-        robot.mainClaw.setPosition(mainClawStone);
-        robot.mainArm.setPosition(0.5);
-    }
-
     public void park() {
         moveToPos2D(0.25,15,15); //temp position
         // change to where the tape is
     }
 
-    public void dropStone() {
-        // lower arm
-        // rotate?
-        robot.mainArm.setPosition(mainArmDown);
-        robot.mainClaw.setPosition(mainClawOpen);
-        robot.mainArm.setPosition(0.5);
-        robot.mainClaw.setPosition(0);
-    }
-
-    public double mainArmAngletoPos(double angle){
-        return ((angle / 180.0) * (this.getClawArmPos180Deg() - this.getClawArmPos0Deg())) + this.getClawArmPos0Deg();
-    }
 }
