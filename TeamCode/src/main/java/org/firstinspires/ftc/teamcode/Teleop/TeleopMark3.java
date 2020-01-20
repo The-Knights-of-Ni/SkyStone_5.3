@@ -39,9 +39,9 @@ public class TeleopMark3 extends LinearOpMode {
     double mainArmVerticalPos = 0.0;
     double mainArmHorizontalMax = 1000.0;
     double mainArmVerticalMax = 1200.0;
-    double mainArmIncrement = 1000.0;
+    double mainArmIncrement = 500.0;
     double mainClawRotationAngle;
-    double mainClawRotationIncrement = 200.0;
+    double mainClawRotationIncrement = 150.0;//was 200
     double winchSpeed;
     double tiltSpeed;
     double deltaT;
@@ -190,6 +190,15 @@ public class TeleopMark3 extends LinearOpMode {
                 robot.control.setCSClawArmDegrees(robot.control.getMainArmTargetAngle());
             }
 
+            //Automate skybrige pos
+            if(robot.bButton2 && robot.isbButton2PressedPrev){
+                robot.control.setMainArmPosition(50.0, 50.0);
+                robot.isbButton2PressedPrev = true;
+            }
+            if(!robot.bButton2){
+                robot.isbButton2PressedPrev = false;
+            }
+
 
 
 //            tiltCurrentAngle = ((tiltCurrentPosition / 2510.0) * 90.0);
@@ -242,8 +251,10 @@ public class TeleopMark3 extends LinearOpMode {
 
 
 //            telemetry.addData("", "");
-//            telemetry.addData("Left trigger", robot);
-//            telemetry.addData("Right trigger", robot.frontLeftDriveMotor.getPower());
+            telemetry.addData("X", mainArmHorizontalPos);
+            telemetry.addData("Y", mainArmVerticalPos);
+            telemetry.addData("clawRotation", mainClawRotationAngle);
+            telemetry.addData("rightStickX2", robot.rightStickX2);
 //            telemetry.addData("Right Rear Power", robot.rearRightDriveMotor.getPower());
 //            telemetry.addData("Right Front Power", robot.frontRightDriveMotor.getPower());
 
