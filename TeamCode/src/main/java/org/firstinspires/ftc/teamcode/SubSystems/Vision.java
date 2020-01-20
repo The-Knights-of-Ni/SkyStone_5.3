@@ -544,12 +544,14 @@ public class Vision {
             Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2YCrCb);
             Core.extractChannel(yCbCrChan2Mat, yCbCrChan1Mat, 1);
             Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);
+            // yCbCrChan1Mat frame is the Cr frame
+            // yCbCrChan2Mat frame is the Cb frame
             switch (detectedColor) {
                 case RED: {
-                    Imgproc.threshold(yCbCrChan2Mat, thresholdMat, redColorThreshold, 255, Imgproc.THRESH_BINARY);
+                    Imgproc.threshold(yCbCrChan1Mat, thresholdMat, redColorThreshold, 255, Imgproc.THRESH_BINARY);
                 }
                 case BLUE: {
-                    Imgproc.threshold(yCbCrChan1Mat, thresholdMat, blueColorThreshold, 255, Imgproc.THRESH_BINARY);
+                    Imgproc.threshold(yCbCrChan2Mat, thresholdMat, blueColorThreshold, 255, Imgproc.THRESH_BINARY);
                 }
                 case YELLOW1: {
                     Imgproc.threshold(yCbCrChan2Mat, thresholdMat, yellowColorThreshold1, 255, Imgproc.THRESH_BINARY_INV);
@@ -570,10 +572,10 @@ public class Vision {
                 case YCbCr: {
                     switch (detectedColor) {
                         case RED: {
-                            return yCbCrChan2Mat;
+                            return yCbCrChan1Mat;
                         }
                         case BLUE: {
-                            return yCbCrChan1Mat;
+                            return yCbCrChan2Mat;
                         }
                         case YELLOW1: {
                             return yCbCrChan2Mat;
