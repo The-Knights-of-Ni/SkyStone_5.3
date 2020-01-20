@@ -41,7 +41,7 @@ public class TeleopMark3 extends LinearOpMode {
     double mainArmVerticalMax = 1200.0;
     double mainArmIncrement = 500.0;
     double mainClawRotationAngle;
-    double mainClawRotationIncrement = 150.0;//was 200
+    double mainClawRotationIncrement = 300;
     double winchSpeed;
     double tiltSpeed;
     double deltaT;
@@ -191,12 +191,8 @@ public class TeleopMark3 extends LinearOpMode {
             }
 
             //Automate skybrige pos
-            if(robot.bButton2 && robot.isbButton2PressedPrev){
-                robot.control.setMainArmPosition(50.0, 50.0);
-                robot.isbButton2PressedPrev = true;
-            }
-            if(!robot.bButton2){
-                robot.isbButton2PressedPrev = false;
+            if(robot.bButton2 && !robot.isbButton2PressedPrev){
+                robot.control.setMainArmPosition(80.0, 50.0);
             }
 
 
