@@ -20,9 +20,9 @@ public class TeleopMark3 extends LinearOpMode {
     double mainArmVerticalPos = 0.0;
     double mainArmHorizontalMax = 1000.0;
     double mainArmVerticalMax = 1200.0;
-    double mainArmIncrement = 500.0;
+    double mainArmIncrement = 300.0;
     double mainClawRotationAngle;
-    double mainClawRotationIncrement = 200;
+    double mainClawRotationIncrement = 150;
     double deltaT;
     double timeCurrent;
     double timePre;
@@ -32,6 +32,18 @@ public class TeleopMark3 extends LinearOpMode {
     private boolean mainClawArmDeployed = false;
     private boolean csClawArmControlDigital = true;
     private boolean csClawArmDeployed = false;
+
+    private void initOpMode() {
+        //Initialize DC motor objects
+        timer = new ElapsedTime();
+        robot = new Robot(this, timer);
+
+        timeCurrent = timer.nanoseconds();
+        timePre = timeCurrent;
+
+        telemetry.addData("Wait for start", "");
+        telemetry.update();
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -167,30 +179,22 @@ public class TeleopMark3 extends LinearOpMode {
 
             //Automate skybrige pos
             if(robot.bButton2 && !robot.isbButton2PressedPrev){
-                robot.control.setMainArmPosition(80.0, 50.0);
+                mainArmHorizontalPos = 40.0;
+                mainArmVerticalPos = 50.0;
+                robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
             }
 
             telemetry.addData("X", mainArmHorizontalPos);
             telemetry.addData("Y", mainArmVerticalPos);
             telemetry.addData("clawRotation", mainClawRotationAngle);
-            telemetry.addData("rightStickX2", robot.rightStickX2);
+            int currentPositions[] = robot.drive.getCurrentPositions();
+            telemetry.addData("position", "fl %d, fr %d, rl %d, rr %d",
+                    currentPositions[0], currentPositions[1], currentPositions[2], currentPositions[3]);
 //            telemetry.addData("Right Rear Power", robot.rearRightDriveMotor.getPower());
 //            telemetry.addData("Right Front Power", robot.frontRightDriveMotor.getPower());
 
             telemetry.update();
         }
-    }
-
-    private void initOpMode() {
-        //Initialize DC motor objects
-        timer = new ElapsedTime();
-        robot = new Robot(this, timer);
-
-        timeCurrent = timer.nanoseconds();
-        timePre = timeCurrent;
-
-        telemetry.addData("Wait for start", "");
-        telemetry.update();
     }
 
 }

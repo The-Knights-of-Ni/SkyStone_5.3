@@ -95,6 +95,16 @@ public class Drive extends Subsystem {
     }
 
     /**
+     * Initialize MaxVelocity of drive motors
+     */
+    public void initMaxVelocity() {
+        frontLeft.setVelocity(ANGULAR_V_MAX_NEVERREST_20);
+        frontRight.setVelocity(ANGULAR_V_MAX_NEVERREST_20);
+        rearLeft.setVelocity(ANGULAR_V_MAX_NEVERREST_20);
+        rearRight.setVelocity(ANGULAR_V_MAX_NEVERREST_20);
+    }
+
+    /**
      * Sets all drive motors to specified zero power behavior
      */
     private void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior mode) {
@@ -159,6 +169,15 @@ public class Drive extends Subsystem {
         frontRight.setTargetPosition(targetPosition);
         rearLeft.setTargetPosition(targetPosition);
         rearRight.setTargetPosition(targetPosition);
+    }
+
+    public int[] getCurrentPositions() {
+        return new int[] {
+                frontLeft.getCurrentPosition(),
+                frontRight.getCurrentPosition(),
+                rearLeft.getCurrentPosition(),
+                rearRight.getCurrentPosition()
+        };
     }
 
     /**

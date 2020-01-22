@@ -79,7 +79,7 @@ public class Control extends Subsystem {
     private static final double     fClawRFoundation = 0.56;
     private static final double     fClawLDown = 0.36;
     private static final double     fClawLUp = 0.795;
-    private static final double     fClawRUp = 0.21;
+    private static final double     fClawRUp = 0.05;
     private static final double     fClawRDown = 0.63;
 
     private static final double     CLAW_ARM_POS_ANGLE                  = 71.3; // most positive angle
@@ -100,7 +100,8 @@ public class Control extends Subsystem {
     private static final double     CS_CLAW_POS_CLOSED                = 0.43;
 
     // define variables
-    private double mainArmAngle;
+    private double mainArmAngle = 0.0;
+    private double mainArmTargetAngle = 0.0;
     private double mainArmLength;
     private boolean mainClawArmTrackingMode = false;
     private double mainClawRotationAngle;
@@ -137,13 +138,14 @@ public class Control extends Subsystem {
 
     // main arm tilting angle from horizontal
     public double getMainArmAngle() {
-        return mainArmTickToAngle((double) armTilt.getCurrentPosition());
-    }
-    public double getMainArmTargetAngle() {
+        mainArmAngle = mainArmTickToAngle((double) armTilt.getCurrentPosition());
         return mainArmAngle;
     }
+    public double getMainArmTargetAngle() {
+        return mainArmTargetAngle;
+    }
     public void setMainArmAngle(double angle) {
-        mainArmAngle = angle;
+        mainArmTargetAngle = angle;
         armTilt.setTargetPosition((int) mainArmAngleToTick(angle));
     }
 
@@ -279,7 +281,7 @@ public class Control extends Subsystem {
     }
 
     public void retractCSClawArm() {
-        setCSClawArmDegrees(-175.0);
+        setCSClawArmDegrees(-174.0);
     }
 
 

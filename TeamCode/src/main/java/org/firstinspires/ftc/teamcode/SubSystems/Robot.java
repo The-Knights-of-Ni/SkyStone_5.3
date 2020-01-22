@@ -215,6 +215,11 @@ public class Robot extends Subsystem {
 
         //Subsystems
         drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, opMode, timer);
+        drive.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        drive.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        drive.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        drive.initMaxVelocity();
+//        drive.stop();
         control = new Control(xRailWinch, armTilt, mainClaw, mainClawRotation, mainClawArm, csClaw, csArm, fClawL, fClawR, imu, opMode, timer);
         if (visionMode != 0) {
             vision = new Vision(hardwareMap, this, visionMode);

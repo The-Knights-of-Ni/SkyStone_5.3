@@ -64,12 +64,23 @@ public class Vision {
     public static Mat yCbCrChan2Mat = new Mat();
     public static Mat thresholdMat = new Mat();
     public static Mat contoursOnFrameMat = new Mat();
+    public static Mat outputFrame = new Mat();
     public static List<MatOfPoint> contoursList = new ArrayList<>();
     public static int numContoursFound;
-    private static int redColorThreshold = 160;
-    private static int blueColorThreshold = 150;
-    private static int yellowColorThreshold1 = 65;
-    private static int yellowColorThreshold2 = 65;
+    private static int redColorThreshold = 120;
+    private static int blueColorThreshold = 145;
+    private static int yellowColorThreshold1 = 90;
+    private static int yellowColorThreshold2 = 100;
+    enum Stage {
+        YCbCr,
+        THRESHOLD,
+        CONTOURS_OVERLAYED_ON_FRAME,
+        RAW_IMAGE,
+    }
+
+    private Stage stageToRenderToViewport = Stage.CONTOURS_OVERLAYED_ON_FRAME;
+    private Stage[] stages = Stage.values();
+
     public enum DetectedColor {
         RED,
         BLUE,
@@ -77,12 +88,19 @@ public class Vision {
         YELLOW2,
     }
     private static DetectedColor detectedColor = DetectedColor.YELLOW1;
+    public static DetectedColor[] detectedColors = DetectedColor.values();
 
     public enum TappingMode {
         VIEW,
         THRESHOLD,
     }
     private static TappingMode tappingMode = TappingMode.VIEW;
+    public static TappingMode[] tappingModes = TappingMode.values();
+
+    private int markerUpperLeftx = 40;
+    private int markerUpperLefty = 40;
+    private int markerLowerRightx = 100;
+    private int markerLowerRighty = 100;
 
     int[] viewportContainerIds;
 
@@ -477,17 +495,7 @@ public class Vision {
         }
     }
 
-    static class ExtractColor extends OpenCvPipeline {
-        enum Stage {
-            YCbCr,
-            THRESHOLD,
-            CONTOURS_OVERLAYED_ON_FRAME,
-            RAW_IMAGE,
-        }
-
-        private Stage stageToRenderToViewport = Stage.YCbCr;
-        private Stage[] stages = Stage.values();
-
+    class ExtractColor extends OpenCvPipeline {
         @Override
         public void onViewportTapped() {
             /*
@@ -502,6 +510,7 @@ public class Vision {
                         nextStageNum = 0;
                     }
                     stageToRenderToViewport = stages[nextStageNum];
+                    break;
                 }
                 case THRESHOLD: {
                     stageToRenderToViewport = Stage.CONTOURS_OVERLAYED_ON_FRAME;
@@ -511,18 +520,21 @@ public class Vision {
                             if (redColorThreshold > 255) {
                                 redColorThreshold = 0;
                             }
+                            break;
                         }
                         case BLUE: {
                             blueColorThreshold = blueColorThreshold + 5;
                             if (blueColorThreshold > 255) {
                                 blueColorThreshold = 0;
                             }
+                            break;
                         }
                         case YELLOW1: {
                             yellowColorThreshold1 = yellowColorThreshold1 - 5;
                             if (yellowColorThreshold1 < 0) {
                                 yellowColorThreshold1 = 255;
                             }
+                            break;
 
                         }
                         case YELLOW2: {
@@ -530,9 +542,10 @@ public class Vision {
                             if (yellowColorThreshold2 < 0) {
                                 yellowColorThreshold2 = 255;
                             }
-
+                            break;
                         }
                     }
+                    break;
                 }
             }
         }
@@ -540,6 +553,7 @@ public class Vision {
         @Override
         public Mat processFrame(Mat input) {
             contoursList.clear();
+            checkCorners(input);
             input.copyTo(frameBuffer1);
             Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2YCrCb);
             Core.extractChannel(yCbCrChan2Mat, yCbCrChan1Mat, 1);
@@ -549,18 +563,23 @@ public class Vision {
             switch (detectedColor) {
                 case RED: {
                     Imgproc.threshold(yCbCrChan1Mat, thresholdMat, redColorThreshold, 255, Imgproc.THRESH_BINARY);
+                    break;
                 }
                 case BLUE: {
                     Imgproc.threshold(yCbCrChan2Mat, thresholdMat, blueColorThreshold, 255, Imgproc.THRESH_BINARY);
+                    break;
                 }
                 case YELLOW1: {
                     Imgproc.threshold(yCbCrChan2Mat, thresholdMat, yellowColorThreshold1, 255, Imgproc.THRESH_BINARY_INV);
+                    break;
                 }
                 case YELLOW2: {
                     Imgproc.threshold(yCbCrChan2Mat, thresholdMat, yellowColorThreshold2, 255, Imgproc.THRESH_BINARY_INV);
+                    break;
                 }
                 default: {
                     Imgproc.threshold(yCbCrChan2Mat, thresholdMat, yellowColorThreshold1, 255, Imgproc.THRESH_BINARY_INV);
+                    break;
                 }
             }
             Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -572,35 +591,50 @@ public class Vision {
                 case YCbCr: {
                     switch (detectedColor) {
                         case RED: {
-                            return yCbCrChan1Mat;
+                            yCbCrChan1Mat.copyTo(outputFrame);
+                            break;
                         }
                         case BLUE: {
-                            return yCbCrChan2Mat;
+                            yCbCrChan2Mat.copyTo(outputFrame);
+                            break;
                         }
                         case YELLOW1: {
-                            return yCbCrChan2Mat;
+                            yCbCrChan2Mat.copyTo(outputFrame);
+                            break;
                         }
                         case YELLOW2: {
-                            return yCbCrChan2Mat;
+                            yCbCrChan2Mat.copyTo(outputFrame);
+                            break;
                         }
                         default: {
-                            return yCbCrChan2Mat;
+                            yCbCrChan2Mat.copyTo(outputFrame);
+                            break;
                         }
                     }
+                    break;
                 }
                 case THRESHOLD: {
-                    return thresholdMat;
+                    thresholdMat.copyTo(outputFrame);
+                    break;
                 }
                 case CONTOURS_OVERLAYED_ON_FRAME: {
-                    return contoursOnFrameMat;
+                    contoursOnFrameMat.copyTo(outputFrame);
+                    break;
                 }
                 case RAW_IMAGE: {
-                    return input;
+                    input.copyTo(outputFrame);
+                    break;
                 }
                 default: {
-                    return input;
+                    input.copyTo(outputFrame);
+                    break;
                 }
             }
+            Imgproc.rectangle(outputFrame,
+                    new Point(markerUpperLeftx, markerUpperLefty),
+                    new Point(markerLowerRightx, markerLowerRighty),
+                    new Scalar(255, 0, 0), 2);
+            return outputFrame;
         }
     }
 
@@ -621,6 +655,26 @@ public class Vision {
     public TappingMode getTappingMode() { return tappingMode; }
 
     public void setTappingMode(TappingMode mode) { tappingMode = mode; }
+
+    public int[] getMarkerCorners() {
+        return new int[] {markerUpperLeftx, markerUpperLefty, markerLowerRightx, markerLowerRighty};
+    }
+
+    public void setMarkerCorners(int corners[]) {
+        markerUpperLeftx = corners[0];
+        markerUpperLefty = corners[1];
+        markerLowerRightx = corners[2];
+        markerLowerRighty = corners[3];
+    }
+
+    private void checkCorners(Mat input) {
+        if (markerUpperLeftx < 0) markerUpperLeftx = 0;
+        if (markerUpperLefty < 0) markerUpperLefty = 0;
+        if (markerLowerRightx >= input.cols()) markerLowerRightx = input.cols() - 1;
+        if (markerLowerRighty >= input.rows()) markerLowerRighty = input.rows() - 1;
+        if (markerUpperLeftx > markerLowerRightx) markerUpperLeftx = markerLowerRightx;
+        if (markerUpperLefty > markerLowerRighty) markerUpperLefty = markerLowerRighty;
+    }
 
     /**
      * Save an image to a file

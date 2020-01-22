@@ -111,6 +111,20 @@
 
     <!-- ======================================================================================= -->
 
+    <!-- Logitech HD Pro Webcam C930e, Calibrated by Andrew Chiang, 2020.01.13 using 3DF Zephyr -->
+    <!-- <Camera vid="0x046D" pid="0x0843">
+
+        <Calibration
+            size="800 600"
+            focalLength="637.653f, 637.653f"
+            principalPoint="386.098f, 292.487f"
+            distortionCoefficients="0.0935164, -0.230473, 0, 0, 0.0983825, 0, 0, 0"
+            />
+
+    </Camera> -->
+
+    <!-- ======================================================================================= -->
+
     <!-- Logitech HD Webcam C270, Calibrated by Noah Andrews, 2019.03.13 using 3DF Zephyr -->
     <!--<Camera vid="Logitech" pid="0x0825">
         <Calibration

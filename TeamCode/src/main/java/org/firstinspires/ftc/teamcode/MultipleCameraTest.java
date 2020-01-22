@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -22,6 +23,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
  * OpenCV on both.
  */
 @TeleOp (name = "MCT1")
+@Disabled
 public class MultipleCameraTest extends LinearOpMode
 {
     OpenCvCamera phoneCam;

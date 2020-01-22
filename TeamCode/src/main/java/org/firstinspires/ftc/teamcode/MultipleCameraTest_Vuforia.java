@@ -1,6 +1,7 @@
 
         package org.firstinspires.ftc.teamcode;
 
+        import com.qualcomm.robotcore.eventloop.opmode.Disabled;
         import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
         import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -32,6 +33,7 @@
  * OpenCV on an internal camera, and Vuforia on a webcam
  */
 @TeleOp (name = "MCT_Vuforia")
+@Disabled
 public class MultipleCameraTest_Vuforia extends LinearOpMode
 {
     OpenCvCamera webcam1;

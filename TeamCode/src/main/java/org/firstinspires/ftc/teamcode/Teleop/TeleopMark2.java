@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 //Message from Elijah, please comment your code
 
 @TeleOp(name = "TeleopMark2")
+@Disabled
 public class TeleopMark2 extends LinearOpMode {
     //Declare DC motor objects
     private Robot robot;
