@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.SubSystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,7 +22,7 @@ import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 public class Robot extends Subsystem {
     public String name;
     private HardwareMap hardwareMap;
-    private OpMode opMode;
+    private LinearOpMode opMode;
     public ElapsedTime timer;
 
     //DC Motors
@@ -63,7 +64,7 @@ public class Robot extends Subsystem {
      */
 
     //Sensors
-    private BNO055IMU imu;
+    public BNO055IMU imu;
     private ColorSensor colorSensor;
 
     // Declare game pad objects
@@ -114,12 +115,14 @@ public class Robot extends Subsystem {
     public boolean islBumper2PressedPrev = false;
     public boolean isrBumper2PressedPrev = false;
 
+    private double joystickDeadZone = 0.1;
+
     //Subsystems
     public Drive drive;
     public Control control;
     public Vision vision;
 
-    public Robot(OpMode opMode, ElapsedTime timer){
+    public Robot(LinearOpMode opMode, ElapsedTime timer){
         hardwareMap = opMode.hardwareMap;
         this.opMode = opMode;
         this.timer = timer;
@@ -137,7 +140,7 @@ public class Robot extends Subsystem {
      *          3: backWebcam is initialized for Vuforia and frontWebcam is initialized for OpenCV
      *          4: armWebcam is initialized for OpenCV and frontWebcam is initialized for OpenCV
      */
-    public Robot(OpMode opMode, ElapsedTime timer, int visionMode){
+    public Robot(LinearOpMode opMode, ElapsedTime timer, int visionMode){
         hardwareMap = opMode.hardwareMap;
         this.opMode = opMode;
         this.timer = timer;
@@ -211,8 +214,20 @@ public class Robot extends Subsystem {
         parameters.loggingTag          = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
+        opMode.telemetry.addData("Mode", " IMU initializing...");
+        opMode.telemetry.update();
         imu.initialize(parameters);
+        opMode.telemetry.addData("Mode", " IMU calibrating...");
+        opMode.telemetry.update();
+        // make sure the imu gyro is calibrated before continuing.
+        while (opMode.opModeIsActive() && !imu.isGyroCalibrated())
+        {
+            opMode.sleep(50);
+            opMode.idle();
+        }
 
+        opMode.telemetry.addData("Mode", " drive/control initializing...");
+        opMode.telemetry.update();
         //Subsystems
         drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, opMode, timer);
         drive.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -221,6 +236,9 @@ public class Robot extends Subsystem {
 //        drive.initMaxVelocity();
 //        drive.stop();
         control = new Control(xRailWinch, armTilt, mainClaw, mainClawRotation, mainClawArm, csClaw, csArm, fClawL, fClawR, imu, opMode, timer);
+
+        opMode.telemetry.addData("Mode", " Camera initializing...");
+        opMode.telemetry.update();
         if (visionMode != 0) {
             vision = new Vision(hardwareMap, this, visionMode);
         }
@@ -253,10 +271,10 @@ public class Robot extends Subsystem {
         isyButtonPressedPrev = yButton;
         islBumperPressedPrev = bumperLeft;
         isrBumperPressedPrev = bumperRight;
-        leftStickX = opMode.gamepad1.left_stick_x;
-        leftStickY = -opMode.gamepad1.left_stick_y;
-        rightStickX = opMode.gamepad1.right_stick_x;
-        rightStickY = opMode.gamepad1.right_stick_y;
+        leftStickX = joystickDeadzoneCorrection(opMode.gamepad1.left_stick_x);
+        leftStickY = joystickDeadzoneCorrection(-opMode.gamepad1.left_stick_y);
+        rightStickX = joystickDeadzoneCorrection(opMode.gamepad1.right_stick_x);
+        rightStickY = joystickDeadzoneCorrection(opMode.gamepad1.right_stick_y);
         triggerLeft = opMode.gamepad1.left_trigger;
         triggerRight = opMode.gamepad1.right_trigger;
         aButton = opMode.gamepad1.a;
@@ -276,10 +294,10 @@ public class Robot extends Subsystem {
         isyButton2PressedPrev = yButton2;
         islBumper2PressedPrev = bumperLeft2;
         isrBumper2PressedPrev = bumperRight2;
-        leftStickX2 = opMode.gamepad2.left_stick_x;
-        leftStickY2 = -opMode.gamepad2.left_stick_y;
-        rightStickX2 = opMode.gamepad2.right_stick_x;
-        rightStickY2 = -opMode.gamepad2.right_stick_y;
+        leftStickX2 = joystickDeadzoneCorrection(opMode.gamepad2.left_stick_x);
+        leftStickY2 = joystickDeadzoneCorrection(-opMode.gamepad2.left_stick_y);
+        rightStickX2 = joystickDeadzoneCorrection(opMode.gamepad2.right_stick_x);
+        rightStickY2 = joystickDeadzoneCorrection(-opMode.gamepad2.right_stick_y);
         triggerLeft2 = opMode.gamepad2.left_trigger;
         triggerRight2 = opMode.gamepad2.right_trigger;
         aButton2 = opMode.gamepad2.a;
@@ -292,6 +310,20 @@ public class Robot extends Subsystem {
         dPadRight2 = opMode.gamepad2.dpad_right;
         bumperLeft2 = opMode.gamepad2.left_bumper;
         bumperRight2 = opMode.gamepad2.right_bumper;
+    }
+
+    public double joystickDeadzoneCorrection(double joystickInput) {
+        double joystickOutput;
+        if (joystickInput > joystickDeadZone) {
+            joystickOutput = (joystickInput - joystickDeadZone) / (1.0-joystickDeadZone);
+        }
+        else if (joystickInput > -joystickDeadZone) {
+            joystickOutput = 0.0;
+        }
+        else {
+            joystickOutput = (joystickInput + joystickDeadZone) / (1.0-joystickDeadZone);
+        }
+        return joystickOutput;
     }
 
 }

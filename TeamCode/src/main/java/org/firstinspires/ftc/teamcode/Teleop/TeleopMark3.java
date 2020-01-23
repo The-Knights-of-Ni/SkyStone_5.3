@@ -33,10 +33,25 @@ public class TeleopMark3 extends LinearOpMode {
     private boolean csClawArmControlDigital = true;
     private boolean csClawArmDeployed = false;
 
+    enum Prospective {
+        ROBOT,
+        DRIVER,
+    }
+
+    private Prospective prospectiveMode = Prospective.ROBOT;
+    private double robotAngle;
+    private boolean visionEnabled = true;
+
     private void initOpMode() {
         //Initialize DC motor objects
         timer = new ElapsedTime();
-        robot = new Robot(this, timer);
+        if (visionEnabled) {
+            // visionMode 4: backWebcam is initialized for Vuforia and armWebcam is initialized for OpenCV
+            robot = new Robot(this, timer, 4);
+        }
+        else {
+            robot = new Robot(this, timer);
+        }
 
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
@@ -58,6 +73,9 @@ public class TeleopMark3 extends LinearOpMode {
         telemetry.clearAll();
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
+        if (visionEnabled) {
+            robot.vision.getTargetsSkyStone().activate();
+        }
         while(opModeIsActive()) {
 
             // Get gamepad inputs
@@ -68,8 +86,22 @@ public class TeleopMark3 extends LinearOpMode {
             deltaT = timeCurrent - timePre;
             timePre = timeCurrent;
 
+            if (visionEnabled) {
+                robot.vision.vuMarkScan();
+            }
+
             // Drive the motors
-            double[] motorPowers = robot.drive.calcMotorPowers(robot.leftStickX, robot.leftStickY, robot.rightStickX);
+            double[] motorPowers;
+            robotAngle = robot.imu.getAngularOrientation().firstAngle;
+            if (prospectiveMode == Prospective.ROBOT) {
+                motorPowers = robot.drive.calcMotorPowers(robot.leftStickX, robot.leftStickY, robot.rightStickX);
+            }
+            else {  // DRIVER prospective mode
+                // Get robot angle
+                double relativeX = robot.leftStickX * Math.cos(robotAngle*Math.PI/180.0) + robot.leftStickY * Math.sin(robotAngle*Math.PI/180.0);
+                double relativeY = -robot.leftStickX * Math.sin(robotAngle*Math.PI/180.0) + robot.leftStickY * Math.cos(robotAngle*Math.PI/180.0);
+                motorPowers = robot.drive.calcMotorPowers(relativeX, relativeY, robot.rightStickX);
+            }
             robot.drive.setDrivePowers(motorPowers);
 
             // move foundation claw
@@ -184,9 +216,25 @@ public class TeleopMark3 extends LinearOpMode {
                 robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
             }
 
-            telemetry.addData("X", mainArmHorizontalPos);
-            telemetry.addData("Y", mainArmVerticalPos);
-            telemetry.addData("clawRotation", mainClawRotationAngle);
+            // reset drive motor encoders
+            if (robot.yButton && !robot.isyButtonPressedPrev) {
+                robot.drive.resetDriveMotorEncoders();
+            }
+
+            // toggle drive prospective mode
+            if (robot.xButton && !robot.isxButtonPressedPrev) {
+                if (prospectiveMode == Prospective.DRIVER) {
+                    prospectiveMode = Prospective.ROBOT;
+                }
+                else {
+                    prospectiveMode = Prospective.DRIVER;
+                }
+            }
+
+            telemetry.addData("Arm ","X %.1f, Y %.1f", mainArmHorizontalPos, mainArmVerticalPos);
+             telemetry.addData("clawRotation", mainClawRotationAngle);
+            telemetry.addData("Drive Mode ", prospectiveMode.toString());
+            telemetry.addData("robot angle ", robotAngle);
             int currentPositions[] = robot.drive.getCurrentPositions();
             telemetry.addData("position", "fl %d, fr %d, rl %d, rr %d",
                     currentPositions[0], currentPositions[1], currentPositions[2], currentPositions[3]);

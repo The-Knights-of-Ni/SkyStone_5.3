@@ -125,9 +125,9 @@ public class Vision {
     private static final float halfField = 72 * mmPerInch;
     private static final float quadField  = 36 * mmPerInch;
 
-    final int CAMERA_FORWARD_DISPLACEMENT  = 150;   // eg: Camera is 150 mm in front of robot center
-    final int CAMERA_VERTICAL_DISPLACEMENT = 200;   // eg: Camera is 200 mm above ground
-    final int CAMERA_LEFT_DISPLACEMENT     = 118;     // eg: Camera is 118 mm left of the robot's center line
+    final int CAMERA_FORWARD_DISPLACEMENT  = -198;   // eg: Camera is -198 mm in front of robot center
+    final int CAMERA_VERTICAL_DISPLACEMENT = 106;   // eg: Camera is 106 mm above ground
+    final int CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is 0 mm left of the robot's center line
 
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
@@ -169,7 +169,8 @@ public class Vision {
      *          1: only armWebcam is initialized for OpenCV
      *          2: backWebcam is initialized for Vuforia
      *          3: backWebcam is initialized for Vuforia and frontWebcam is initialized for OpenCV
-     *          4: armWebcam is initialized for OpenCV and frontWebcam is initialized for OpenCV
+     *          4: backWebcam is initialized for Vuforia and armWebcam is initialized for OpenCV
+     *          5: armWebcam is initialized for OpenCV and frontWebcam is initialized for OpenCV
      */
     public Vision(HardwareMap hardwareMap, Robot robot, int visionMode){
         this.hardwareMap = hardwareMap;
@@ -193,6 +194,11 @@ public class Vision {
                 initFrontWebcam(1);
                 break;
             case 4:
+                setupViewports(2);
+                initVuforiaEngine(0);
+                initArmWebcam(1);
+                break;
+            case 5:
                 setupViewports(2);
                 initArmWebcam(0);
                 initFrontWebcam(1);

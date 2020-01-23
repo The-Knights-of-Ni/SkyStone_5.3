@@ -2,6 +2,7 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 /** Mecanum drivetrain subsystem */
 public class Drive extends Subsystem {
     private HardwareMap hardwareMap;
-    private OpMode opMode;
+    private LinearOpMode opMode;
     //DC Motors
     public DcMotorEx frontLeft;
     public DcMotorEx frontRight;
@@ -27,23 +28,28 @@ public class Drive extends Subsystem {
     private double robotCurrentPosY;    // unit in mm
     private double robotCurrentAngle;   // unit in degrees
 
-
+    private int encoderOffsetFL = 0;
+    private int encoderOffsetFR = 0;
+    private int encoderOffsetRL = 0;
+    private int encoderOffsetRR = 0;
 
     //DO WITH ENCODERS
     private static final double     TICKS_PER_MOTOR_REV_20          = 537.6;    // AM Orbital 20 motor
     private static final double     RPM_MAX_NEVERREST_20            = 340;
     private static final double     ANGULAR_V_MAX_NEVERREST_20      = (TICKS_PER_MOTOR_REV_20 * RPM_MAX_NEVERREST_20) / 60.0;
     private static final double     DRIVE_GEAR_REDUCTION            = 1.0 ;     // This is < 1.0 if geared UP
-    private static final double     WHEEL_DIAMETER_INCHES           = 4.0 ;     // For figuring circumference
-    private static final double     WHEEL_DIAMETER_MM               = 4.0 * 2.54 * 10.0;
+    private static final double     WHEEL_DIAMETER_INCHES           = 100.0/25.4 ;     // For figuring circumference
+    private static final double     WHEEL_DIAMETER_MM               = 100.0;
     private static final double     COUNTS_PER_INCH                 = (TICKS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
     private static final double     COUNTS_PER_MM                 = (TICKS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * Math.PI);
-    private static final double     COUNTS_CORRECTION_X             = 0.939;
-    private static final double     COUNTS_CORRECTION_Y             = 0.646;
+    private static final double     COUNTS_CORRECTION_X             = 1.1;
+    private static final double     COUNTS_CORRECTION_Y             = 0.92;
+    private static final double     COUNTS_PER_DEGREE             = 10.833*1.1;     // 975 ticks per 90 degrees
 
     private static final double     DRIVE_SPEED             = 0.4;
     private static final double     TURN_SPEED              = 0.3;
+    private static boolean    driveFullPower          = false;
 
     private static final double     ROBOT_INIT_POS_X    = 15.0;
     private static final double     ROBOT_INIT_POS_Y    = 15.0;
@@ -57,7 +63,7 @@ public class Drive extends Subsystem {
     private boolean targetVisible = false;
 
 
-    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, OpMode opMode, ElapsedTime timer) {
+    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer) {
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
         this.rearLeft = rearLeft;
@@ -164,6 +170,10 @@ public class Drive extends Subsystem {
         rearRight.setPower(powers[3]);
     }
 
+    public void setDriveFullPower(boolean fullPower) {
+        driveFullPower = fullPower;
+    }
+
     public void setTargetPosition(int targetPosition) {
         frontLeft.setTargetPosition(targetPosition);
         frontRight.setTargetPosition(targetPosition);
@@ -173,11 +183,18 @@ public class Drive extends Subsystem {
 
     public int[] getCurrentPositions() {
         return new int[] {
-                frontLeft.getCurrentPosition(),
-                frontRight.getCurrentPosition(),
-                rearLeft.getCurrentPosition(),
-                rearRight.getCurrentPosition()
+                frontLeft.getCurrentPosition() - encoderOffsetFL,
+                frontRight.getCurrentPosition() - encoderOffsetFR,
+                rearLeft.getCurrentPosition() - encoderOffsetRL,
+                rearRight.getCurrentPosition() - encoderOffsetRR
         };
+    }
+
+    public void resetDriveMotorEncoders() {
+        encoderOffsetFL = frontLeft.getCurrentPosition();
+        encoderOffsetFR = frontRight.getCurrentPosition();
+        encoderOffsetRL = rearLeft.getCurrentPosition();
+        encoderOffsetRR = rearRight.getCurrentPosition();
     }
 
     /**
@@ -188,6 +205,58 @@ public class Drive extends Subsystem {
         frontRight.setTargetPosition(-targetPosition);
         rearLeft.setTargetPosition(-targetPosition);
         rearRight.setTargetPosition(targetPosition);
+    }
+
+    public void turnRobotByTick(double angle) {
+        this.turnByTick(TURN_SPEED, angle);
+//        robotCurrentPosX += ROBOT_HALF_LENGTH * (Math.cos((robotCurrentAngle+degrees)*Math.PI/180.0)
+//                - Math.cos(robotCurrentAngle*Math.PI/180.0));
+//        robotCurrentPosY += ROBOT_HALF_LENGTH * (Math.sin((robotCurrentAngle+degrees)*Math.PI/180.0)
+//                - Math.sin(robotCurrentAngle*Math.PI/180.0));
+        robotCurrentAngle += angle;
+        // Display it for the driver.
+        opMode.telemetry.addData("turnRobot",  "turn to %7.2f degrees", robotCurrentAngle);
+        opMode.telemetry.update();
+//        opMode.sleep(100);
+    }
+
+    public void turnByTick(double power, double angle) {
+        setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setTargetPosition(0);
+        frontRight.setTargetPosition(0);
+        rearLeft.setTargetPosition(0);
+        rearRight.setTargetPosition(0);
+
+        setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+        // convert from degrees to motor counts
+        int tickCount = (int) (angle * COUNTS_PER_DEGREE);
+        frontLeft.setTargetPosition(-tickCount);
+        frontRight.setTargetPosition(tickCount);
+        rearLeft.setTargetPosition(-tickCount);
+        rearRight.setTargetPosition(tickCount);
+        if (driveFullPower) {
+            setDrivePower(1.0);
+        }
+        else {
+            setDrivePower(power);
+        }
+        while (frontLeft.isBusy() && frontRight.isBusy() && rearLeft.isBusy() && rearRight.isBusy()) {
+
+        }
+        stop();
+    }
+
+    public void turnRobot(double degrees) {
+        this.turnByAngle(TURN_SPEED, degrees);
+//        robotCurrentPosX += ROBOT_HALF_LENGTH * (Math.cos((robotCurrentAngle+degrees)*Math.PI/180.0)
+//                - Math.cos(robotCurrentAngle*Math.PI/180.0));
+//        robotCurrentPosY += ROBOT_HALF_LENGTH * (Math.sin((robotCurrentAngle+degrees)*Math.PI/180.0)
+//                - Math.sin(robotCurrentAngle*Math.PI/180.0));
+        robotCurrentAngle += degrees;
+        // Display it for the driver.
+        opMode.telemetry.addData("turnRobot",  "turn to %7.2f degrees", robotCurrentAngle);
+        opMode.telemetry.update();
+//        opMode.sleep(100);
     }
 
     public double getYaw() {
@@ -240,7 +309,12 @@ public class Drive extends Subsystem {
         distanceCountX = targetPositionX * COUNTS_PER_MM * COUNTS_CORRECTION_X;
         distanceCountY = targetPositionY * COUNTS_PER_MM * COUNTS_CORRECTION_Y;
         setTargetPosition2D(distanceCountX, distanceCountY);
-        setPower2D(distanceCountX, distanceCountY, power);
+        if (driveFullPower) {
+            setPower2D(distanceCountX, distanceCountY, 1.0);
+        }
+        else {
+            setPower2D(distanceCountX, distanceCountY, power);
+        }
         while (frontLeft.isBusy() && frontRight.isBusy() && rearLeft.isBusy() && rearRight.isBusy()) {
 
         }
@@ -258,10 +332,14 @@ public class Drive extends Subsystem {
 
     public void setTargetPosition2D(double targetPositionX, double targetPositionY) {
         // set motor rotation targets appropriately according to the direction of motion
-        frontLeft.setTargetPosition((int)  ((+ targetPositionX + targetPositionY)*Math.sqrt(2.0)));
-        frontRight.setTargetPosition((int) ((- targetPositionX + targetPositionY)*Math.sqrt(2.0)));
-        rearLeft.setTargetPosition((int)   ((- targetPositionX + targetPositionY)*Math.sqrt(2.0)));
-        rearRight.setTargetPosition((int)  ((+ targetPositionX + targetPositionY)*Math.sqrt(2.0)));
+//        frontLeft.setTargetPosition((int)  ((+ targetPositionX + targetPositionY)*Math.sqrt(2.0)));
+//        frontRight.setTargetPosition((int) ((- targetPositionX + targetPositionY)*Math.sqrt(2.0)));
+//        rearLeft.setTargetPosition((int)   ((- targetPositionX + targetPositionY)*Math.sqrt(2.0)));
+//        rearRight.setTargetPosition((int)  ((+ targetPositionX + targetPositionY)*Math.sqrt(2.0)));
+        frontLeft.setTargetPosition((int)  (+ targetPositionX + targetPositionY));
+        frontRight.setTargetPosition((int) (- targetPositionX + targetPositionY));
+        rearLeft.setTargetPosition((int)   (- targetPositionX + targetPositionY));
+        rearRight.setTargetPosition((int)  (+ targetPositionX + targetPositionY));
     }
 
     public double[] calcMotorPowers2D(double targetPositionX, double targetPositionY, double motorPower)
@@ -274,19 +352,6 @@ public class Drive extends Subsystem {
         double rrPower = motorPower * (+ targetPositionX + targetPositionY) / angleScale;
         double rfPower = motorPower * (- targetPositionX + targetPositionY) / angleScale;
         return new double[]{lrPower, lfPower, rrPower, rfPower};
-    }
-
-    public void turnRobot(double degrees) {
-        this.turnByAngle(TURN_SPEED, degrees);
-//        robotCurrentPosX += ROBOT_HALF_LENGTH * (Math.cos((robotCurrentAngle+degrees)*Math.PI/180.0)
-//                - Math.cos(robotCurrentAngle*Math.PI/180.0));
-//        robotCurrentPosY += ROBOT_HALF_LENGTH * (Math.sin((robotCurrentAngle+degrees)*Math.PI/180.0)
-//                - Math.sin(robotCurrentAngle*Math.PI/180.0));
-        robotCurrentAngle += degrees;
-        // Display it for the driver.
-        opMode.telemetry.addData("turnRobot",  "turn to %7.2f degrees", robotCurrentAngle);
-        opMode.telemetry.update();
-//        opMode.sleep(100);
     }
 
     public void moveToPosABS(double targetPositionX, double targetPositionY) {

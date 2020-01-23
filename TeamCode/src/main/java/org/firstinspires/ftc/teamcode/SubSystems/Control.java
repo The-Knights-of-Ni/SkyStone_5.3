@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.SubSystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -15,7 +16,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Control extends Subsystem {
     // device declaration
     private HardwareMap hardwareMap;
-    private OpMode opMode;
+    private LinearOpMode opMode;
     //DC Motors
     private DcMotorEx xRailWinch;
     private DcMotorEx armTilt;
@@ -107,7 +108,7 @@ public class Control extends Subsystem {
     private double mainClawRotationAngle;
 
     public Control(DcMotorEx xRailWinch, DcMotorEx armTilt, Servo mainClaw, Servo mainClawRotation, Servo mainClawArm,
-                   Servo csClaw, Servo csArm, Servo fClawL, Servo fClawR, BNO055IMU imu, OpMode opMode, ElapsedTime timer) {
+                   Servo csClaw, Servo csArm, Servo fClawL, Servo fClawR, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer) {
         // store device information locally
         this.xRailWinch = xRailWinch;
         this.armTilt = armTilt;
