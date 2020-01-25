@@ -123,9 +123,9 @@ public class ServoTest extends LinearOpMode {
                 robot.control.modifyServo(robot.mainClaw,-0.005);
             }
 
-            telemetry.addData("Main Arm ", robot.mainClawArm.getPosition());
-            telemetry.addData("Main Claw Rotation ", robot.mainClawRotation.getPosition());
-            telemetry.addData("Main Claw ", robot.mainClaw.getPosition());
+            telemetry.addData("Main Arm ", "%.3f", robot.mainClawArm.getPosition());
+            telemetry.addData("Main Claw Rotation ", "%.3f", robot.mainClawRotation.getPosition());
+            telemetry.addData("Main Claw ", "%.3f", robot.mainClaw.getPosition());
 
             // test capstone arm servos
 
@@ -161,8 +161,8 @@ public class ServoTest extends LinearOpMode {
                 robot.control.modifyServo(robot.csClaw,-0.005);
             }
 
-            telemetry.addData("Capstone Arm ", robot.csArm.getPosition());
-            telemetry.addData("Capstone Claw ", robot.csClaw.getPosition());
+            telemetry.addData("Capstone Arm ", "%.3f", robot.csArm.getPosition());
+            telemetry.addData("Capstone Claw ", "%.3f", robot.csClaw.getPosition());
 
             // test foundation claw servos
 
@@ -198,11 +198,11 @@ public class ServoTest extends LinearOpMode {
                 robot.control.modifyServo(robot.fClawR,-0.005);
             }
 
-            telemetry.addData("Foundation Claw L ", robot.fClawL.getPosition());
-            telemetry.addData("Foundation Claw R ", robot.fClawR.getPosition());
+            telemetry.addData("Foundation Claw L ", "%.3f", robot.fClawL.getPosition());
+            telemetry.addData("Foundation Claw R ", "%.3f", robot.fClawR.getPosition());
 
             telemetry.update();
-            sleep(10);
+            sleep(100);
         }
 
     }

@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.google.ftcresearch.tfod.util.ImageUtils;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.vuforia.Vec3I;
@@ -41,6 +42,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
+import static org.opencv.core.Core.BORDER_CONSTANT;
 
 /**
  * Created by AndrewC on 12/27/2019.
@@ -66,6 +68,8 @@ public class Vision {
     public static Mat contoursOnFrameMat = new Mat();
     public static Mat outputFrame = new Mat();
     public static List<MatOfPoint> contoursList = new ArrayList<>();
+    private static Mat map1 = new Mat();
+    private static Mat map2 = new Mat();
     public static int numContoursFound;
     private static int redColorThreshold = 120;
     private static int blueColorThreshold = 145;
@@ -76,6 +80,7 @@ public class Vision {
         THRESHOLD,
         CONTOURS_OVERLAYED_ON_FRAME,
         RAW_IMAGE,
+        RAW_INPUT,
     }
 
     private Stage stageToRenderToViewport = Stage.CONTOURS_OVERLAYED_ON_FRAME;
@@ -105,6 +110,8 @@ public class Vision {
     int[] viewportContainerIds;
 
     private int systemVisionMode;
+    private static boolean armWebcamIsActive = false;
+    private static boolean frontWebcamIsActive = false;
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
@@ -177,6 +184,7 @@ public class Vision {
         this.robot = robot;
         setupCameraNames();
         systemVisionMode = visionMode;
+//        readCameraCalibrationMaps("ELP_USBFHD06H_mapx.txt");
         switch (visionMode) {
             case 0:
                 break;
@@ -377,6 +385,7 @@ public class Vision {
             phoneXRotate = 90 ;
         }
 
+        // This is according to ConceptVuforiaSkyStoneNavigationWebcam.java for webcam setting
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
@@ -454,11 +463,13 @@ public class Vision {
         frontWebcam.openCameraDevice();
         frontWebcam.setPipeline(new ExtractColor());
         frontWebcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        frontWebcamIsActive = true;
     }
 
     public void closeFrontWebcam() {
         frontWebcam.stopStreaming();
         frontWebcam.closeCameraDevice();
+        frontWebcamIsActive = false;
     }
 
     public void initArmWebcam() {
@@ -470,11 +481,13 @@ public class Vision {
         armWebcam.openCameraDevice();
         armWebcam.setPipeline(new ExtractColor());
         armWebcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        armWebcamIsActive = true;
     }
 
     public void closeArmWebcam() {
         armWebcam.stopStreaming();
         armWebcam.closeCameraDevice();
+        armWebcamIsActive = false;
     }
 
     class SamplePipeline extends OpenCvPipeline {
@@ -559,6 +572,10 @@ public class Vision {
         @Override
         public Mat processFrame(Mat input) {
             contoursList.clear();
+            input.copyTo(frameBuffer2);
+//            if (armWebcamIsActive) {
+//                Imgproc.remap(input,input, map1, map2, Imgproc.INTER_LINEAR, BORDER_CONSTANT);
+//            }
             checkCorners(input);
             input.copyTo(frameBuffer1);
             Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2YCrCb);
@@ -630,6 +647,9 @@ public class Vision {
                 case RAW_IMAGE: {
                     input.copyTo(outputFrame);
                     break;
+                }
+                case RAW_INPUT: {
+                    frameBuffer2.copyTo(outputFrame);
                 }
                 default: {
                     input.copyTo(outputFrame);
@@ -708,4 +728,22 @@ public class Vision {
         }
     }
 
+    public void readCameraCalibrationMaps(String fileName) {
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+        String file = path + "/" + fileName;
+        robot.getOpmode().telemetry.addData("file", file);
+        robot.getOpmode().telemetry.addData("reading", "map1");
+        robot.getOpmode().telemetry.update();
+
+        map1 = YamlMatLoader.getMatYml(file, "map1");
+
+        robot.getOpmode().telemetry.addData("file", file);
+        robot.getOpmode().telemetry.addData("reading", "map2");
+        robot.getOpmode().telemetry.update();
+        map2 = YamlMatLoader.getMatYml(file, "map2");
+        robot.getOpmode().telemetry.addData(" camera calibration", "completed");
+        robot.getOpmode().telemetry.addData(" map1", "row: %d, col: %d", map1.rows(), map1.cols());
+        robot.getOpmode().telemetry.update();
+
+    }
 }

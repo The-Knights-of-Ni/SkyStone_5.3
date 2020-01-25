@@ -32,6 +32,8 @@ public class Auto_Blue extends LinearOpMode {
     double mainArmVerticalMax = 1200.0;
     double mainClawRotationAngle;
 
+    double robotAngle;
+
     enum Alliance {
         BLUE,
         RED,
@@ -94,6 +96,7 @@ public class Auto_Blue extends LinearOpMode {
         // use the front camera image to determine the SkyStone pattern
         skyStonePattern = findSkyStoneLocation();
 
+
         // setup main arm and claw position
         mainClawRotationAngle = 90.0;
         robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
@@ -106,12 +109,15 @@ public class Auto_Blue extends LinearOpMode {
         // move out from the wall
         robot.drive.moveForward(570);
         sleep(100);
+        printRobotPosition();
+        sleep(10000);
+
         // move to the left depending on the SkyStone pattern
         switch (skyStonePattern) {
             case PATTERNA:
-                robot.drive.setDriveFullPower(true);
-                robot.drive.moveLeft(20);
-                robot.drive.setDriveFullPower(false);
+//                robot.drive.setDriveFullPower(true);
+//                robot.drive.moveLeft(20);
+//                robot.drive.setDriveFullPower(false);
                 break;
             case PATTERNB:
                 robot.drive.moveLeft(223);
@@ -125,9 +131,11 @@ public class Auto_Blue extends LinearOpMode {
         sleep(100);
         pickupSkySTone();
         sleep(100);
-        robot.drive.turnRobotByTick(90.0);
+//        robot.drive.turnRobotByTick(90.0);
+        robot.drive.turnRobot(90.0);
 
-        sleep(5000);
+        printRobotPosition();
+        sleep(10000);
 
         // Disable Tracking when we are done;
         robot.vision.getTargetsSkyStone().deactivate();
@@ -219,5 +227,14 @@ public class Auto_Blue extends LinearOpMode {
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         sleep(300);
+    }
+
+    private void printRobotPosition() {
+        sleep(5000);
+        robot.vision.vuMarkScan();
+        robot.vision.vuMarkScan();
+        robotAngle = robot.drive.getYaw();
+        telemetry.addData("robot angle ", "%.1f", robotAngle);
+        telemetry.update();
     }
 }
