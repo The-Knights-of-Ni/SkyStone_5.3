@@ -76,8 +76,8 @@ public class Control extends Subsystem {
     private static final double     MAINARM_STACK_HEIGHT         = 123.0;    // main arm vertical offset (mm)
 
     // Servos
-    private static final double     fClawLFoundation = 0.45;
-    private static final double     fClawRFoundation = 0.56;
+    private static final double     fClawLFoundation = 0.42;
+    private static final double     fClawRFoundation = 0.58;
     private static final double     fClawLDown = 0.36;
     private static final double     fClawLUp = 0.795;
     private static final double     fClawRUp = 0.05;

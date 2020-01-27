@@ -13,6 +13,7 @@ import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
 
 // This code was adopted from https://stackoverflow.com/questions/34297676/how-to-load-opencv-matrices-saved-with-filestorage-in-java
+// Modified by Andrew Chiang on 1/25/2020 to support importing a specified matrix
 public class YamlMatLoader {
     // This nested class specifies the expected variables in the file
     // Mat cannot be used directly because it lacks rows and cols variables

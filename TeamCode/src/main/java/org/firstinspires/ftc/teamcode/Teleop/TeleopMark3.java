@@ -20,9 +20,9 @@ public class TeleopMark3 extends LinearOpMode {
     double mainArmVerticalPos = 0.0;
     double mainArmHorizontalMax = 1000.0;
     double mainArmVerticalMax = 1200.0;
-    double mainArmIncrement = 300.0;
+    double mainArmIncrement = 600.0;
     double mainClawRotationAngle;
-    double mainClawRotationIncrement = 150;
+    double mainClawRotationIncrement = 300;
     double deltaT;
     double timeCurrent;
     double timePre;
@@ -161,10 +161,10 @@ public class TeleopMark3 extends LinearOpMode {
             // move robot main arm
             // move robot main arm along horizontal line
             if(robot.leftStickY2 >= 0.1){
-                mainArmHorizontalPos = mainArmHorizontalPos + (robot.leftStickY2 - 0.1) * mainArmIncrement * deltaT/1e9;
+                mainArmHorizontalPos = mainArmHorizontalPos + (robot.leftStickY2 - 0.1) * (robot.leftStickY2 - 0.1) * mainArmIncrement * deltaT/1e9;
             }
             else if(robot.leftStickY2  <= -0.1){
-                mainArmHorizontalPos = mainArmHorizontalPos + (robot.leftStickY2 + 0.1) * mainArmIncrement * deltaT/1e9;
+                mainArmHorizontalPos = mainArmHorizontalPos - (robot.leftStickY2 + 0.1) * (robot.leftStickY2 + 0.1) * mainArmIncrement * deltaT/1e9;
             }
             if (mainArmHorizontalPos > mainArmHorizontalMax) {
                 mainArmHorizontalPos = mainArmHorizontalMax;
@@ -174,10 +174,10 @@ public class TeleopMark3 extends LinearOpMode {
             }
             // move robot main arm along vertical line
             if(robot.rightStickY2 >= 0.1){
-                mainArmVerticalPos = mainArmVerticalPos + (robot.rightStickY2 - 0.1) * mainArmIncrement * deltaT/1e9;
+                mainArmVerticalPos = mainArmVerticalPos + (robot.rightStickY2 - 0.1) * (robot.rightStickY2 - 0.1) * mainArmIncrement * deltaT/1e9;
             }
             else if(robot.rightStickY2  <= -0.1){
-                mainArmVerticalPos = mainArmVerticalPos + (robot.rightStickY2 + 0.1) * mainArmIncrement * deltaT/1e9;
+                mainArmVerticalPos = mainArmVerticalPos - (robot.rightStickY2 + 0.1) * (robot.rightStickY2 + 0.1) * mainArmIncrement * deltaT/1e9;
             }
             if (mainArmVerticalPos > mainArmVerticalMax) {
                 mainArmVerticalPos = mainArmVerticalMax;
@@ -189,10 +189,10 @@ public class TeleopMark3 extends LinearOpMode {
 
             // rotate main claw
             if(robot.rightStickX2 >= 0.1){
-                mainClawRotationAngle = mainClawRotationAngle + (robot.rightStickX2 - 0.1) * mainClawRotationIncrement * deltaT/1e9;
+                mainClawRotationAngle = mainClawRotationAngle + (robot.rightStickX2 - 0.1) * (robot.rightStickX2 - 0.1) * mainClawRotationIncrement * deltaT/1e9;
             }
             else if(robot.rightStickX2  <= -0.1){
-                mainClawRotationAngle = mainClawRotationAngle + (robot.rightStickX2 + 0.1) * mainClawRotationIncrement * deltaT/1e9;
+                mainClawRotationAngle = mainClawRotationAngle - (robot.rightStickX2 + 0.1) * (robot.rightStickX2 + 0.1) * mainClawRotationIncrement * deltaT/1e9;
             }
             if (mainClawRotationAngle > 180.0) {
                 mainClawRotationAngle = 180.0;

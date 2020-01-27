@@ -39,10 +39,12 @@ import static android.os.SystemClock.sleep;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 import static org.opencv.core.Core.BORDER_CONSTANT;
+import static org.opencv.core.Core.BORDER_WRAP;
 
 /**
  * Created by AndrewC on 12/27/2019.
@@ -62,14 +64,20 @@ public class Vision {
 
     public static Mat frameBuffer1 = new Mat();
     public static Mat frameBuffer2 = new Mat();
+    public static Mat yCbCrChan0Mat = new Mat();
     public static Mat yCbCrChan1Mat = new Mat();
     public static Mat yCbCrChan2Mat = new Mat();
+    public static Mat yCbCrChan1Mat_compensated = new Mat();
+    public static Mat yCbCrChan2Mat_compensated = new Mat();
+    public static Mat yCbCrChan2Mat_compensatedn = new Mat();
     public static Mat thresholdMat = new Mat();
     public static Mat contoursOnFrameMat = new Mat();
     public static Mat outputFrame = new Mat();
     public static List<MatOfPoint> contoursList = new ArrayList<>();
-    private static Mat map1 = new Mat();
-    private static Mat map2 = new Mat();
+//    private static Mat map1 = new Mat();
+//    private static Mat map2 = new Mat();
+    private static Mat map1;
+    private static Mat map2;
     public static int numContoursFound;
     private static int redColorThreshold = 120;
     private static int blueColorThreshold = 145;
@@ -184,7 +192,9 @@ public class Vision {
         this.robot = robot;
         setupCameraNames();
         systemVisionMode = visionMode;
-//        readCameraCalibrationMaps("ELP_USBFHD06H_mapx.txt");
+        readCameraCalibrationMaps("ELP_USBFHD06H_map_320x240");
+//        map1 = Camera_map.createMap1();
+//        map2 = Camera_map.createMap2();
         switch (visionMode) {
             case 0:
                 break;
@@ -386,9 +396,14 @@ public class Vision {
         }
 
         // This is according to ConceptVuforiaSkyStoneNavigationWebcam.java for webcam setting
+//        OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
+//                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+//                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
+
+        // according to the analysis posted on https://ftcforum.firstinspires.org/forum/first-tech-challenge-community-forum-this-is-an-open-forum/teams-helping-teams-programming/76847-question-on-vuforia-navigation
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, ZYX, DEGREES, -90, 90, 0));
 
         /**  Let all the trackable listeners know where the phone is.  */
         for (VuforiaTrackable trackable : allTrackables) {
@@ -573,35 +588,50 @@ public class Vision {
         public Mat processFrame(Mat input) {
             contoursList.clear();
             input.copyTo(frameBuffer2);
-//            if (armWebcamIsActive) {
-//                Imgproc.remap(input,input, map1, map2, Imgproc.INTER_LINEAR, BORDER_CONSTANT);
-//            }
+            if (armWebcamIsActive) {
+                Imgproc.remap(input,input, map1, map2, Imgproc.INTER_LINEAR, BORDER_CONSTANT);
+            }
             checkCorners(input);
             input.copyTo(frameBuffer1);
             Imgproc.cvtColor(input, yCbCrChan2Mat, Imgproc.COLOR_RGB2YCrCb);
+            Core.extractChannel(yCbCrChan2Mat, yCbCrChan0Mat, 0);
             Core.extractChannel(yCbCrChan2Mat, yCbCrChan1Mat, 1);
             Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);
+            // yCbCrChan0Mat frame is the Y frame
             // yCbCrChan1Mat frame is the Cr frame
             // yCbCrChan2Mat frame is the Cb frame
+            Core.addWeighted(yCbCrChan0Mat, 0.25, yCbCrChan1Mat, 0.75, 0.0, yCbCrChan1Mat_compensated);
+            Core.addWeighted(yCbCrChan0Mat, 0.25, yCbCrChan2Mat, 0.75, 0.0, yCbCrChan2Mat_compensated);
+            Core.addWeighted(yCbCrChan0Mat, -0.25, yCbCrChan2Mat, 0.75, 64.0, yCbCrChan2Mat_compensatedn);
             switch (detectedColor) {
                 case RED: {
-                    Imgproc.threshold(yCbCrChan1Mat, thresholdMat, redColorThreshold, 255, Imgproc.THRESH_BINARY);
+                    Imgproc.threshold(yCbCrChan1Mat_compensated, thresholdMat, redColorThreshold, 255, Imgproc.THRESH_BINARY);
+//                    Imgproc.adaptiveThreshold(yCbCrChan1Mat, thresholdMat, 255,
+//                            Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 11, 12);
                     break;
                 }
                 case BLUE: {
-                    Imgproc.threshold(yCbCrChan2Mat, thresholdMat, blueColorThreshold, 255, Imgproc.THRESH_BINARY);
+                    Imgproc.threshold(yCbCrChan2Mat_compensated, thresholdMat, blueColorThreshold, 255, Imgproc.THRESH_BINARY);
+//                    Imgproc.adaptiveThreshold(yCbCrChan2Mat, thresholdMat, 255,
+//                            Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 11, 12);
                     break;
                 }
                 case YELLOW1: {
                     Imgproc.threshold(yCbCrChan2Mat, thresholdMat, yellowColorThreshold1, 255, Imgproc.THRESH_BINARY_INV);
+//                    Imgproc.adaptiveThreshold(yCbCrChan2Mat, thresholdMat, 255,
+//                            Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV, 11, -12);
                     break;
                 }
                 case YELLOW2: {
-                    Imgproc.threshold(yCbCrChan2Mat, thresholdMat, yellowColorThreshold2, 255, Imgproc.THRESH_BINARY_INV);
+                    Imgproc.threshold(yCbCrChan2Mat_compensatedn, thresholdMat, yellowColorThreshold2, 255, Imgproc.THRESH_BINARY_INV);
+//                    Imgproc.adaptiveThreshold(yCbCrChan2Mat, thresholdMat, 255,
+//                            Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV, 11, -12);
                     break;
                 }
                 default: {
                     Imgproc.threshold(yCbCrChan2Mat, thresholdMat, yellowColorThreshold1, 255, Imgproc.THRESH_BINARY_INV);
+//                    Imgproc.adaptiveThreshold(yCbCrChan2Mat, thresholdMat, 255,
+//                            Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV, 11, -12);
                     break;
                 }
             }
@@ -650,6 +680,7 @@ public class Vision {
                 }
                 case RAW_INPUT: {
                     frameBuffer2.copyTo(outputFrame);
+                    break;
                 }
                 default: {
                     input.copyTo(outputFrame);

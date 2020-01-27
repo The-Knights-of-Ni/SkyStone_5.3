@@ -102,7 +102,7 @@ public class Auto_Blue extends LinearOpMode {
         robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         mainArmHorizontalPos = 40.0;
-        mainArmVerticalPos = 50.0;
+        mainArmVerticalPos = 80.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
 
@@ -230,9 +230,37 @@ public class Auto_Blue extends LinearOpMode {
     }
 
     private void printRobotPosition() {
-        sleep(5000);
+        sleep(1000);
         robot.vision.vuMarkScan();
+        telemetry.addData("after ", "1 sec");
+        telemetry.update();
+        sleep(1000);
         robot.vision.vuMarkScan();
+        telemetry.addData("after ", "2 sec");
+        telemetry.update();
+        sleep(1000);
+        robot.vision.vuMarkScan();
+        telemetry.addData("after ", "3 sec");
+        telemetry.update();
+        sleep(1000);
+        robot.vision.vuMarkScan();
+        telemetry.addData("after ", "4 sec");
+        telemetry.update();
+        sleep(1000);
+        robot.vision.vuMarkScan();
+        telemetry.addData("after ", "5 sec");
+        telemetry.update();
+        sleep(1000);
+        robot.vision.vuMarkScan();
+        telemetry.addData("after ", "6 sec");
+        telemetry.update();
+        sleep(1000);
+        robot.vision.vuMarkScan();
+        telemetry.addData("after ", "7 sec");
+        telemetry.update();
+        sleep(1000);
+        robot.vision.vuMarkScan();
+        telemetry.addData("after ", "8 sec");
         robotAngle = robot.drive.getYaw();
         telemetry.addData("robot angle ", "%.1f", robotAngle);
         telemetry.update();

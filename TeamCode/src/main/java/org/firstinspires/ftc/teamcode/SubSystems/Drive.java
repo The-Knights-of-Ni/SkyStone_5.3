@@ -265,11 +265,12 @@ public class Drive extends Subsystem {
 
     public void turnByAngle(double power, double turnAngle) {
         double initialAngle = getYaw();
+        double currentAngle;
         setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (turnAngle > 0.0) {
             // counter-clockwise
-            double currentAngle = initialAngle;
+            currentAngle = initialAngle;
             while (Math.abs(currentAngle - initialAngle - turnAngle) > 2) {
                 turn(-power);
                 currentAngle = getYaw();
@@ -280,7 +281,7 @@ public class Drive extends Subsystem {
             }
         } else {
             // clockwise
-            double currentAngle = initialAngle;
+            currentAngle = initialAngle;
             while (Math.abs(currentAngle - initialAngle - turnAngle) > 2) {
                 turn(power);
                 currentAngle = getYaw();
@@ -291,6 +292,11 @@ public class Drive extends Subsystem {
             }
         }
         stop();
+        opMode.telemetry.addData("initial angle",  "%7.2f degrees", initialAngle);
+        opMode.telemetry.addData("last read angle",  "%7.2f degrees", currentAngle);
+        opMode.telemetry.addData("final angle",  "%7.2f degrees", getYaw());
+        opMode.telemetry.update();
+        opMode.sleep(3000);
     }
 
     public void moveToPos2D(double power, double targetPositionX, double targetPositionY){

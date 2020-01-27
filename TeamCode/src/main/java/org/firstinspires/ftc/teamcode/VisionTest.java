@@ -21,9 +21,9 @@ public class VisionTest extends LinearOpMode {
     double mainArmVerticalPos = 0.0;
     double mainArmHorizontalMax = 1000.0;
     double mainArmVerticalMax = 1200.0;
-    double mainArmIncrement = 500.0;
+    double mainArmIncrement = 600.0;
     double mainClawRotationAngle;
-    double mainClawRotationIncrement = 200;
+    double mainClawRotationIncrement = 300;
     double deltaT;
     double timeCurrent;
     double timePre;
@@ -70,6 +70,12 @@ public class VisionTest extends LinearOpMode {
         timePre = timeCurrent;
 
         robot.vision.getTargetsSkyStone().activate();
+
+        mainArmHorizontalPos = 40.0;
+        mainArmVerticalPos = 80.0;
+        robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+
         while (!isStopRequested()) {
 
             // Get gamepad inputs
@@ -139,11 +145,13 @@ public class VisionTest extends LinearOpMode {
 
             // move robot main arm
             // move robot main arm along horizontal line
+            // move robot main arm
+            // move robot main arm along horizontal line
             if(robot.leftStickY2 >= 0.1){
-                mainArmHorizontalPos = mainArmHorizontalPos + (robot.leftStickY2 - 0.1) * mainArmIncrement * deltaT/1e9;
+                mainArmHorizontalPos = mainArmHorizontalPos + (robot.leftStickY2 - 0.1) * (robot.leftStickY2 - 0.1) * mainArmIncrement * deltaT/1e9;
             }
             else if(robot.leftStickY2  <= -0.1){
-                mainArmHorizontalPos = mainArmHorizontalPos + (robot.leftStickY2 + 0.1) * mainArmIncrement * deltaT/1e9;
+                mainArmHorizontalPos = mainArmHorizontalPos - (robot.leftStickY2 + 0.1) * (robot.leftStickY2 + 0.1) * mainArmIncrement * deltaT/1e9;
             }
             if (mainArmHorizontalPos > mainArmHorizontalMax) {
                 mainArmHorizontalPos = mainArmHorizontalMax;
@@ -153,10 +161,10 @@ public class VisionTest extends LinearOpMode {
             }
             // move robot main arm along vertical line
             if(robot.rightStickY2 >= 0.1){
-                mainArmVerticalPos = mainArmVerticalPos + (robot.rightStickY2 - 0.1) * mainArmIncrement * deltaT/1e9;
+                mainArmVerticalPos = mainArmVerticalPos + (robot.rightStickY2 - 0.1) * (robot.rightStickY2 - 0.1) * mainArmIncrement * deltaT/1e9;
             }
             else if(robot.rightStickY2  <= -0.1){
-                mainArmVerticalPos = mainArmVerticalPos + (robot.rightStickY2 + 0.1) * mainArmIncrement * deltaT/1e9;
+                mainArmVerticalPos = mainArmVerticalPos - (robot.rightStickY2 + 0.1) * (robot.rightStickY2 + 0.1) * mainArmIncrement * deltaT/1e9;
             }
             if (mainArmVerticalPos > mainArmVerticalMax) {
                 mainArmVerticalPos = mainArmVerticalMax;
@@ -168,10 +176,10 @@ public class VisionTest extends LinearOpMode {
 
             // rotate main claw
             if(robot.rightStickX2 >= 0.1){
-                mainClawRotationAngle = mainClawRotationAngle + (robot.rightStickX2 - 0.1) * mainClawRotationIncrement * deltaT/1e9;
+                mainClawRotationAngle = mainClawRotationAngle + (robot.rightStickX2 - 0.1) * (robot.rightStickX2 - 0.1) * mainClawRotationIncrement * deltaT/1e9;
             }
             else if(robot.rightStickX2  <= -0.1){
-                mainClawRotationAngle = mainClawRotationAngle + (robot.rightStickX2 + 0.1) * mainClawRotationIncrement * deltaT/1e9;
+                mainClawRotationAngle = mainClawRotationAngle - (robot.rightStickX2 + 0.1) * (robot.rightStickX2 + 0.1) * mainClawRotationIncrement * deltaT/1e9;
             }
             if (mainClawRotationAngle > 180.0) {
                 mainClawRotationAngle = 180.0;
@@ -190,7 +198,9 @@ public class VisionTest extends LinearOpMode {
 
             //Automate skybrige pos
             if(robot.bButton2 && !robot.isbButton2PressedPrev){
-                robot.control.setMainArmPosition(80.0, 50.0);
+                mainArmHorizontalPos = 40.0;
+                mainArmVerticalPos = 80.0;
+                robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
             }
 
             telemetry.addData("X Y Rot ", "%.1f,  %.1f,  %.1f", mainArmHorizontalPos, mainArmVerticalPos, mainClawRotationAngle);
@@ -281,8 +291,12 @@ public class VisionTest extends LinearOpMode {
                 robot.getOpmode().telemetry.addData("saving ", "images...");
                 robot.vision.saveImage("VisionTest", robot.vision.frameBuffer2, Imgproc.COLOR_RGBA2BGR, "original", (long) timeCurrent);
                 robot.vision.saveImage("VisionTest", robot.vision.frameBuffer1, Imgproc.COLOR_RGBA2BGR, "undistorted", (long) timeCurrent);
+                robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan2Mat_compensatedn, Imgproc.COLOR_RGBA2BGR, "CbImage_c25n", (long) timeCurrent);
+                robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan2Mat_compensated, Imgproc.COLOR_RGBA2BGR, "CbImage_c25", (long) timeCurrent);
+                robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan1Mat_compensated, Imgproc.COLOR_RGBA2BGR, "CrImage_c25", (long) timeCurrent);
                 robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan2Mat, Imgproc.COLOR_RGBA2BGR, "CbImage", (long) timeCurrent);
                 robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan1Mat, Imgproc.COLOR_RGBA2BGR, "CrImage", (long) timeCurrent);
+                robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan0Mat, Imgproc.COLOR_RGBA2BGR, "YImage", (long) timeCurrent);
                 robot.vision.saveImage("VisionTest", robot.vision.thresholdMat, Imgproc.COLOR_RGBA2BGR, "threshold", (long) timeCurrent);
                 robot.vision.saveImage("VisionTest", robot.vision.contoursOnFrameMat, Imgproc.COLOR_RGBA2BGR, "contours", (long) timeCurrent);
             }
