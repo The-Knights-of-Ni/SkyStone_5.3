@@ -32,6 +32,11 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -187,14 +192,18 @@ public class Vision {
      *          4: backWebcam is initialized for Vuforia and armWebcam is initialized for OpenCV
      *          5: armWebcam is initialized for OpenCV and frontWebcam is initialized for OpenCV
      */
-    public Vision(HardwareMap hardwareMap, Robot robot, int visionMode){
+    public Vision(HardwareMap hardwareMap, Robot robot, int visionMode) throws IOException {
         this.hardwareMap = hardwareMap;
         this.robot = robot;
         setupCameraNames();
         systemVisionMode = visionMode;
-        readCameraCalibrationMaps("ELP_USBFHD06H_map_320x240");
+//        readCameraCalibrationMaps("ELP_USBFHD06H_map_320x240");
+//        fastWriteCameraCalibrationMaps("ELP_USBFHD06H_map_320x240");
+        fastReadCameraCalibrationMaps("ELP_USBFHD06H_map_320x240", 320, 240);
 //        map1 = Camera_map.createMap1();
 //        map2 = Camera_map.createMap2();
+        robot.getOpmode().telemetry.addData("Initialize", "cameras");
+        robot.getOpmode().telemetry.update();
         switch (visionMode) {
             case 0:
                 break;
@@ -775,6 +784,113 @@ public class Vision {
         robot.getOpmode().telemetry.addData(" camera calibration", "completed");
         robot.getOpmode().telemetry.addData(" map1", "row: %d, col: %d", map1.rows(), map1.cols());
         robot.getOpmode().telemetry.update();
+    }
 
+    // adapted from solution mentioned in https://stackoverflow.com/questions/22249483/write-read-float-array-in-java-fast-way
+    // modified by Andrew Chiang for OpenCV Mat on 1/27/2020
+    public void fastWriteCameraCalibrationMaps(String fileName) throws IOException {
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+        String file = path + "/" + fileName + "map1";
+        RandomAccessFile outputfile = null;
+        try {
+            robot.getOpmode().telemetry.addData("file", file);
+            robot.getOpmode().telemetry.addData("writing", "map1");
+            robot.getOpmode().telemetry.update();
+            outputfile = new RandomAccessFile(file, "rw");
+            FileChannel outChannel = outputfile.getChannel();
+
+            ByteBuffer buf = ByteBuffer.allocate(4*map1.cols()*map1.rows());
+            buf.clear();
+            float[] data = new float[map1.cols()*map1.rows()];
+            map1.get(0, 0, data);
+            buf.asFloatBuffer().put(data);
+
+            //while (buf.hasRemaining())
+            {
+                outChannel.write(buf);
+            }
+            outChannel.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        file = path + "/" + fileName + "map2";
+        outputfile = null;
+        try {
+            robot.getOpmode().telemetry.addData("file", file);
+            robot.getOpmode().telemetry.addData("writing", "map2");
+            robot.getOpmode().telemetry.update();
+            outputfile = new RandomAccessFile(file, "rw");
+            FileChannel outChannel = outputfile.getChannel();
+
+            ByteBuffer buf = ByteBuffer.allocate(4*map2.cols()*map2.rows());
+            buf.clear();
+            float[] data = new float[map2.cols()*map2.rows()];
+            map2.get(0, 0, data);
+            buf.asFloatBuffer().put(data);
+
+            //while (buf.hasRemaining())
+            {
+                outChannel.write(buf);
+            }
+            outChannel.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    // adapted from solution mentioned in https://stackoverflow.com/questions/22249483/write-read-float-array-in-java-fast-way
+    // modified by Andrew Chiang for OpenCV Mat on 1/27/2020
+    public void fastReadCameraCalibrationMaps(String fileName, int cols, int rows) throws IOException {
+        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+        String file = path + "/" + fileName + "map1";
+        RandomAccessFile inputfile = null;
+        try {
+            robot.getOpmode().telemetry.addData("file", file);
+            robot.getOpmode().telemetry.addData("reading", "map1");
+            robot.getOpmode().telemetry.update();
+            inputfile = new RandomAccessFile(file, "rw");
+            FileChannel inChannel = inputfile.getChannel();
+
+            ByteBuffer buf = ByteBuffer.allocate(4*cols*rows);
+            buf.clear();
+
+            inChannel.read(buf);
+            buf.rewind();
+
+            map1 = new Mat(rows, cols, CvType.CV_32FC1);
+//            map1.put(0, 0, buf.asFloatBuffer().array());  // this does not work
+            float[] data = new float[cols*rows];
+            buf.asFloatBuffer().get(data);
+            map1.put(0, 0, data);
+
+            inChannel.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        file = path + "/" + fileName + "map2";
+        inputfile = null;
+        try {
+            robot.getOpmode().telemetry.addData("file", file);
+            robot.getOpmode().telemetry.addData("reading", "map2");
+            robot.getOpmode().telemetry.update();
+            inputfile = new RandomAccessFile(file, "rw");
+            FileChannel inChannel = inputfile.getChannel();
+
+            ByteBuffer buf = ByteBuffer.allocate(4*cols*rows);
+            buf.clear();
+
+            inChannel.read(buf);
+            buf.rewind();
+
+            map2 = new Mat(rows, cols, CvType.CV_32FC1);
+//            map2.put(0, 0, buf.asFloatBuffer().array());  // this does not work
+            float[] data = new float[cols*rows];
+            buf.asFloatBuffer().get(data);
+            map2.put(0, 0, data);
+
+            inChannel.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

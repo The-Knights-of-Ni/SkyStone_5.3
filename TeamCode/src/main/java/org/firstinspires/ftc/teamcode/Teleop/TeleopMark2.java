@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
+import java.io.IOException;
+
 /**
  * Created by AndrewChiang on 12/27/19.
  */
@@ -229,7 +231,11 @@ public class TeleopMark2 extends LinearOpMode {
     private void initOpMode() {
         //Initialize DC motor objects
         timer = new ElapsedTime();
-        robot = new Robot(this, timer);
+        try {
+            robot = new Robot(this, timer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         robot.xRailWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.xRailWinch.setTargetPosition(0);
         robot.xRailWinch.setMode(DcMotor.RunMode.RUN_TO_POSITION);

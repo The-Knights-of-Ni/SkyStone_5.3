@@ -11,6 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
+import java.io.IOException;
+
 
 @Autonomous(name = "AutoEncoder")
 
@@ -55,7 +57,11 @@ public class AutoEncoder extends LinearOpMode {
     public void runOpMode() {
 
         timer = new ElapsedTime();
-        robot = new Robot(this, timer);
+        try {
+            robot = new Robot(this, timer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         robot.drive.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.drive.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.drive.rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

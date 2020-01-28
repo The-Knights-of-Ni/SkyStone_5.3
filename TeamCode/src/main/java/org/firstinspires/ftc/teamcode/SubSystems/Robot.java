@@ -15,6 +15,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.SubSystems.Drive;
 import org.firstinspires.ftc.teamcode.SubSystems.Vision;
 
+import java.io.IOException;
+
 /**
  * Created by AndrewC on 12/27/2019.
  */
@@ -122,7 +124,7 @@ public class Robot extends Subsystem {
     public Control control;
     public Vision vision;
 
-    public Robot(LinearOpMode opMode, ElapsedTime timer){
+    public Robot(LinearOpMode opMode, ElapsedTime timer) throws IOException {
         hardwareMap = opMode.hardwareMap;
         this.opMode = opMode;
         this.timer = timer;
@@ -140,22 +142,22 @@ public class Robot extends Subsystem {
      *          3: backWebcam is initialized for Vuforia and frontWebcam is initialized for OpenCV
      *          4: armWebcam is initialized for OpenCV and frontWebcam is initialized for OpenCV
      */
-    public Robot(LinearOpMode opMode, ElapsedTime timer, int visionMode){
+    public Robot(LinearOpMode opMode, ElapsedTime timer, int visionMode) throws IOException {
         hardwareMap = opMode.hardwareMap;
         this.opMode = opMode;
         this.timer = timer;
         init(visionMode);
     }
 
-    public Robot (){
+    public Robot () throws IOException {
         init(0);
     }
 
-    public void init() {
+    public void init() throws IOException {
         init(0);
     }
 
-    public void init(int visionMode){
+    public void init(int visionMode) throws IOException {
         //DC Motors
         frontLeftDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fl");
         frontRightDriveMotor = (DcMotorEx) hardwareMap.dcMotor.get("fr");

@@ -11,6 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
+import java.io.IOException;
+
 
 @TeleOp(name="Drive by Wire", group="Assisted Driving")
 public class DriveByWire extends LinearOpMode {
@@ -20,7 +22,7 @@ public class DriveByWire extends LinearOpMode {
     Orientation lastAngles = new Orientation();
     double                  globalAngle, power = .30;
 
-    private void initOpMode() {
+    private void initOpMode() throws IOException {
         //Initialize DC motor objects
         ElapsedTime timer = new ElapsedTime();
         robot = new Robot(this, timer);
@@ -31,7 +33,11 @@ public class DriveByWire extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException
     {
-        initOpMode();
+        try {
+            initOpMode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 

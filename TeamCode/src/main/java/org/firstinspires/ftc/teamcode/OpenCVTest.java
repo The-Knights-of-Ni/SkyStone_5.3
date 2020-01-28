@@ -13,6 +13,8 @@ package org.firstinspires.ftc.teamcode;
         import org.opencv.core.Mat;
         import org.opencv.videoio.VideoCapture;
 
+        import java.io.IOException;
+
 @TeleOp(name="OpenCV Test")
 public class OpenCVTest extends LinearOpMode {
     private static final int targetPosition = 315;
@@ -21,13 +23,17 @@ public class OpenCVTest extends LinearOpMode {
 
     private Robot robot;
 
-    public void initOpMode(){
+    public void initOpMode() throws IOException {
         ElapsedTime timer = new ElapsedTime();
         this.robot = new Robot(this, timer);
 
     }
     public void runOpMode() {
-        initOpMode();
+        try {
+            initOpMode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         waitForStart();
         int maxID = 500;
         Mat frame = new Mat();

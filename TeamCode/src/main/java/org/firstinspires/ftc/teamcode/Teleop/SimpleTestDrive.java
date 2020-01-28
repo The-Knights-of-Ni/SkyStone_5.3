@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
+import java.io.IOException;
+
 
 @TeleOp(name = "Strafe Program", group = "Drive Tests")
 public class SimpleTestDrive extends LinearOpMode {
@@ -45,7 +47,11 @@ public class SimpleTestDrive extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        initOpMode();
+        try {
+            initOpMode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         waitForStart();
         telemetry.clearAll();
         while(opModeIsActive()) {
@@ -100,7 +106,7 @@ public class SimpleTestDrive extends LinearOpMode {
             timePre = timeCurrent;
         }
     }
-    private void initOpMode() {
+    private void initOpMode() throws IOException {
         //Initialize DC motor objects
         timer = new ElapsedTime();
         robot = new Robot(this, timer);

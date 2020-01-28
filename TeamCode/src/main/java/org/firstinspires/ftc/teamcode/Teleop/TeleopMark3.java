@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
+import java.io.IOException;
+
 /**
  * Complete Teleop Program
  * Created by AndrewC on 1/18/2020
@@ -47,10 +49,18 @@ public class TeleopMark3 extends LinearOpMode {
         timer = new ElapsedTime();
         if (visionEnabled) {
             // visionMode 4: backWebcam is initialized for Vuforia and armWebcam is initialized for OpenCV
-            robot = new Robot(this, timer, 4);
+            try {
+                robot = new Robot(this, timer, 4);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         else {
-            robot = new Robot(this, timer);
+            try {
+                robot = new Robot(this, timer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         timeCurrent = timer.nanoseconds();

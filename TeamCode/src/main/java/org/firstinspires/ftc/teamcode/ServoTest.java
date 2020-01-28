@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
+import java.io.IOException;
+
 /**
  * Created by tarunsingh on 12/5/17.
  * Modified by AndrewC on 1/17/2020.
@@ -23,13 +25,17 @@ public class ServoTest extends LinearOpMode {
     double timeCurrent;
     ElapsedTime timer;
 
-    public void initOpMode(){
+    public void initOpMode() throws IOException {
         timer = new ElapsedTime();
         this.robot = new Robot(this, timer);
 
     }
     public void runOpMode() {
-        initOpMode();
+        try {
+            initOpMode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         robot.initServosAuto();
         telemetry.clearAll();
 //        telemetry.addLine("Wait For Start");

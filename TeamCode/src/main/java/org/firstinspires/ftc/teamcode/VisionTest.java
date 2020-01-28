@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.IOException;
+
 /**
  * Created by tarunsingh on 12/5/17.
  * Modified by AndrewC on 12/27/2019.
@@ -47,7 +49,11 @@ public class VisionTest extends LinearOpMode {
         telemetry.update();
         timer = new ElapsedTime();
         // visionMode 3: backWebcam is initialized for Vuforia and frontWebcam is initialized for OpenCV
-        this.robot = new Robot(this, timer, 3);
+        try {
+            this.robot = new Robot(this, timer, 3);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         cameraSelection = 0;
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;

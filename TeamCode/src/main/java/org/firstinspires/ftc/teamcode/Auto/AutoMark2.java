@@ -21,6 +21,8 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.io.IOException;
+
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
@@ -98,9 +100,17 @@ public class AutoMark2 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         timer = new ElapsedTime();
         double startTime = 0.0;
-        robot = new Robot(this, timer);
+        try {
+            robot = new Robot(this, timer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        initRobot();
+        try {
+            initRobot();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         waitForStart();
 
         log("Started Mark 2 Auto");
@@ -171,7 +181,7 @@ public class AutoMark2 extends LinearOpMode {
 
 
 
-    private void initRobot() {
+    private void initRobot() throws IOException {
         robot.init();
         robot.drive.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.drive.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);

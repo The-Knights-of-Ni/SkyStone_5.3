@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
+import java.io.IOException;
+
 /**
  * Created by AndrewChiang on 12/27/19.
  */
@@ -46,7 +48,11 @@ public class OpModeServos extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        initOpMode();
+        try {
+            initOpMode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         waitForStart();
 
         //set foundation servo positions
@@ -126,7 +132,7 @@ public class OpModeServos extends LinearOpMode {
             timePre = timeCurrent;
         }
     }
-    private void initOpMode() {
+    private void initOpMode() throws IOException {
         //Initialize DC motor objects
         timer = new ElapsedTime();
         robot = new Robot(this, timer);

@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,9 +120,17 @@ public class Auto_Blue_Crater extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         timer = new ElapsedTime();
         double startTime = 0.0;
-        robot = new Robot(this, timer);
+        try {
+            robot = new Robot(this, timer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        initRobot();
+        try {
+            initRobot();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         waitForStart();
 
         log("Started Mark 1 Auto");
@@ -181,7 +190,7 @@ public class Auto_Blue_Crater extends LinearOpMode {
 
 
 
-    private void initRobot() {
+    private void initRobot() throws IOException {
         robot.init();
         robot.drive.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.drive.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);

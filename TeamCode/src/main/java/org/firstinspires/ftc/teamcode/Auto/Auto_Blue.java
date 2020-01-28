@@ -10,6 +10,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.IOException;
+
 import static org.opencv.core.Core.mean;
 
 /**
@@ -58,7 +60,7 @@ public class Auto_Blue extends LinearOpMode {
     }
     private SkyStonePattern skyStonePattern;
 
-    private void initOpMode(){
+    private void initOpMode() throws IOException {
         telemetry.addData("Init Robot", "");
         telemetry.update();
         timer = new ElapsedTime();
@@ -80,7 +82,11 @@ public class Auto_Blue extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        initOpMode();
+        try {
+            initOpMode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         robot.initServosAuto();
         waitForStart();
 
@@ -120,10 +126,10 @@ public class Auto_Blue extends LinearOpMode {
 //                robot.drive.setDriveFullPower(false);
                 break;
             case PATTERNB:
-                robot.drive.moveLeft(223);
+                robot.drive.moveLeft(203);
                 break;
             case BATTERNC:
-                robot.drive.moveLeft(426);
+                robot.drive.moveLeft(406);
                 break;
             default:
                 break;
@@ -131,6 +137,8 @@ public class Auto_Blue extends LinearOpMode {
         sleep(100);
         pickupSkySTone();
         sleep(100);
+        printRobotPosition();
+        sleep(10000);
 //        robot.drive.turnRobotByTick(90.0);
         robot.drive.turnRobot(90.0);
 

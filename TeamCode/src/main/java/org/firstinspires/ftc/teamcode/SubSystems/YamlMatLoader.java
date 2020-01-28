@@ -27,10 +27,10 @@ public class YamlMatLoader {
         public MatStorage() {
         }
 
-        public double[] getData() {
-            double[] dataOut = new double[data.size()];
+        public float[] getData() {
+            float[] dataOut = new float[data.size()];
             for (int i = 0; i < dataOut.length; i++) {
-                dataOut[i] = Double.parseDouble(data.get(i));
+                dataOut[i] = Float.parseFloat(data.get(i));
             }
 
             return dataOut;

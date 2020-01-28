@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
+import java.io.IOException;
+
 /**
  * Created by tarunsingh on 12/5/17.
  */
@@ -18,7 +20,7 @@ public class EncoderTest extends LinearOpMode {
     private Robot robot;
     private double currentPos;
 
-    public void initOpMode(){
+    public void initOpMode() throws IOException {
         ElapsedTime timer = new ElapsedTime();
         robot = new Robot(this, timer);
         robot.xRailWinch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -32,7 +34,11 @@ public class EncoderTest extends LinearOpMode {
         telemetry.addData("OK!", 5);
     }
     public void runOpMode() {
-        initOpMode();
+        try {
+            initOpMode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         waitForStart();
         robot.timer.reset();
 
