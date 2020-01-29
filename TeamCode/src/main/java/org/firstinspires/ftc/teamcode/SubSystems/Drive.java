@@ -1,12 +1,17 @@
 
 package org.firstinspires.ftc.teamcode.SubSystems;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.MotorControlAlgorithm;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -43,12 +48,12 @@ public class Drive extends Subsystem {
     private static final double     COUNTS_PER_INCH                 = (TICKS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
     private static final double     COUNTS_PER_MM                 = (TICKS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * Math.PI);
-    private static final double     COUNTS_CORRECTION_X             = 1.1;
-    private static final double     COUNTS_CORRECTION_Y             = 0.92;
-    private static final double     COUNTS_PER_DEGREE             = 10.833*1.1;     // 975 ticks per 90 degrees
+    private static final double     COUNTS_CORRECTION_X             = 1.08;
+    private static final double     COUNTS_CORRECTION_Y             = 0.91;
+    private static final double     COUNTS_PER_DEGREE             = 10.833*1.02;     // 975 ticks per 90 degrees
 
-    private static final double     DRIVE_SPEED             = 0.4;
-    private static final double     TURN_SPEED              = 0.3;
+    private static final double     DRIVE_SPEED             = 0.45;
+    private static final double     TURN_SPEED              = 0.45;
     private static boolean    driveFullPower          = false;
 
     private static final double     ROBOT_INIT_POS_X    = 15.0;
@@ -62,6 +67,7 @@ public class Drive extends Subsystem {
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
 
+    private long startTime;
 
     public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer) {
         this.frontLeft = frontLeft;
@@ -88,6 +94,13 @@ public class Drive extends Subsystem {
         frontRight.setPower(0);
         rearLeft.setPower(0);
         rearRight.setPower(0);
+    }
+
+    public void checkAndStopMotors() {
+        if (!frontLeft.isBusy()) { frontLeft.setPower(0); }
+        if (!frontRight.isBusy()) { frontRight.setPower(0); }
+        if (!rearLeft.isBusy()) { rearLeft.setPower(0); }
+        if (!rearRight.isBusy()) { rearRight.setPower(0); }
     }
 
     /**
@@ -190,6 +203,15 @@ public class Drive extends Subsystem {
         };
     }
 
+    public int[] getDriveMotorEncoders() {
+        return new int[] {
+                frontLeft.getCurrentPosition(),
+                frontRight.getCurrentPosition(),
+                rearLeft.getCurrentPosition(),
+                rearRight.getCurrentPosition()
+        };
+    }
+
     public void resetDriveMotorEncoders() {
         encoderOffsetFL = frontLeft.getCurrentPosition();
         encoderOffsetFR = frontRight.getCurrentPosition();
@@ -228,22 +250,25 @@ public class Drive extends Subsystem {
         rearRight.setTargetPosition(0);
 
         setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
-        // convert from degrees to motor counts
-        int tickCount = (int) (angle * COUNTS_PER_DEGREE);
-        frontLeft.setTargetPosition(-tickCount);
-        frontRight.setTargetPosition(tickCount);
-        rearLeft.setTargetPosition(-tickCount);
-        rearRight.setTargetPosition(tickCount);
         if (driveFullPower) {
             setDrivePower(1.0);
         }
         else {
             setDrivePower(power);
         }
+        // convert from degrees to motor counts
+        int tickCount = (int) (angle * COUNTS_PER_DEGREE);
+        frontLeft.setTargetPosition(-tickCount);
+        frontRight.setTargetPosition(tickCount);
+        rearLeft.setTargetPosition(-tickCount);
+        rearRight.setTargetPosition(tickCount);
+        startTime = timer.nanoseconds();
         while (frontLeft.isBusy() && frontRight.isBusy() && rearLeft.isBusy() && rearRight.isBusy()) {
-
+            logDriveEncoders();
+            checkAndStopMotors();
         }
         stop();
+        logDriveEncoders();
     }
 
     public void turnRobot(double degrees) {
@@ -295,6 +320,8 @@ public class Drive extends Subsystem {
         opMode.telemetry.addData("initial angle",  "%7.2f degrees", initialAngle);
         opMode.telemetry.addData("last read angle",  "%7.2f degrees", currentAngle);
         opMode.telemetry.addData("final angle",  "%7.2f degrees", getYaw());
+        opMode.sleep(3000);
+        opMode.telemetry.addData("final2 angle",  "%7.2f degrees", getYaw());
         opMode.telemetry.update();
         opMode.sleep(3000);
     }
@@ -314,17 +341,20 @@ public class Drive extends Subsystem {
         double distanceCountX, distanceCountY;
         distanceCountX = targetPositionX * COUNTS_PER_MM * COUNTS_CORRECTION_X;
         distanceCountY = targetPositionY * COUNTS_PER_MM * COUNTS_CORRECTION_Y;
-        setTargetPosition2D(distanceCountX, distanceCountY);
         if (driveFullPower) {
             setPower2D(distanceCountX, distanceCountY, 1.0);
         }
         else {
             setPower2D(distanceCountX, distanceCountY, power);
         }
+        setTargetPosition2D(distanceCountX, distanceCountY);
+        startTime = timer.nanoseconds();
         while (frontLeft.isBusy() && frontRight.isBusy() && rearLeft.isBusy() && rearRight.isBusy()) {
-
+            logDriveEncoders();
+            checkAndStopMotors();
         }
         stop();
+        logDriveEncoders();
     }
 
     public void setPower2D(double targetPositionX, double targetPositionY, double motorPower) {
@@ -435,6 +465,79 @@ public class Drive extends Subsystem {
     public void park() {
         moveToPos2D(0.25,15,15); //temp position
         // change to where the tape is
+    }
+
+    public void printMotorPIDCoefficients() {
+        PIDFCoefficients pidCoeff;
+        pidCoeff = getMotorPIDCoefficients(frontLeft, DcMotor.RunMode.RUN_TO_POSITION);
+        opMode.telemetry.addData("Front Left ", "P: %.2f I: %.2f D: %.2f F: %.2f A: %s",
+                pidCoeff.p, pidCoeff.i, pidCoeff.d, pidCoeff.f, pidCoeff.algorithm.toString());
+        pidCoeff = getMotorPIDCoefficients(frontRight, DcMotor.RunMode.RUN_TO_POSITION);
+        opMode.telemetry.addData("Front Right", "P: %.2f I: %.2f D: %.2f F: %.2f A: %s",
+                pidCoeff.p, pidCoeff.i, pidCoeff.d, pidCoeff.f, pidCoeff.algorithm.toString());
+        pidCoeff = getMotorPIDCoefficients(rearLeft, DcMotor.RunMode.RUN_TO_POSITION);
+        opMode.telemetry.addData("Rear Left  ", "P: %.2f I: %.2f D: %.2f F: %.2f A: %s",
+                pidCoeff.p, pidCoeff.i, pidCoeff.d, pidCoeff.f, pidCoeff.algorithm.toString());
+        pidCoeff = getMotorPIDCoefficients(rearRight, DcMotor.RunMode.RUN_TO_POSITION);
+        opMode.telemetry.addData("Rear Right ", "P: %.2f I: %.2f D: %.2f F: %.2f A: %s",
+                pidCoeff.p, pidCoeff.i, pidCoeff.d, pidCoeff.f, pidCoeff.algorithm.toString());
+        opMode.telemetry.update();
+    }
+
+    public void setMotorKp(double motorKPFL, double motorKPFR, double motorKPRL, double motorKPRR) {
+        frontLeft.setPositionPIDFCoefficients(motorKPFL);
+        frontRight.setPositionPIDFCoefficients(motorKPFR);
+        rearLeft.setPositionPIDFCoefficients(motorKPRL);
+        rearRight.setPositionPIDFCoefficients(motorKPRR);
+    }
+
+    public void setMotorPID(double Kp, double Ki, double Kd, double Kf) {
+        PIDFCoefficients pidCoeff = new PIDFCoefficients();
+        pidCoeff.p = Kp;
+        pidCoeff.i = Ki;
+        pidCoeff.d = Kd;
+        pidCoeff.f = Kf;
+        pidCoeff.algorithm = MotorControlAlgorithm.PIDF;
+        setMotorPIDCoefficients(frontLeft, DcMotor.RunMode.RUN_TO_POSITION, pidCoeff);
+        setMotorPIDCoefficients(frontRight, DcMotor.RunMode.RUN_TO_POSITION, pidCoeff);
+        setMotorPIDCoefficients(rearLeft, DcMotor.RunMode.RUN_TO_POSITION, pidCoeff);
+        setMotorPIDCoefficients(rearRight, DcMotor.RunMode.RUN_TO_POSITION, pidCoeff);
+    }
+
+    public PIDFCoefficients getMotorPIDCoefficients(DcMotorEx motor, DcMotor.RunMode mode) {
+        // get a reference to the motor controller and cast it as an extended functionality controller.
+        // we assume it's a REV Robotics Expansion Hub (which supports the extended controller functions).
+        DcMotorControllerEx motorControllerEx = (DcMotorControllerEx) motor.getController();
+
+        // get the port number of our configured motor.
+        int motorIndex = motor.getPortNumber();
+
+        // get the PID coefficients for the specific motor mode.
+        PIDFCoefficients pidOrig = motorControllerEx.getPIDFCoefficients(motorIndex, mode);
+
+        return pidOrig;
+    }
+
+    public void setMotorPIDCoefficients(DcMotorEx motor, DcMotor.RunMode mode, PIDFCoefficients pidfCoefficients) {
+        // get a reference to the motor controller and cast it as an extended functionality controller.
+        // we assume it's a REV Robotics Expansion Hub (which supports the extended controller functions).
+        DcMotorControllerEx motorControllerEx = (DcMotorControllerEx) motor.getController();
+
+        // get the port number of our configured motor.
+        int motorIndex = motor.getPortNumber();
+
+        // get the PID coefficients for the specific motor mode.
+        motorControllerEx.setPIDFCoefficients(motorIndex, mode, pidfCoefficients);
+    }
+
+    public void logDriveEncoders() {
+        long currentTime1 = timer.nanoseconds();
+        int[] encoders = getDriveMotorEncoders();
+        long currentTime2 = timer.nanoseconds();
+        long currentTime3 = timer.nanoseconds();
+        String output = String.format("%d, %d, %d, FL %d, FR %d, RL %d, RR %d", currentTime1 - startTime, currentTime2-currentTime1, currentTime3-currentTime2,
+                encoders[0], encoders[1], encoders[2], encoders[3]);
+        Log.d("motorEnc", output);
     }
 
 }

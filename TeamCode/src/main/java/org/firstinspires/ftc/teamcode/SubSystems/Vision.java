@@ -412,7 +412,7 @@ public class Vision {
         // according to the analysis posted on https://ftcforum.firstinspires.org/forum/first-tech-challenge-community-forum-this-is-an-open-forum/teams-helping-teams-programming/76847-question-on-vuforia-navigation
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, ZYX, DEGREES, -90, 90, 0));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, ZYX, DEGREES, -90, 90, -90));
 
         /**  Let all the trackable listeners know where the phone is.  */
         for (VuforiaTrackable trackable : allTrackables) {
@@ -768,6 +768,7 @@ public class Vision {
         }
     }
 
+    // reading from YAML file is extremely slow because of parsing text to float conversion
     public void readCameraCalibrationMaps(String fileName) {
         String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
         String file = path + "/" + fileName;
@@ -801,6 +802,7 @@ public class Vision {
 
             ByteBuffer buf = ByteBuffer.allocate(4*map1.cols()*map1.rows());
             buf.clear();
+//            buf.asFloatBuffer().put(map1.dataAddr());     // this does not work
             float[] data = new float[map1.cols()*map1.rows()];
             map1.get(0, 0, data);
             buf.asFloatBuffer().put(data);
@@ -824,6 +826,7 @@ public class Vision {
 
             ByteBuffer buf = ByteBuffer.allocate(4*map2.cols()*map2.rows());
             buf.clear();
+//            buf.asFloatBuffer().put(map2.dataAddr());     // this does not work
             float[] data = new float[map2.cols()*map2.rows()];
             map2.get(0, 0, data);
             buf.asFloatBuffer().put(data);

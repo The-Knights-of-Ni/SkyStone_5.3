@@ -114,9 +114,9 @@ public class Auto_Blue extends LinearOpMode {
 
         // move out from the wall
         robot.drive.moveForward(570);
-        sleep(100);
-        printRobotPosition();
-        sleep(10000);
+//        sleep(100);
+//        printRobotPosition();
+        sleep(500);
 
         // move to the left depending on the SkyStone pattern
         switch (skyStonePattern) {
@@ -136,15 +136,37 @@ public class Auto_Blue extends LinearOpMode {
         }
         sleep(100);
         pickupSkySTone();
-        sleep(100);
-        printRobotPosition();
-        sleep(10000);
-//        robot.drive.turnRobotByTick(90.0);
-        robot.drive.turnRobot(90.0);
+//        sleep(100);
+//        printRobotPosition();
+        sleep(500);
+        robot.drive.turnRobotByTick(90.0);
+//        robot.drive.turnRobot(90.0);
 
-        printRobotPosition();
-        sleep(10000);
+//        printRobotPosition();
+        sleep(500);
+        switch (skyStonePattern) {
+            case PATTERNA:
+                robot.drive.moveForward(2106);
+                break;
+            case PATTERNB:
+                robot.drive.moveForward(1903);
+                break;
+            case BATTERNC:
+                robot.drive.moveForward(1700);
+                break;
+            default:
+                break;
+        }
+//        sleep(5000);
+//        printRobotPosition();
+        sleep(500);
 
+        robot.drive.turnRobotByTick(-90.0);
+//        robot.drive.turnRobot(90.0);
+
+//        sleep(5000);
+//        printRobotPosition();
+        sleep(500);
         // Disable Tracking when we are done;
         robot.vision.getTargetsSkyStone().deactivate();
         robot.vision.closeFrontWebcam();
@@ -225,50 +247,64 @@ public class Auto_Blue extends LinearOpMode {
         mainArmVerticalPos = 5.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
 //        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
-        sleep(2000);
+        sleep(600);
         robot.control.closeMainClawStone();
-        sleep(1000);
+        sleep(500);
         mainArmVerticalPos = 50.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         sleep(200);
         mainArmHorizontalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
-        sleep(300);
+        sleep(500);
     }
 
     private void printRobotPosition() {
+        sleep(3000);
+//        robot.vision.vuMarkScan();
+//        telemetry.addData("after ", "1 sec");
+//        telemetry.update();
+//        sleep(1000);
+//        robot.vision.vuMarkScan();
+//        telemetry.addData("after ", "2 sec");
+//        telemetry.update();
+//        sleep(1000);
+//        robot.vision.vuMarkScan();
+//        telemetry.addData("after ", "3 sec");
+//        telemetry.update();
+//        sleep(1000);
+//        robot.vision.vuMarkScan();
+//        telemetry.addData("after ", "4 sec");
+//        telemetry.update();
+//        sleep(1000);
+//        robot.vision.vuMarkScan();
+//        telemetry.addData("after ", "5 sec");
+//        telemetry.update();
+//        sleep(1000);
+//        robot.vision.vuMarkScan();
+//        telemetry.addData("after ", "6 sec");
+//        telemetry.update();
+//        sleep(1000);
+//        robot.vision.vuMarkScan();
+//        telemetry.addData("after ", "7 sec");
+//        telemetry.update();
+//        sleep(1000);
+//        robot.vision.vuMarkScan();
+//        telemetry.addData("after ", "8 sec");
+        telemetry.addData("robot angle ", "%.1f", robot.drive.getYaw());
         sleep(1000);
-        robot.vision.vuMarkScan();
-        telemetry.addData("after ", "1 sec");
-        telemetry.update();
+        telemetry.addData("robot angle ", "%.1f", robot.drive.getYaw());
         sleep(1000);
-        robot.vision.vuMarkScan();
-        telemetry.addData("after ", "2 sec");
-        telemetry.update();
+        telemetry.addData("robot angle ", "%.1f", robot.drive.getYaw());
         sleep(1000);
-        robot.vision.vuMarkScan();
-        telemetry.addData("after ", "3 sec");
-        telemetry.update();
+        telemetry.addData("robot angle ", "%.1f", robot.drive.getYaw());
         sleep(1000);
-        robot.vision.vuMarkScan();
-        telemetry.addData("after ", "4 sec");
-        telemetry.update();
+        telemetry.addData("robot angle ", "%.1f", robot.drive.getYaw());
         sleep(1000);
-        robot.vision.vuMarkScan();
-        telemetry.addData("after ", "5 sec");
-        telemetry.update();
+        telemetry.addData("robot angle ", "%.1f", robot.drive.getYaw());
         sleep(1000);
-        robot.vision.vuMarkScan();
-        telemetry.addData("after ", "6 sec");
-        telemetry.update();
+        telemetry.addData("robot angle ", "%.1f", robot.drive.getYaw());
         sleep(1000);
-        robot.vision.vuMarkScan();
-        telemetry.addData("after ", "7 sec");
-        telemetry.update();
-        sleep(1000);
-        robot.vision.vuMarkScan();
-        telemetry.addData("after ", "8 sec");
         robotAngle = robot.drive.getYaw();
         telemetry.addData("robot angle ", "%.1f", robotAngle);
         telemetry.update();

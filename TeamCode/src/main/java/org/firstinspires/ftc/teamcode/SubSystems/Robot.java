@@ -6,9 +6,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -232,6 +235,14 @@ public class Robot extends Subsystem {
         opMode.telemetry.update();
         //Subsystems
         drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, opMode, timer);
+
+        drive.printMotorPIDCoefficients();
+        opMode.sleep(2000);
+//        drive.setMotorKp(10.0, 10.0, 10.0, 10.0);
+//        drive.setMotorPID(5.0, 1.0, 1.0, 0.0);
+//        drive.printMotorPIDCoefficients();
+//        opMode.sleep(3000);
+
         drive.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         drive.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        drive.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -327,6 +338,7 @@ public class Robot extends Subsystem {
         }
         return joystickOutput;
     }
+
 
 }
 
