@@ -52,6 +52,17 @@ public class Control extends Subsystem {
             53.3, 3804, 54.4, 3893, 55.5, 3987, 57.0, 4106, 58.1, 4186, 59.6, 4301, 61.0, 4414, 62.0, 4491, 63.0, 4564, 63.7, 4615,
             64.7, 4688, 65.9, 4771, 67.5, 4889 };
 
+    /**
+     * The CLAW_ARM_TILT_TABLE is a lookup table for mapping the claw arm angle to the claw arm servo
+     * The CLAW_ARM_TILT_TABLE_SIZE records the number of entries in the CLAW_ARM_TILT_TABLE
+     * The CLAW_ARM_TILT_TABLE consists of CLAW_ARM_TILT_TABLE_SIZE pairs of data. Each pair is (tilt angle, arm tilt servo).
+     */
+    private static final int        CLAW_ARM_TILT_TABLE_SIZE                     = 23;
+    private static final double[]   CLAW_ARM_TILT_TABLE = {
+            -180.0, 0.04, -70.2, 0.416, -30.8, 0.563, -12.2, 0.634, -5.8, 0.658, -2.9, 0.679, 0.2, 0.692, 4.6, 0.703, 6.1, 0.716, 11.0, 0.736,
+            15.2, 0.743, 18,2, 0.763, 23.2, 0.782, 29.0, 0.804, 33.9, 0.825, 40.8, 0.851, 46.6, 0.879, 51.0, 0.894, 57.4, 0.921, 62.5, 0.941,
+            70.1, 0.971, 75.6, 0.993, 77.6, 1.0 };
+
     //DO WITH ENCODERS
     private static final double     TICKS_PER_MOTOR_REV_40          = 1120;    // AM Orbital 20 motor
     private static final double     RPM_MAX_NEVERREST_40            = 160;
@@ -83,16 +94,17 @@ public class Control extends Subsystem {
     private static final double     fClawRUp = 0.05;
     private static final double     fClawRDown = 0.63;
 
-    private static final double     CLAW_ARM_POS_ANGLE                  = 71.3; // most positive angle
-    private static final double     CLAW_ARM_POS_VALUE                  = 0.953; // servo setting at most positive angle
-    private static final double     CLAW_ARM_POS_0_DEG                  = 0.664; // xRail horizontal and main claw facing down
+    private static final double     CLAW_ARM_POS_ANGLE                  = 70.1; // most positive angle
+    private static final double     CLAW_ARM_POS_VALUE                  = 0.971; // servo setting at most positive angle
+    private static final double     CLAW_ARM_POS_0_DEG                  = 0.692; // xRail horizontal and main claw facing down
     private static final double     CLAW_ARM_POS_N180_DEG                = 0.04;
     private static final double     CLAW_ARM_ROT_0_DEG                  = 0.046;
     private static final double     CLAW_ARM_ROT_180_DEG                = 0.796;
 //    private static final double     MAIN_CLAW_POS_OPEN                  = 0.65;
-    private static final double     MAIN_CLAW_POS_OPEN                  = 0.575;
-    private static final double     MAIN_CLAW_POS_CLOSED_STONE          = 0.35;
-    private static final double     MAIN_CLAW_POS_CLOSED                = 0.35;
+    private static final double     MAIN_CLAW_POS_OPEN_WIDE              = 0.581;
+    private static final double     MAIN_CLAW_POS_OPEN                  = 0.532;
+    private static final double     MAIN_CLAW_POS_CLOSED_STONE          = 0.42;
+    private static final double     MAIN_CLAW_POS_CLOSED                = 0.42;
 
     private static final double     CS_ARM_POS_ANGLE                  = 68.5; // most positive angle
     private static final double     CS_ARM_POS_VALUE                  = 0.038; // servo setting at most positive angle
@@ -256,6 +268,9 @@ public class Control extends Subsystem {
     public double getClawArmRot180Deg(){
         return CLAW_ARM_ROT_180_DEG;
     }
+    public double getMainClawPosOpenWide(){
+        return  MAIN_CLAW_POS_OPEN_WIDE;
+    }
     public double getMainClawPosOpen(){
         return  MAIN_CLAW_POS_OPEN;
     }
@@ -315,6 +330,9 @@ public class Control extends Subsystem {
 //        mainClaw.setPosition(0);
 //    }
 //
+    public void openMainClawWide() {
+    mainClaw.setPosition(this.getMainClawPosOpenWide());
+}
     public void openMainClaw() {
         mainClaw.setPosition(this.getMainClawPosOpen());
     }
@@ -328,16 +346,29 @@ public class Control extends Subsystem {
         mainClawArm.setPosition(this.mainClawArmAngleToPos(angle));
     }
     public double mainClawArmAngleToPos(double angle){
-        double value;
-        if (angle < 0.0) {
-            value = ((angle / 180.0) * (CLAW_ARM_POS_0_DEG - CLAW_ARM_POS_N180_DEG)) + CLAW_ARM_POS_0_DEG;
+//        double value;
+//        if (angle < 0.0) {
+//            value = ((angle / 180.0) * (CLAW_ARM_POS_0_DEG - CLAW_ARM_POS_N180_DEG)) + CLAW_ARM_POS_0_DEG;
+//        }
+//        else {
+//            value = ((angle / CLAW_ARM_POS_ANGLE) * (CLAW_ARM_POS_VALUE - CLAW_ARM_POS_0_DEG)) + CLAW_ARM_POS_0_DEG;
+//        }
+//        if (value > 1.0) value = 1.0;
+//        if (value < 0.0) value = 0.0;
+//        return value;
+//
+        int lowerIndex, upperIndex;
+        int i = 1;
+        double servoTarget;
+        while ((i < CLAW_ARM_TILT_TABLE_SIZE) && (CLAW_ARM_TILT_TABLE[i*2] < angle)) {
+            ++i;
         }
-        else {
-            value = ((angle / CLAW_ARM_POS_ANGLE) * (CLAW_ARM_POS_VALUE - CLAW_ARM_POS_0_DEG)) + CLAW_ARM_POS_0_DEG;
-        }
-        if (value > 1.0) value = 1.0;
-        if (value < 0.0) value = 0.0;
-        return value;
+        upperIndex = i;
+        lowerIndex = i-1;
+        servoTarget = CLAW_ARM_TILT_TABLE[lowerIndex*2+1] +
+                (CLAW_ARM_TILT_TABLE[upperIndex*2+1]-CLAW_ARM_TILT_TABLE[lowerIndex*2+1])*(angle-CLAW_ARM_TILT_TABLE[lowerIndex*2])
+                        /(CLAW_ARM_TILT_TABLE[upperIndex*2]-CLAW_ARM_TILT_TABLE[lowerIndex*2]);
+        return servoTarget;
     }
     public void setMainClawRotationDegrees(double angle) {
         mainClawRotationAngle = angle;
@@ -390,7 +421,7 @@ public class Control extends Subsystem {
      */
     public double mainArmAngleToTick(double angle) {
         int lowerIndex, upperIndex;
-        int i = 0;
+        int i = 1;
         double tickTarget;
         while ((i < TILT_TABLE_SIZE) && (TILT_TABLE[i*2] < angle)) {
             ++i;
@@ -410,7 +441,7 @@ public class Control extends Subsystem {
      */
     public double mainArmTickToAngle(double tick) {
         int lowerIndex, upperIndex;
-        int i = 0;
+        int i = 1;
         double angleTarget;
         while ((i < TILT_TABLE_SIZE) && (TILT_TABLE[i*2+1] < tick)) {
             ++i;
