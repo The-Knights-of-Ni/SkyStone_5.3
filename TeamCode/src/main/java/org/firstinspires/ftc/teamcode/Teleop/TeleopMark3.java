@@ -49,7 +49,7 @@ public class TeleopMark3 extends LinearOpMode {
 
     private Prospective prospectiveMode = Prospective.ROBOT;
     private double robotAngle;
-    private boolean visionEnabled = true;
+    private boolean visionEnabled = false;
 
     private void initOpMode() {
         //Initialize DC motor objects
@@ -80,12 +80,12 @@ public class TeleopMark3 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         initOpMode();
-        // call initServosTeleop() after running Auto program
-//        robot.initServosTeleop();
-        // call initServosAuto() if testing Teleop stand-alone
-        robot.initServosAuto();
         waitForStart();
 
+        // call initServosTeleop() after running Auto program
+        robot.initServosTeleop();
+        // call initServosAuto() if testing Teleop stand-alone
+//        robot.initServosAuto();
         mainClawRotationAngle = robot.control.getMainClawRotationDegrees();
         telemetry.clearAll();
         timeCurrent = timer.nanoseconds();

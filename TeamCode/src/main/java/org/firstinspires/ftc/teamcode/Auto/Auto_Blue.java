@@ -227,9 +227,7 @@ public class Auto_Blue extends LinearOpMode {
 
         robot.control.lowerClawsToFoundation();
         robot.control.closeMainClawStone();
-        sleep(300);
-        robot.control.retractMainClawArm();
-        sleep(500);
+        sleep(800);
 
 
         pullbackBlueFoundation();
@@ -245,10 +243,9 @@ public class Auto_Blue extends LinearOpMode {
         mainArmHorizontalPos = 0.0;
         mainArmVerticalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+        robot.control.retractMainClawArm();
+        sleep(1000);
 
-//        sleep(100);
-//        robot.drive.moveBackward(200);
-//        sleep(100);
         parkRobot();
 
         // Disable Tracking when we are done;

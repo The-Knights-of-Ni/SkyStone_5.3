@@ -880,7 +880,7 @@ public class Drive extends Subsystem {
                         isTimeOutExceeded = true;
                     }
                 }
-                else {
+                else { // time out was not started yet
                     isTimeOutStarted = true;
                     timeOutStartedTime = currentTime;
                 }
@@ -889,9 +889,11 @@ public class Drive extends Subsystem {
                 isTimeOutStarted = false;
                 isTimeOutExceeded = false;
             }
-            String output = String.format("FL %.1f, %d, FR %.1f %d, RL %.1f %d, RR %.1f %d %.1f %.3f %.1f %.3f",
+            String output = String.format("FL %.1f, %d, FR %.1f %d, RL %.1f %d, RR %.1f %d %.1f %.3f %.1f %.3f %s %s %s %s %s %.1f %s",
                     prevTimeFL*1000.0, prevCountFL, prevTimeFR*1000.0, prevCountFR, prevTimeRL*1000.0, prevCountRL,
-                    prevTimeRR*1000.0, prevCountRR, currentError, acculErrorRR, errorSlope, currentPower);
+                    prevTimeRR*1000.0, prevCountRR, currentError, acculErrorRR, errorSlope, currentPower,
+                    isMotorFLNotMoving?"Y":"N", isMotorFRNotMoving?"Y":"N", isMotorRLNotMoving?"Y":"N", isMotorRRNotMoving?"Y":"N",
+                    isTimeOutStarted?"Y":"N", timeOutStartedTime*1000.0, isTimeOutExceeded?"Y":"N");
             Log.d("motorEnc", output);
         }
 
