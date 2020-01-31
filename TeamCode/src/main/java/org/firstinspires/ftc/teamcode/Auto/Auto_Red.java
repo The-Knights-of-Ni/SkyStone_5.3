@@ -21,11 +21,11 @@ import static org.opencv.core.Core.BORDER_CONSTANT;
 import static org.opencv.core.Core.mean;
 
 /**
- * SkyStone Auto Mode for Blue Alliance
- * Created by Andrew Chiang on 1/20/2020
+ * SkyStone Auto Mode for Red Alliance
+ * Created by Andrew Chiang on 1/31/2020
  */
-@Autonomous(name = "Auto_Blue")
-public class Auto_Blue extends LinearOpMode {
+@Autonomous(name = "Auto_Red")
+public class Auto_Red extends LinearOpMode {
     private Robot robot;
 
     ElapsedTime timer;
@@ -46,7 +46,7 @@ public class Auto_Blue extends LinearOpMode {
         BLUE,
         RED,
     }
-    Alliance alliance = Alliance.BLUE;
+    Alliance alliance = Alliance.RED;
 
     // visual markers for aligning stones to robot initial position
     private int[] initMarkerCornersBlue = {51, 120, 282, 159};    // Blue Alliance
@@ -137,15 +137,13 @@ public class Auto_Blue extends LinearOpMode {
         // move to the left depending on the SkyStone pattern
         switch (skyStonePattern) {
             case PATTERNA:
-//                robot.drive.setDriveFullPower(true);
-//                robot.drive.moveLeft(20);
-//                robot.drive.setDriveFullPower(false);
+                robot.drive.moveLeft(263);
                 break;
             case PATTERNB:
-                robot.drive.moveLeft(203);
+                robot.drive.moveLeft(60);
                 break;
             case PATTERNC:
-                robot.drive.moveLeft(406);
+                robot.drive.moveRight(143);
                 break;
             default:
                 break;
@@ -160,20 +158,20 @@ public class Auto_Blue extends LinearOpMode {
 //        sleep(100);
 //        printRobotPosition();
         sleep(500);
-        robot.drive.turnRobotByTick(90.0);
+        robot.drive.turnRobotByTick(-90.0);
 //        robot.drive.turnRobot(90.0);
 
 //        printRobotPosition();
         sleep(100);
         switch (skyStonePattern) {
             case PATTERNA:
-                robot.drive.moveForward(2236);
+                robot.drive.moveForward(2459);
                 break;
             case PATTERNB:
-                robot.drive.moveForward(2033);
+                robot.drive.moveForward(2256);
                 break;
             case PATTERNC:
-                robot.drive.moveForward(1830);
+                robot.drive.moveForward(2053);
                 break;
             default:
                 break;
@@ -187,13 +185,13 @@ public class Auto_Blue extends LinearOpMode {
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
 
-        robot.drive.turnRobotByTick(-90.0);
+        robot.drive.turnRobotByTick(90.0);
 //        robot.drive.turnRobot(90.0);
 
 //        sleep(5000);
 //        printRobotPosition();
         sleep(100);
-        stoneOffset = getBlueFoundationOffset();
+        stoneOffset = getRedFoundationOffset();
         saveImages();
 //        sleep(3000);
 
@@ -230,10 +228,10 @@ public class Auto_Blue extends LinearOpMode {
         sleep(800);
 
 
-        pullbackBlueFoundation();
+        pullbackRedFoundation();
 //        sleep(100);
 
-        pushBlueFoundation();
+        pushRedFoundation();
 //        sleep(100);
 
         robot.control.raiseClawsFromFoundation();
@@ -259,7 +257,7 @@ public class Auto_Blue extends LinearOpMode {
         }
     }
 
-    private void pullbackBlueFoundation() {
+    private void pullbackRedFoundation() {
         double initialAngle = robot.drive.getYaw();
         double currentAngle;
         robot.drive.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -281,31 +279,31 @@ public class Auto_Blue extends LinearOpMode {
         robot.drive.rearLeft.setTargetPosition(-5000);
         robot.drive.rearRight.setTargetPosition(-5000);
 
-        while (robot.drive.rearLeft.getCurrentPosition() > -200) {
+        while (robot.drive.rearRight.getCurrentPosition() > -200) {
 
         }
-        motorPowerLeft = 0.6;
-        motorPowerRight = 0.1;
+        motorPowerLeft = 0.1;
+        motorPowerRight = 0.6;
         robot.drive.rearLeft.setPower(motorPowerLeft);
         robot.drive.frontLeft.setPower(motorPowerLeft);
         robot.drive.rearRight.setPower(motorPowerRight);
         robot.drive.frontRight.setPower(motorPowerRight);
 
-        while (robot.drive.rearLeft.getCurrentPosition() > -1100) {
+        while (robot.drive.rearRight.getCurrentPosition() > -1100) {
 
         }
 
-        motorPowerRight = 0.6;
-        robot.drive.rearRight.setPower(motorPowerRight);
-        robot.drive.frontRight.setPower(motorPowerRight);
-        robot.drive.frontRight.setTargetPosition(4000);
-        robot.drive.rearRight.setTargetPosition(4000);
+        motorPowerLeft = 0.6;
+        robot.drive.rearLeft.setPower(motorPowerLeft);
+        robot.drive.frontLeft.setPower(motorPowerLeft);
+        robot.drive.frontLeft.setTargetPosition(4000);
+        robot.drive.rearLeft.setTargetPosition(4000);
 
         boolean keepGoing = true;
         while (keepGoing) {
             currentAngle = robot.drive.getYaw();
-            if (((currentAngle - initialAngle > 80.0) && (currentAngle - initialAngle < 95.0)) ||
-                    ((currentAngle - initialAngle + 360.0 > 80.0) && (currentAngle - initialAngle + 360.0 < 95.0))) {
+            if (((initialAngle - currentAngle > 80.0) && (initialAngle - currentAngle < 95.0)) ||
+                    ((initialAngle - currentAngle + 360.0 > 80.0) && (initialAngle - currentAngle + 360.0 < 95.0))) {
                 keepGoing = false;
             }
         }
@@ -321,7 +319,7 @@ public class Auto_Blue extends LinearOpMode {
 
     }
 
-    private void pushBlueFoundation() {
+    private void pushRedFoundation() {
         robot.drive.moveForward(500, 0.2);
         robot.drive.stop();
     }
@@ -480,12 +478,12 @@ public class Auto_Blue extends LinearOpMode {
     }
 
     /**
-     * use arm camera image to detect the offset of Blue Foundation
+     * use arm camera image to detect the offset of Red Foundation
      * @return  xOffset: lateral offset of the Foundation
      *          yOffset: longitudinal offset of the Foundation
      *          angle: angular offset of the Foundation
      */
-    private double[] getBlueFoundationOffset() {
+    private double[] getRedFoundationOffset() {
         double xOffset = 0.0;
         double yOffset = 0.0;
         double angle = 0.0;
@@ -493,15 +491,15 @@ public class Auto_Blue extends LinearOpMode {
         Mat block1, block2, block3, block4, block5;
         Scalar mean1, mean2, mean3, mean4, mean5;
         Mat thresholdMat = new Mat();
-        // use analog Cb image to detect the Blue Foundation
-        // yCbCrChan2Mat_compensated is positively compensated by Y image to deal with the region with strong reflection
-        // Blue Foundation region should have high Cb value, but the strong reflection is white which will have mid-level Cb value
-        // yCbCrChan2Mat_compensated is 0.75*Cb + 0.25*Y
-        block1 = robot.vision.yCbCrChan2Mat_compensated.submat(1, 21, 50, 70);
-        block2 = robot.vision.yCbCrChan2Mat_compensated.submat(30, 50, 150, 170);
-        block3 = robot.vision.yCbCrChan2Mat_compensated.submat(1, 21, 250, 270);
-        block4 = robot.vision.yCbCrChan2Mat_compensated.submat(200, 220, 5, 25);
-        block5 = robot.vision.yCbCrChan2Mat_compensated.submat(200, 220, 295, 315);
+        // use analog Cr image to detect the Red Foundation
+        // yCbCrChan1Mat_compensated is positively compensated by Y image to deal with the region with strong reflection
+        // Red Foundation region should have high Cr value, but the strong reflection is white which will have mid-level Cr value
+        // yCbCrChan1Mat_compensated is 0.75*Cr + 0.25*Y
+        block1 = robot.vision.yCbCrChan1Mat_compensated.submat(1, 21, 50, 70);
+        block2 = robot.vision.yCbCrChan1Mat_compensated.submat(30, 50, 150, 170);
+        block3 = robot.vision.yCbCrChan1Mat_compensated.submat(1, 21, 250, 270);
+        block4 = robot.vision.yCbCrChan1Mat_compensated.submat(200, 220, 5, 25);
+        block5 = robot.vision.yCbCrChan1Mat_compensated.submat(200, 220, 295, 315);
         mean1 = Core.mean(block1);
         mean2 = Core.mean(block2);
         mean3 = Core.mean(block3);
@@ -522,12 +520,12 @@ public class Auto_Blue extends LinearOpMode {
         minLevel = Math.min(minLevel, mean4.val[0]);
         minLevel = Math.min(minLevel, mean5.val[0]);
         thresholdLevel = (minLevel + maxLevel) * 0.5;
-        String output = String.format("Blue Foundation: block1 %.2f, block2 %.2f, block3 %.2f, block4 %.2f, block5 %.2f, threshold %.2f",
+        String output = String.format("Red Foundation: block1 %.2f, block2 %.2f, block3 %.2f, block4 %.2f, block5 %.2f, threshold %.2f",
                 mean1.val[0], mean2.val[0], mean3.val[0], mean4.val[0], mean5.val[0], thresholdLevel);
         Log.d("autoVision", output);
         Imgproc.threshold(robot.vision.yCbCrChan2Mat_compensated, thresholdMat, (int) thresholdLevel, 255, Imgproc.THRESH_BINARY);
         timeCurrent = timer.nanoseconds();
-        robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "BlueFThreshold", (long) timeCurrent);
+        robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "RedFThreshold", (long) timeCurrent);
         Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
         Imgproc.dilate(thresholdMat, thresholdMat, kernel);
         robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "dilate", (long) timeCurrent);
@@ -556,7 +554,7 @@ public class Auto_Blue extends LinearOpMode {
         maxY = Math.max(maxY, maxY2);
         yOffset = (double) (126 - maxY)*1.513;
 
-        output = String.format("Blue Foundation: maxY0 %d, maxY1 %d, maxY2 %d, yOffset %.1f", maxY0, maxY1, maxY2, yOffset);
+        output = String.format("Red Foundation: maxY0 %d, maxY1 %d, maxY2 %d, yOffset %.1f", maxY0, maxY1, maxY2, yOffset);
         Log.d("autoVision", output);
 
         return new double[] {xOffset, yOffset, angle};

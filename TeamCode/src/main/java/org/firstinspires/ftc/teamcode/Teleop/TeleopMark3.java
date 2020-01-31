@@ -165,23 +165,25 @@ public class TeleopMark3 extends LinearOpMode {
 
             // control main claw
             if ((robot.triggerLeft2 > 0.5) && (robot.triggerRight2 < 0.5)) { // main claw open
-                if ((mainClawState == MainClawState.OPEN) || (mainClawState == MainClawState.WIDEOPEN)) {
-                    robot.control.openMainClawWide();
-                    mainClawState = MainClawState.WIDEOPEN;
-                }
-                else {
-                    robot.control.openMainClaw();
-                    mainClawState = MainClawState.OPEN;
-                }
+//                if ((mainClawState == MainClawState.OPEN) || (mainClawState == MainClawState.WIDEOPEN)) {
+//                    robot.control.openMainClawWide();
+//                    mainClawState = MainClawState.WIDEOPEN;
+//                }
+//                else {
+//                    robot.control.openMainClaw();
+//                    mainClawState = MainClawState.OPEN;
+//                }
+                robot.control.openMainClaw();
             } else if ((robot.triggerRight2 > 0.5) && (robot.triggerLeft2 < 0.5)) { // main claw close
-                if (mainClawState == MainClawState.WIDEOPEN) {
-                    robot.control.openMainClaw();
-                    mainClawState = MainClawState.OPEN;
-                }
-                else {
-                    robot.control.closeMainClawStone();
-                    mainClawState = MainClawState.CLOSE;
-                }
+//                if (mainClawState == MainClawState.WIDEOPEN) {
+//                    robot.control.openMainClaw();
+//                    mainClawState = MainClawState.OPEN;
+//                }
+//                else {
+//                    robot.control.closeMainClawStone();
+//                    mainClawState = MainClawState.CLOSE;
+//                }
+                robot.control.closeMainClawStone();
             }
 
             // control capstone claw
