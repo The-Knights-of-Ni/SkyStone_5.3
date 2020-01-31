@@ -123,8 +123,8 @@ public class Vision {
     int[] viewportContainerIds;
 
     private int systemVisionMode;
-    private static boolean armWebcamIsActive = false;
-    private static boolean frontWebcamIsActive = false;
+    public static boolean armWebcamIsActive = false;
+    public static boolean frontWebcamIsActive = false;
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here

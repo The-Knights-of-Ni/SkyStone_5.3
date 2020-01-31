@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -7,11 +9,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
 
+import static org.opencv.core.Core.BORDER_CONSTANT;
 import static org.opencv.core.Core.mean;
 
 /**
@@ -56,9 +61,10 @@ public class Auto_Blue extends LinearOpMode {
     enum SkyStonePattern {
         PATTERNA,
         PATTERNB,
-        BATTERNC,
+        PATTERNC,
     }
     private SkyStonePattern skyStonePattern;
+    double[] stoneOffset;
 
     private void initOpMode() throws IOException {
         telemetry.addData("Init Robot", "");
@@ -102,10 +108,15 @@ public class Auto_Blue extends LinearOpMode {
         // use the front camera image to determine the SkyStone pattern
         skyStonePattern = findSkyStoneLocation();
 
-
         // setup main arm and claw position
         mainClawRotationAngle = 90.0;
         robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
+        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+
+        // switch camera to the arm camera
+        robot.vision.closeFrontWebcam();
+        robot.vision.initArmWebcam(1);
+
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         mainArmHorizontalPos = 40.0;
         mainArmVerticalPos = 80.0;
@@ -116,7 +127,11 @@ public class Auto_Blue extends LinearOpMode {
         robot.drive.moveForward(570);
 //        sleep(100);
 //        printRobotPosition();
-        sleep(500);
+        // detect Skystone offset from the arm camera
+        sleep(100);
+        stoneOffset = getStoneOffset();
+        saveImages();
+//        sleep(3000);
 
         // move to the left depending on the SkyStone pattern
         switch (skyStonePattern) {
@@ -128,14 +143,19 @@ public class Auto_Blue extends LinearOpMode {
             case PATTERNB:
                 robot.drive.moveLeft(203);
                 break;
-            case BATTERNC:
+            case PATTERNC:
                 robot.drive.moveLeft(406);
                 break;
             default:
                 break;
         }
+        // detect Skystone offset from the arm camera
         sleep(100);
-        pickupSkySTone();
+        stoneOffset = getStoneOffset();
+        saveImages();
+//        sleep(3000);
+
+        pickupSkySTone(stoneOffset[1]);
 //        sleep(100);
 //        printRobotPosition();
         sleep(500);
@@ -143,33 +163,77 @@ public class Auto_Blue extends LinearOpMode {
 //        robot.drive.turnRobot(90.0);
 
 //        printRobotPosition();
-        sleep(500);
+        sleep(100);
         switch (skyStonePattern) {
             case PATTERNA:
-                robot.drive.moveForward(2106);
+                robot.drive.moveForward(2236);
                 break;
             case PATTERNB:
-                robot.drive.moveForward(1903);
+                robot.drive.moveForward(2033);
                 break;
-            case BATTERNC:
-                robot.drive.moveForward(1700);
+            case PATTERNC:
+                robot.drive.moveForward(1830);
                 break;
             default:
                 break;
         }
 //        sleep(5000);
 //        printRobotPosition();
-        sleep(500);
+        sleep(100);
+
+        mainArmHorizontalPos = 0.0;
+        mainArmVerticalPos = 120.0;
+        robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
 
         robot.drive.turnRobotByTick(-90.0);
 //        robot.drive.turnRobot(90.0);
 
 //        sleep(5000);
 //        printRobotPosition();
+        sleep(100);
+        saveImages();
+//        sleep(3000);
+
+        mainArmHorizontalPos = 100.0;
+        robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+        robot.drive.moveForward(130);
+//        sleep(100);
+//        saveImages();
+//        sleep(3000);
+
+        mainArmVerticalPos = 60.0;
+        robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         sleep(500);
+        robot.control.openMainClaw();
+        sleep(300);
+
+        mainArmHorizontalPos = 100.0;
+        mainArmVerticalPos = 120.0;
+        robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+        sleep(300);
+        mainArmHorizontalPos = 0.0;
+        mainArmVerticalPos = 120.0;
+        robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+
+        robot.drive.moveRight(20);
+        sleep(100);
+
+        robot.control.lowerClawsToFoundation();
+        sleep(10000);
+
         // Disable Tracking when we are done;
         robot.vision.getTargetsSkyStone().deactivate();
-        robot.vision.closeFrontWebcam();
+        if (robot.vision.frontWebcamIsActive) {
+            robot.vision.closeFrontWebcam();
+        }
+        if (robot.vision.armWebcamIsActive) {
+            robot.vision.closeArmWebcam();
+        }
     }
 
     /**
@@ -181,8 +245,9 @@ public class Auto_Blue extends LinearOpMode {
     private SkyStonePattern findSkyStoneLocation() {
         Mat block1, block2, block3;
         Scalar mean1, mean2, mean3, mean1x, mean2x, mean3x;
-        SkyStonePattern skyStonePattern = SkyStonePattern.BATTERNC;
+        SkyStonePattern skyStonePattern = SkyStonePattern.PATTERNC;
         if (alliance == Alliance.BLUE) {
+            // use a fixed threshold to detect the Skystone
 //            block1 = robot.vision.thresholdMat.submat(block1CornersBlue[1], block1CornersBlue[3], block1CornersBlue[0], block1CornersBlue[2]);
 //            block2 = robot.vision.thresholdMat.submat(block2CornersBlue[1], block2CornersBlue[3], block2CornersBlue[0], block2CornersBlue[2]);
 //            block3 = robot.vision.thresholdMat.submat(block3CornersBlue[1], block3CornersBlue[3], block3CornersBlue[0], block3CornersBlue[2]);
@@ -190,6 +255,7 @@ public class Auto_Blue extends LinearOpMode {
 //            mean2 = Core.mean(block2);
 //            mean3 = Core.mean(block3);
 
+            // use analog Cb image to detect the Skystone
             block1 = robot.vision.yCbCrChan2Mat.submat(block1CornersBlue[1], block1CornersBlue[3], block1CornersBlue[0], block1CornersBlue[2]);
             block2 = robot.vision.yCbCrChan2Mat.submat(block2CornersBlue[1], block2CornersBlue[3], block2CornersBlue[0], block2CornersBlue[2]);
             block3 = robot.vision.yCbCrChan2Mat.submat(block3CornersBlue[1], block3CornersBlue[3], block3CornersBlue[0], block3CornersBlue[2]);
@@ -200,11 +266,12 @@ public class Auto_Blue extends LinearOpMode {
             // yCbCrChan2Mat was the extracted Cb plane, there is only one mean value in the returned Scalar (the rest three values are zeros)
             // yellow stone has lower Cb values than the SkyStone which is essentially black
             // on the Blue Alliance side, the camera sees the 3 stones closest to the bridge
-            if ((mean1x.val[0] > mean2x.val[0]) && (mean1x.val[0] > mean3x.val[0])) skyStonePattern = SkyStonePattern.BATTERNC;
+            if ((mean1x.val[0] > mean2x.val[0]) && (mean1x.val[0] > mean3x.val[0])) skyStonePattern = SkyStonePattern.PATTERNC;
             if ((mean2x.val[0] > mean1x.val[0]) && (mean2x.val[0] > mean3x.val[0])) skyStonePattern = SkyStonePattern.PATTERNB;
             if ((mean3x.val[0] > mean1x.val[0]) && (mean3x.val[0] > mean2x.val[0])) skyStonePattern = SkyStonePattern.PATTERNA;
         }
         else {  // Red alliance
+            // use a fixed threshold to detect the Skystone
 //            block1 = robot.vision.thresholdMat.submat(block1CornersRed[1], block1CornersRed[3], block1CornersRed[0], block1CornersRed[2]);
 //            block2 = robot.vision.thresholdMat.submat(block2CornersRed[1], block2CornersRed[3], block2CornersRed[0], block2CornersRed[2]);
 //            block3 = robot.vision.thresholdMat.submat(block3CornersRed[1], block3CornersRed[3], block3CornersRed[0], block3CornersRed[2]);
@@ -212,6 +279,7 @@ public class Auto_Blue extends LinearOpMode {
 //            mean2 = Core.mean(block2);
 //            mean3 = Core.mean(block3);
 
+            // use analog Cb image to detect the Skystone
             block1 = robot.vision.yCbCrChan2Mat.submat(block1CornersRed[1], block1CornersRed[3], block1CornersRed[0], block1CornersRed[2]);
             block2 = robot.vision.yCbCrChan2Mat.submat(block2CornersRed[1], block2CornersRed[3], block2CornersRed[0], block2CornersRed[2]);
             block3 = robot.vision.yCbCrChan2Mat.submat(block3CornersRed[1], block3CornersRed[3], block3CornersRed[0], block3CornersRed[2]);
@@ -220,7 +288,7 @@ public class Auto_Blue extends LinearOpMode {
             mean3x = Core.mean(block3);
             // Core.mean() returns a Scalar which is a vector of four doubles
             // on the Red Alliance side, the camera sees the 3 stones next to the one closest to the bridge
-            if ((mean1x.val[0] > mean2x.val[0]) && (mean1x.val[0] > mean3x.val[0])) skyStonePattern = SkyStonePattern.BATTERNC;
+            if ((mean1x.val[0] > mean2x.val[0]) && (mean1x.val[0] > mean3x.val[0])) skyStonePattern = SkyStonePattern.PATTERNC;
             if ((mean2x.val[0] > mean1x.val[0]) && (mean2x.val[0] > mean3x.val[0])) skyStonePattern = SkyStonePattern.PATTERNA;
             if ((mean3x.val[0] > mean1x.val[0]) && (mean3x.val[0] > mean2x.val[0])) skyStonePattern = SkyStonePattern.PATTERNB;
         }
@@ -233,13 +301,89 @@ public class Auto_Blue extends LinearOpMode {
         telemetry.addData("block3 mean ", "%.2f", mean3x.val[0]);
         telemetry.addData("SkyStone pattern ", skyStonePattern.toString());
         telemetry.update();
+        String output = String.format("Skystone Side: block1 mean %.2f, block2 mean %.2f, block3 mean %.2f, SkyStone pattern %s",
+                mean1x.val[0], mean2x.val[0], mean3x.val[0], skyStonePattern.toString());
+        Log.d("autoVision", output);
 
         return skyStonePattern;
     }
 
-    private void pickupSkySTone() {
+    /**
+     * use arm camera image to detect the offset of Skystone
+     * @return
+     */
+    private double[] getStoneOffset() {
+        double xOffset = 0.0;
+        double yOffset = 0.0;
+        double angle = 0.0;
+        double maxLevel, minLevel, thresholdLevel;
+        Mat block1, block2, block3, block4, block5;
+        Scalar mean1, mean2, mean3, mean4, mean5;
+        Mat thresholdMat = new Mat();
+        // use analog Cb image to detect the Skystone
+        block1 = robot.vision.yCbCrChan2Mat_compensatedn.submat(1, 21, 150, 170);
+        block2 = robot.vision.yCbCrChan2Mat_compensatedn.submat(55, 75, 150, 170);
+        block3 = robot.vision.yCbCrChan2Mat_compensatedn.submat(110, 130, 150, 170);
+        block4 = robot.vision.yCbCrChan2Mat_compensatedn.submat(165, 185, 150, 170);
+        block5 = robot.vision.yCbCrChan2Mat_compensatedn.submat(218, 238, 150, 170);
+        mean1 = Core.mean(block1);
+        mean2 = Core.mean(block2);
+        mean3 = Core.mean(block3);
+        mean4 = Core.mean(block4);
+        mean5 = Core.mean(block5);
+        telemetry.addData("block1 mean ", "%.2f", mean1.val[0]);
+        telemetry.addData("block2 mean ", "%.2f", mean2.val[0]);
+        telemetry.addData("block3 mean ", "%.2f", mean3.val[0]);
+        telemetry.addData("block4 mean ", "%.2f", mean4.val[0]);
+        telemetry.addData("block5 mean ", "%.2f", mean5.val[0]);
+        telemetry.update();
+        maxLevel = Math.max(mean1.val[0], mean2.val[0]);
+        maxLevel = Math.max(maxLevel, mean3.val[0]);
+        maxLevel = Math.max(maxLevel, mean4.val[0]);
+        maxLevel = Math.max(maxLevel, mean5.val[0]);
+        minLevel = Math.min(mean1.val[0], mean2.val[0]);
+        minLevel = Math.min(minLevel, mean3.val[0]);
+        minLevel = Math.min(minLevel, mean4.val[0]);
+        minLevel = Math.min(minLevel, mean5.val[0]);
+        thresholdLevel = (minLevel + maxLevel) * 0.5;
+        String output = String.format("Skystone Top: block1 %.2f, block2 %.2f, block3 %.2f, block4 %.2f, block5 %.2f, threshold %.2f",
+                mean1.val[0], mean2.val[0], mean3.val[0], mean4.val[0], mean5.val[0], thresholdLevel);
+        Log.d("autoVision", output);
+        Imgproc.threshold(robot.vision.yCbCrChan2Mat_compensatedn, thresholdMat, (int) thresholdLevel, 255, Imgproc.THRESH_BINARY_INV);
+        timeCurrent = timer.nanoseconds();
+        robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "StoneThreshold", (long) timeCurrent);
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
+        Imgproc.erode(thresholdMat, thresholdMat, kernel);
+        robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "erode", (long) timeCurrent);
+        Imgproc.dilate(thresholdMat, thresholdMat, kernel);
+        robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "erodedilate", (long) timeCurrent);
+
+        telemetry.addData("thresholdMat ", " elemsize %d, elemsize1 %d", thresholdMat.elemSize(), thresholdMat.elemSize1());
+        telemetry.update();
+
+        byte[] data = new byte[thresholdMat.cols()*thresholdMat.rows()];
+        thresholdMat.get(0, 0, data);
+        int minY = -1;
+        int maxY = -1;
+        for (int y = 0; y < thresholdMat.rows(); ++y) {
+            if ((data[y*thresholdMat.cols() + thresholdMat.cols()/2] != 0) && (minY == -1)) {
+                minY = y;
+            }
+            if ((data[y*thresholdMat.cols() + thresholdMat.cols()/2] == 0) && (maxY == -1) && (minY != -1)) {
+                maxY = y;
+            }
+        }
+        yOffset = (double) (70 - minY)*0.9;
+
+        output = String.format("Skystone Top: minY %d, maxY %d, yOffset %.1f", minY, maxY, yOffset);
+        Log.d("autoVision", output);
+
+        return new double[] {xOffset, yOffset, angle};
+    }
+
+    private void pickupSkySTone(double yOffset) {
         robot.control.openMainClaw();
-        mainArmHorizontalPos = 132.0;
+        mainArmHorizontalPos = 139.0 + yOffset;
         mainArmVerticalPos = 50.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
@@ -308,5 +452,19 @@ public class Auto_Blue extends LinearOpMode {
         robotAngle = robot.drive.getYaw();
         telemetry.addData("robot angle ", "%.1f", robotAngle);
         telemetry.update();
+    }
+
+    private void saveImages() {
+        timeCurrent = timer.nanoseconds();
+        robot.vision.saveImage("VisionTest", robot.vision.frameBuffer2, Imgproc.COLOR_RGBA2BGR, "original", (long) timeCurrent);
+        robot.vision.saveImage("VisionTest", robot.vision.frameBuffer1, Imgproc.COLOR_RGBA2BGR, "undistorted", (long) timeCurrent);
+        robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan2Mat_compensatedn, Imgproc.COLOR_RGBA2BGR, "CbImage_c25n", (long) timeCurrent);
+        robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan2Mat_compensated, Imgproc.COLOR_RGBA2BGR, "CbImage_c25", (long) timeCurrent);
+        robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan1Mat_compensated, Imgproc.COLOR_RGBA2BGR, "CrImage_c25", (long) timeCurrent);
+        robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan2Mat, Imgproc.COLOR_RGBA2BGR, "CbImage", (long) timeCurrent);
+        robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan1Mat, Imgproc.COLOR_RGBA2BGR, "CrImage", (long) timeCurrent);
+        robot.vision.saveImage("VisionTest", robot.vision.yCbCrChan0Mat, Imgproc.COLOR_RGBA2BGR, "YImage", (long) timeCurrent);
+        robot.vision.saveImage("VisionTest", robot.vision.thresholdMat, Imgproc.COLOR_RGBA2BGR, "threshold", (long) timeCurrent);
+        robot.vision.saveImage("VisionTest", robot.vision.contoursOnFrameMat, Imgproc.COLOR_RGBA2BGR, "contours", (long) timeCurrent);
     }
 }

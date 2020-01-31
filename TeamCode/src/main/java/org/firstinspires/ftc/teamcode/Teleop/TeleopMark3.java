@@ -40,6 +40,13 @@ public class TeleopMark3 extends LinearOpMode {
         DRIVER,
     }
 
+    enum MainClawState {
+        CLOSE,
+        OPEN,
+        WIDEOPEN,
+    }
+    private MainClawState mainClawState;
+
     private Prospective prospectiveMode = Prospective.ROBOT;
     private double robotAngle;
     private boolean visionEnabled = true;
@@ -86,6 +93,8 @@ public class TeleopMark3 extends LinearOpMode {
         if (visionEnabled) {
             robot.vision.getTargetsSkyStone().activate();
         }
+        robot.control.closeMainClawStone();
+        mainClawState = MainClawState.CLOSE;
         while(opModeIsActive()) {
 
             // Get gamepad inputs
@@ -156,9 +165,23 @@ public class TeleopMark3 extends LinearOpMode {
 
             // control main claw
             if ((robot.triggerLeft2 > 0.5) && (robot.triggerRight2 < 0.5)) { // main claw open
-                robot.control.openMainClaw();
+                if ((mainClawState == MainClawState.OPEN) || (mainClawState == MainClawState.WIDEOPEN)) {
+                    robot.control.openMainClawWide();
+                    mainClawState = MainClawState.WIDEOPEN;
+                }
+                else {
+                    robot.control.openMainClaw();
+                    mainClawState = MainClawState.OPEN;
+                }
             } else if ((robot.triggerRight2 > 0.5) && (robot.triggerLeft2 < 0.5)) { // main claw close
-                robot.control.closeMainClawStone();
+                if (mainClawState == MainClawState.WIDEOPEN) {
+                    robot.control.openMainClaw();
+                    mainClawState = MainClawState.OPEN;
+                }
+                else {
+                    robot.control.closeMainClawStone();
+                    mainClawState = MainClawState.CLOSE;
+                }
             }
 
             // control capstone claw

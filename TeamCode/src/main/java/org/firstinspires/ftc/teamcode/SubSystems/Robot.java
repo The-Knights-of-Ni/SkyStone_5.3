@@ -236,8 +236,6 @@ public class Robot extends Subsystem {
         //Subsystems
         drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, opMode, timer);
 
-        drive.printMotorPIDCoefficients();
-        opMode.sleep(2000);
 //        drive.setMotorKp(10.0, 10.0, 10.0, 10.0);
 //        drive.setMotorPID(5.0, 1.0, 1.0, 0.0);
 //        drive.printMotorPIDCoefficients();
@@ -248,6 +246,9 @@ public class Robot extends Subsystem {
 //        drive.setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        drive.initMaxVelocity();
 //        drive.stop();
+//        drive.printMotorPIDCoefficients();
+//        opMode.sleep(2000);
+
         control = new Control(xRailWinch, armTilt, mainClaw, mainClawRotation, mainClawArm, csClaw, csArm, fClawL, fClawR, imu, opMode, timer);
 
         opMode.telemetry.addData("Mode", " Camera initializing...");

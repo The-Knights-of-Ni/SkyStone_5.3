@@ -48,8 +48,8 @@ public class Drive extends Subsystem {
     private static final double     COUNTS_PER_INCH                 = (TICKS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
     private static final double     COUNTS_PER_MM                 = (TICKS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * Math.PI);
-    private static final double     COUNTS_CORRECTION_X             = 1.08;
-    private static final double     COUNTS_CORRECTION_Y             = 0.96;
+    private static final double     COUNTS_CORRECTION_X             = 1.167;
+    private static final double     COUNTS_CORRECTION_Y             = 0.9918;
     private static final double     COUNTS_PER_DEGREE             = 10.833*0.97;     // 975 ticks per 90 degrees
 
     private static final double     DRIVE_SPEED             = 0.40;
@@ -57,9 +57,9 @@ public class Drive extends Subsystem {
     private static final double     DRIVE_SPEED_Y             = 0.40;
     private static final double     TURN_SPEED              = 0.40;
     private static boolean          driveFullPower          = false;
-    private static double           motorKp                 = 0.01;
-    private static double           motorKi                 = 0.015;
-    private static double           motorKd                 = 0.0005;
+    private static double           motorKp                 = 0.015;
+    private static double           motorKi                 = 0.02;
+    private static double           motorKd                 = 0.0003;
     private static double           motorRampTime           = 0.3;
 
     private static final double     ROBOT_INIT_POS_X    = 15.0;
@@ -772,12 +772,13 @@ public class Drive extends Subsystem {
                 targetCount = getTargetTickCount(tickCount, peakSpeed, rampTime, currentTime);
                 currentTargetSpeed = getTargetSpeed(tickCount, peakSpeed, rampTime, currentTime);
                 if (motorRRForward) {
+                    currentError = (double) (currentCount-targetCount);
                     if (currentCount >= tickCount) {
                         isMotorRRDone = true;
+                        currentPower = 0.0;
                         rearRight.setPower(0.0);
                     }
                     else {
-                        currentError = (double) (currentCount-targetCount);
                         if (initialized) { // after the first point, the previous data is valid
                             acculErrorRR = acculErrorRR*alpha + currentError*(currentTime-prevTimeRR);  // integrate error
                             errorSlope = (currentError - prevErrorRR)/(currentTime-prevTimeRR);         // error slope
@@ -792,12 +793,13 @@ public class Drive extends Subsystem {
                     }
                 }
                 else { // motorFLForward is false
+                    currentError = (double) (-currentCount-targetCount);
                     if (currentCount <= -tickCount) {
                         isMotorRRDone = true;
+                        currentPower = 0.0;
                         rearRight.setPower(0.0);
                     }
                     else {
-                        currentError = (double) (-currentCount-targetCount);
                         if (initialized) { // after the first point, the previous data is valid
                             acculErrorRR = acculErrorRR*alpha + currentError*(currentTime-prevTimeRR);  // integrate error
                             errorSlope = (currentError - prevErrorRR)/(currentTime-prevTimeRR);         // error slope
@@ -827,15 +829,30 @@ public class Drive extends Subsystem {
     private int getTargetTickCount(int tickCount, double speed, double rampTime, double elapsedTime) {
         int targetTick;
         double tickCountD = (double) tickCount;
-        if (elapsedTime < rampTime) { // during ramp up time
-            targetTick = (int) (0.5*speed * elapsedTime * elapsedTime/rampTime);
+        double speedOffset = speed * 0.15; // ramp up and ramp down with this speed offset so that there is no time the speed is close to zero
+        double speedExcess= speed - speedOffset;
+
+        if (tickCountD < rampTime*(speed + speedOffset)) {  // distance is shorter than a complete ramp up/ramp down cycle
+            double halfTime = (Math.sqrt(speedOffset*speedOffset + 4.0*tickCountD*speedExcess/rampTime) - speedOffset) * rampTime * 0.5 / speedExcess;
+            if (elapsedTime < halfTime) { // during ramp up time
+                targetTick = (int) ((0.5*speedExcess * elapsedTime/rampTime + speedOffset) * elapsedTime);
+            }
+            else {  // during ramp down time
+                double remainTime = halfTime + halfTime - elapsedTime;
+                targetTick = tickCount - ((int) ((0.5*speedExcess * remainTime/rampTime + speedOffset) * remainTime));
+            }
         }
-        else if (tickCountD > speed * elapsedTime) { // during constant speed period
-            targetTick = (int) (speed * (elapsedTime-rampTime*0.5));
-        }
-        else {  // during ramp down time
-            double remainTime = tickCountD/speed + rampTime - elapsedTime;
-            targetTick = tickCount - ((int) (0.5*remainTime*speed*remainTime/rampTime));
+        else { // distance is long enough to reach the cruise speed
+            if (elapsedTime < rampTime) { // during ramp up time
+                targetTick = (int) ((0.5*speedExcess * elapsedTime/rampTime + speedOffset) * elapsedTime);
+            }
+            else if (tickCountD - speedOffset*rampTime > speed * elapsedTime) { // during constant speed period
+                targetTick = (int) (speed * (elapsedTime-rampTime*0.5) + 0.5*rampTime*speedOffset);
+            }
+            else {  // during ramp down time
+                double remainTime = (tickCountD - speedOffset*rampTime)/speed + rampTime - elapsedTime;
+                targetTick = tickCount - ((int) ((0.5*speedExcess * remainTime/rampTime + speedOffset) * remainTime));
+            }
         }
         if (targetTick > tickCount) targetTick = tickCount;
         return targetTick;
@@ -844,16 +861,32 @@ public class Drive extends Subsystem {
     private double getTargetSpeed(int tickCount, double speed, double rampTime, double elapsedTime) {
         double targetSpeed;
         double tickCountD = (double) tickCount;
-        if (elapsedTime < rampTime) { // during ramp up time
-            targetSpeed = speed * elapsedTime/rampTime;
+        double speedOffset = speed * 0.15; // ramp up and ramp down with this speed offset so that there is no time the speed is close to zero
+        double speedExcess= speed - speedOffset;
+
+        if (tickCountD < rampTime*(speed + speedOffset)) {  // distance is shorter than a complete ramp up/ramp down cycle
+            double halfTime = (Math.sqrt(speedOffset*speedOffset + 4.0*tickCountD*speedExcess/rampTime) - speedOffset) * rampTime * 0.5 / speedExcess;
+            if (elapsedTime < halfTime) { // during ramp up time
+                targetSpeed = speedExcess * elapsedTime/rampTime + speedOffset;
+            }
+            else {  // during ramp down time
+                double remainTime = halfTime + halfTime - elapsedTime;
+                targetSpeed = speedExcess * remainTime/rampTime + speedOffset;
+            }
         }
-        else if (tickCountD > speed * elapsedTime) { // during constant speed period
-            targetSpeed = speed;
+        else { // distance is long enough to reach the cruise speed
+            if (elapsedTime < rampTime) { // during ramp up time
+                targetSpeed = speedExcess * elapsedTime/rampTime + speedOffset;
+            }
+            else if (tickCountD - speedOffset*rampTime > speed * elapsedTime) { // during constant speed period
+                targetSpeed = speed;
+            }
+            else {  // during ramp down time
+                double remainTime = (tickCountD - speedOffset*rampTime)/speed + rampTime - elapsedTime;
+                targetSpeed = speedExcess * remainTime/rampTime + speedOffset;
+            }
         }
-        else {  // during ramp down time
-            double remainTime = tickCountD/speed + rampTime - elapsedTime;
-            targetSpeed = speed - speed*remainTime/rampTime;
-        }
+        if (targetSpeed < speedOffset) targetSpeed = speedOffset;
         return targetSpeed;
     }
 }
