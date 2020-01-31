@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+        import com.qualcomm.robotcore.eventloop.opmode.Disabled;
         import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
         import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
         import com.qualcomm.robotcore.util.ElapsedTime;
@@ -16,6 +17,7 @@ package org.firstinspires.ftc.teamcode;
         import java.io.IOException;
 
 @TeleOp(name="OpenCV Test")
+@Disabled
 public class OpenCVTest extends LinearOpMode {
     private static final int targetPosition = 315;
     private static final double maxPower = 0;

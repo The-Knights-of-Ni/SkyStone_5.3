@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode.Auto;
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.List;
@@ -53,7 +54,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  */
 
 @Autonomous(name = "Auto", group = "Concept")
-
+@Disabled
 public class Auto extends LinearOpMode {
     private Robot robot;
 
