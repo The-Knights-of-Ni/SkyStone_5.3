@@ -57,11 +57,11 @@ public class Control extends Subsystem {
      * The CLAW_ARM_TILT_TABLE_SIZE records the number of entries in the CLAW_ARM_TILT_TABLE
      * The CLAW_ARM_TILT_TABLE consists of CLAW_ARM_TILT_TABLE_SIZE pairs of data. Each pair is (tilt angle, arm tilt servo).
      */
-    private static final int        CLAW_ARM_TILT_TABLE_SIZE                     = 23;
+    private static final int        CLAW_ARM_TILT_TABLE_SIZE                     = 24;
     private static final double[]   CLAW_ARM_TILT_TABLE = {
-            -180.0, 0.04, -70.2, 0.416, -30.8, 0.563, -12.2, 0.634, -5.8, 0.658, -2.9, 0.679, 0.2, 0.692, 4.6, 0.703, 6.1, 0.716, 11.0, 0.736,
-            15.2, 0.743, 18.2, 0.763, 23.2, 0.782, 29.0, 0.804, 33.9, 0.825, 40.8, 0.851, 46.6, 0.879, 51.0, 0.894, 57.4, 0.921, 62.5, 0.941,
-            70.1, 0.971, 75.6, 0.993, 77.6, 1.0 };
+            -183.0, 0.01, -180.0, 0.04, -70.2, 0.416, -30.8, 0.563, -12.2, 0.634, -5.8, 0.658, -2.9, 0.679, 0.2, 0.692, 4.6, 0.703, 6.1, 0.716,
+            11.0, 0.736, 15.2, 0.743, 18.2, 0.763, 23.2, 0.782, 29.0, 0.804, 33.9, 0.825, 40.8, 0.851, 46.6, 0.879, 51.0, 0.894, 57.4, 0.921,
+            62.5, 0.941, 70.1, 0.971, 75.6, 0.993, 77.6, 1.0 };
 
     //DO WITH ENCODERS
     private static final double     TICKS_PER_MOTOR_REV_40          = 1120;    // AM Orbital 20 motor

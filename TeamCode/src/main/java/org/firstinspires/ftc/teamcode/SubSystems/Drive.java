@@ -50,7 +50,7 @@ public class Drive extends Subsystem {
     private static final double     COUNTS_PER_MM                 = (TICKS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * Math.PI);
     private static final double     COUNTS_CORRECTION_X             = 1.167;
     private static final double     COUNTS_CORRECTION_Y             = 0.9918;
-    private static final double     COUNTS_PER_DEGREE             = 10.833*0.97;     // 975 ticks per 90 degrees
+    private static final double     COUNTS_PER_DEGREE             = 10.833*0.983;     // 975 ticks per 90 degrees
 
     private static final double     DRIVE_SPEED             = 0.40;
     private static final double     DRIVE_SPEED_X             = 0.35;
@@ -437,8 +437,12 @@ public class Drive extends Subsystem {
     }
 
     public void moveForward(double distance) {
-//        this.moveToPos2D(DRIVE_SPEED, 0.0, distance);
-        allMotorPIDControl( (int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_Y), DRIVE_SPEED_Y * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
+        moveForward(distance, DRIVE_SPEED_Y);
+    }
+
+    public void moveForward(double distance, double motorSpeed) {
+//        this.moveToPos2D(motorSpeed, 0.0, distance);
+        allMotorPIDControl( (int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_Y), motorSpeed * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
                 motorRampTime, true, true, true, true, motorKp, motorKi, motorKd);
         robotCurrentPosX += distance * Math.cos(robotCurrentAngle*Math.PI/180.0);
         robotCurrentPosY += distance * Math.sin(robotCurrentAngle*Math.PI/180.0);
@@ -449,8 +453,12 @@ public class Drive extends Subsystem {
     }
 
     public void moveBackward(double distance) {
-//        this.moveToPos2D(DRIVE_SPEED, 0.0, -distance);
-        allMotorPIDControl((int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_Y), DRIVE_SPEED_Y * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
+        moveBackward(distance, DRIVE_SPEED_Y);
+    }
+
+    public void moveBackward(double distance, double motorSpeed) {
+//        this.moveToPos2D(motorSpeed, 0.0, -distance);
+        allMotorPIDControl((int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_Y), motorSpeed * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
                 motorRampTime, false, false, false, false, motorKp, motorKi, motorKd);
         robotCurrentPosX += distance * Math.cos((robotCurrentAngle+180.0)*Math.PI/180.0);
         robotCurrentPosY += distance * Math.sin((robotCurrentAngle+180.0)*Math.PI/180.0);
@@ -461,8 +469,12 @@ public class Drive extends Subsystem {
     }
 
     public void moveLeft(double distance) {
-//        this.moveToPos2D(DRIVE_SPEED, -distance, 0.0);
-        allMotorPIDControl((int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_X), DRIVE_SPEED_X * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
+        moveLeft(distance, DRIVE_SPEED_X);
+    }
+
+    public void moveLeft(double distance, double motorSpeed) {
+//        this.moveToPos2D(motorSpeed, -distance, 0.0);
+        allMotorPIDControl((int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_X), motorSpeed * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
                 motorRampTime, false, true, true, false, motorKp, motorKi, motorKd);
         robotCurrentPosX += distance * Math.cos((robotCurrentAngle+90.0)*Math.PI/180.0);
         robotCurrentPosY += distance * Math.sin((robotCurrentAngle+90.0)*Math.PI/180.0);
@@ -473,8 +485,12 @@ public class Drive extends Subsystem {
     }
 
     public void moveRight(double distance) {
-//        this.moveToPos2D(DRIVE_SPEED, distance, 0.0);
-        allMotorPIDControl((int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_X), DRIVE_SPEED_X * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
+        moveRight(distance, DRIVE_SPEED_X);
+    }
+
+    public void moveRight(double distance, double motorSpeed) {
+//        this.moveToPos2D(motorSpeed, distance, 0.0);
+        allMotorPIDControl((int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_X), motorSpeed * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
                 motorRampTime, true, false, false, true, motorKp, motorKi, motorKd);
         robotCurrentPosX += distance * Math.cos((robotCurrentAngle-90.0)*Math.PI/180.0);
         robotCurrentPosY += distance * Math.sin((robotCurrentAngle-90.0)*Math.PI/180.0);
@@ -482,11 +498,6 @@ public class Drive extends Subsystem {
         opMode.telemetry.addData("moveRight",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
         opMode.telemetry.update();
 //        sleep(100);
-    }
-
-    public void park() {
-        moveToPos2D(0.25,15,15); //temp position
-        // change to where the tape is
     }
 
     public void printMotorPIDCoefficients() {
@@ -593,6 +604,15 @@ public class Drive extends Subsystem {
         boolean isMotorFRDone = false;
         boolean isMotorRLDone = false;
         boolean isMotorRRDone = false;
+        boolean isMotorFLNotMoving = false;
+        boolean isMotorFRNotMoving = false;
+        boolean isMotorRLNotMoving = false;
+        boolean isMotorRRNotMoving = false;
+        boolean isTimeOutStarted = false;
+        boolean isTimeOutExceeded = false;
+        double timeOutPeriod = 0.1;         // program will time out if the motors got stuck for more than 0.1 second
+        double timeOutStartedTime = 0.0;
+        int    timeOutThreshold = 3;        // motor is considered to be stuck if the motor count does not change more than 2 ticks
         double acculErrorFL = 0.0;
         double acculErrorFR = 0.0;
         double acculErrorRL = 0.0;
@@ -607,26 +627,35 @@ public class Drive extends Subsystem {
         double prevTimeRR = 0.0;
         boolean initialized = false;        // disable Ki and Kd terms in first iteration
         int currentCount, targetCount;
-        int currentCountFL = 0;
-        int currentCountFR = 0;
-        int currentCountRL = 0;
-        int currentCountRR = 0;
+        int prevCountFL = 0;
+        int prevCountFR = 0;
+        int prevCountRL = 0;
+        int prevCountRR = 0;
         double currentError = 0.0;
         double currentTargetSpeed;
         double currentPower = 0.0;
         double alpha = 0.95;
         double startTime = ((double) timer.nanoseconds()) * 1.0e-9;
-        double currentTime;
+        double currentTime = 0.0;
         double errorSlope = 0.0;
-        while ((!isMotorFLDone) || (!isMotorFRDone) || (!isMotorRLDone) || (!isMotorRRDone)) {
+        while (((!isMotorFLDone) || (!isMotorFRDone) || (!isMotorRLDone) || (!isMotorRRDone)) && (!isTimeOutExceeded)){
             if (!isMotorFLDone) {
                 currentCount = frontLeft.getCurrentPosition();                          // get current motor tick
                 currentTime = ((double) timer.nanoseconds()) * 1.0e-9 - startTime;      // get current time
                 targetCount = getTargetTickCount(tickCount, peakSpeed, rampTime, currentTime);  // get integrated target tick on the speed profile
                 currentTargetSpeed = getTargetSpeed(tickCount, peakSpeed, rampTime, currentTime); // get the target speed on the speed profile
+                if (initialized) {  // check if the motor is rotating
+                    if (Math.abs(currentCount - prevCountFL) < timeOutThreshold) {
+                        isMotorFLNotMoving = true;
+                    }
+                    else {
+                        isMotorFLNotMoving = false;
+                    }
+                }
                 if (motorFLForward) { // tick count increasing
                     if (currentCount >= tickCount) {
                         isMotorFLDone = true;
+                        isMotorFLNotMoving = true;
                         frontLeft.setPower(0.0);
                     }
                     else {
@@ -666,16 +695,25 @@ public class Drive extends Subsystem {
                 }
                 prevErrorFL = currentError;
                 prevTimeFL = currentTime;
-                currentCountFL = currentCount;
+                prevCountFL = currentCount;
             } // if (!isMotorFLDone)
             if (!isMotorFRDone) {
                 currentCount = frontRight.getCurrentPosition();
                 currentTime = ((double) timer.nanoseconds()) * 1.0e-9 - startTime;
                 targetCount = getTargetTickCount(tickCount, peakSpeed, rampTime, currentTime);
                 currentTargetSpeed = getTargetSpeed(tickCount, peakSpeed, rampTime, currentTime);
+                if (initialized) {  // check if the motor is rotating
+                    if (Math.abs(currentCount - prevCountFR) < timeOutThreshold) {
+                        isMotorFRNotMoving = true;
+                    }
+                    else {
+                        isMotorFRNotMoving = false;
+                    }
+                }
                 if (motorFRForward) {
                     if (currentCount >= tickCount) {
                         isMotorFRDone = true;
+                        isMotorFRNotMoving = true;
                         frontRight.setPower(0.0);
                     }
                     else {
@@ -715,16 +753,25 @@ public class Drive extends Subsystem {
                 }
                 prevErrorFR = currentError;
                 prevTimeFR = currentTime;
-                currentCountFR = currentCount;
+                prevCountFR = currentCount;
             } // if (!isMotorFRDone)
             if (!isMotorRLDone) {
                 currentCount = rearLeft.getCurrentPosition();
                 currentTime = ((double) timer.nanoseconds()) * 1.0e-9 - startTime;
                 targetCount = getTargetTickCount(tickCount, peakSpeed, rampTime, currentTime);
                 currentTargetSpeed = getTargetSpeed(tickCount, peakSpeed, rampTime, currentTime);
+                if (initialized) {  // check if the motor is rotating
+                    if (Math.abs(currentCount - prevCountRL) < timeOutThreshold) {
+                        isMotorRLNotMoving = true;
+                    }
+                    else {
+                        isMotorRLNotMoving = false;
+                    }
+                }
                 if (motorRLForward) {
                     if (currentCount >= tickCount) {
                         isMotorRLDone = true;
+                        isMotorRLNotMoving = true;
                         rearLeft.setPower(0.0);
                     }
                     else {
@@ -764,17 +811,26 @@ public class Drive extends Subsystem {
                 }
                 prevErrorRL = currentError;
                 prevTimeRL = currentTime;
-                currentCountRL = currentCount;
+                prevCountRL = currentCount;
             } // if (!isMotorRLDone)
             if (!isMotorRRDone) {
                 currentCount = rearRight.getCurrentPosition();
                 currentTime = ((double) timer.nanoseconds()) * 1.0e-9 - startTime;
                 targetCount = getTargetTickCount(tickCount, peakSpeed, rampTime, currentTime);
                 currentTargetSpeed = getTargetSpeed(tickCount, peakSpeed, rampTime, currentTime);
+                if (initialized) {  // check if the motor is rotating
+                    if (Math.abs(currentCount - prevCountRR) < timeOutThreshold) {
+                        isMotorRRNotMoving = true;
+                    }
+                    else {
+                        isMotorRRNotMoving = false;
+                    }
+                }
                 if (motorRRForward) {
                     currentError = (double) (currentCount-targetCount);
                     if (currentCount >= tickCount) {
                         isMotorRRDone = true;
+                        isMotorRRNotMoving = true;
                         currentPower = 0.0;
                         rearRight.setPower(0.0);
                     }
@@ -815,12 +871,27 @@ public class Drive extends Subsystem {
                 }
                 prevErrorRR = currentError;
                 prevTimeRR = currentTime;
-                currentCountRR = currentCount;
+                prevCountRR = currentCount;
             } // if (!isMotorRRDone)
             initialized = true;         // enable Ki and Kd terms
+            if (isMotorFLNotMoving && isMotorFRNotMoving && isMotorRLNotMoving && isMotorRRNotMoving) {
+                if (isTimeOutStarted) {
+                    if (currentTime - timeOutStartedTime > timeOutPeriod) {
+                        isTimeOutExceeded = true;
+                    }
+                }
+                else {
+                    isTimeOutStarted = true;
+                    timeOutStartedTime = currentTime;
+                }
+            }
+            else {
+                isTimeOutStarted = false;
+                isTimeOutExceeded = false;
+            }
             String output = String.format("FL %.1f, %d, FR %.1f %d, RL %.1f %d, RR %.1f %d %.1f %.3f %.1f %.3f",
-                    prevTimeFL*1000.0, currentCountFL, prevTimeFR*1000.0, currentCountFR, prevTimeRL*1000.0, currentCountRL,
-                    prevTimeRR*1000.0, currentCountRR, currentError, acculErrorRR, errorSlope, currentPower);
+                    prevTimeFL*1000.0, prevCountFL, prevTimeFR*1000.0, prevCountFR, prevTimeRL*1000.0, prevCountRL,
+                    prevTimeRR*1000.0, prevCountRR, currentError, acculErrorRR, errorSlope, currentPower);
             Log.d("motorEnc", output);
         }
 

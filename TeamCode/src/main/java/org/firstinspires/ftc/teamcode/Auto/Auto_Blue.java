@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.SubSystems.Robot;
@@ -192,25 +193,26 @@ public class Auto_Blue extends LinearOpMode {
 //        sleep(5000);
 //        printRobotPosition();
         sleep(100);
+        stoneOffset = getBlueFoundationOffset();
         saveImages();
 //        sleep(3000);
 
-        mainArmHorizontalPos = 100.0;
+        mainArmHorizontalPos = 90.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
-        robot.drive.moveForward(130);
+        robot.drive.moveForward(170 + stoneOffset[1]);
 //        sleep(100);
 //        saveImages();
 //        sleep(3000);
 
-        mainArmVerticalPos = 60.0;
+        mainArmVerticalPos = 70.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         sleep(500);
-        robot.control.openMainClaw();
+        robot.control.openMainClawWide();
         sleep(300);
 
-        mainArmHorizontalPos = 100.0;
+        mainArmHorizontalPos = 90.0;
         mainArmVerticalPos = 120.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
@@ -220,11 +222,34 @@ public class Auto_Blue extends LinearOpMode {
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
 
-        robot.drive.moveRight(20);
+        robot.drive.moveRight(30);
         sleep(100);
 
         robot.control.lowerClawsToFoundation();
-        sleep(10000);
+        robot.control.closeMainClawStone();
+        sleep(300);
+        robot.control.retractMainClawArm();
+        sleep(500);
+
+
+        pullbackBlueFoundation();
+//        sleep(100);
+
+        pushBlueFoundation();
+//        sleep(100);
+
+        robot.control.raiseClawsFromFoundation();
+        sleep(300);
+        robot.drive.moveBackward(400);
+
+        mainArmHorizontalPos = 0.0;
+        mainArmVerticalPos = 0.0;
+        robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+
+//        sleep(100);
+//        robot.drive.moveBackward(200);
+//        sleep(100);
+        parkRobot();
 
         // Disable Tracking when we are done;
         robot.vision.getTargetsSkyStone().deactivate();
@@ -234,6 +259,78 @@ public class Auto_Blue extends LinearOpMode {
         if (robot.vision.armWebcamIsActive) {
             robot.vision.closeArmWebcam();
         }
+    }
+
+    private void pullbackBlueFoundation() {
+        double initialAngle = robot.drive.getYaw();
+        double currentAngle;
+        robot.drive.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.drive.frontLeft.setTargetPosition(0);
+        robot.drive.frontRight.setTargetPosition(0);
+        robot.drive.rearLeft.setTargetPosition(0);
+        robot.drive.rearRight.setTargetPosition(0);
+        robot.drive.setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+        double motorPowerLeft = 0.3;
+        double motorPowerRight = 0.3;
+        robot.drive.rearLeft.setPower(motorPowerLeft);
+        robot.drive.frontLeft.setPower(motorPowerLeft);
+        robot.drive.rearRight.setPower(motorPowerRight);
+        robot.drive.frontRight.setPower(motorPowerRight);
+
+        // start moving backward
+        robot.drive.frontLeft.setTargetPosition(-5000);
+        robot.drive.frontRight.setTargetPosition(-5000);
+        robot.drive.rearLeft.setTargetPosition(-5000);
+        robot.drive.rearRight.setTargetPosition(-5000);
+
+        while (robot.drive.rearLeft.getCurrentPosition() > -200) {
+
+        }
+        motorPowerLeft = 0.6;
+        motorPowerRight = 0.1;
+        robot.drive.rearLeft.setPower(motorPowerLeft);
+        robot.drive.frontLeft.setPower(motorPowerLeft);
+        robot.drive.rearRight.setPower(motorPowerRight);
+        robot.drive.frontRight.setPower(motorPowerRight);
+
+        while (robot.drive.rearLeft.getCurrentPosition() > -1100) {
+
+        }
+
+        motorPowerRight = 0.6;
+        robot.drive.rearRight.setPower(motorPowerRight);
+        robot.drive.frontRight.setPower(motorPowerRight);
+        robot.drive.frontRight.setTargetPosition(4000);
+        robot.drive.rearRight.setTargetPosition(4000);
+
+        boolean keepGoing = true;
+        while (keepGoing) {
+            currentAngle = robot.drive.getYaw();
+            if (((currentAngle - initialAngle > 80.0) && (currentAngle - initialAngle < 95.0)) ||
+                    ((currentAngle - initialAngle + 360.0 > 80.0) && (currentAngle - initialAngle + 360.0 < 95.0))) {
+                keepGoing = false;
+            }
+        }
+
+        robot.drive.stop();
+        robot.drive.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.drive.frontLeft.setTargetPosition(0);
+        robot.drive.frontRight.setTargetPosition(0);
+        robot.drive.rearLeft.setTargetPosition(0);
+        robot.drive.rearRight.setTargetPosition(0);
+        robot.drive.setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.drive.stop();
+
+    }
+
+    private void pushBlueFoundation() {
+        robot.drive.moveForward(500, 0.2);
+        robot.drive.stop();
+    }
+
+    private void parkRobot() {
+        robot.drive.moveBackward(580, 0.15);
+        robot.drive.stop();
     }
 
     /**
@@ -310,7 +407,9 @@ public class Auto_Blue extends LinearOpMode {
 
     /**
      * use arm camera image to detect the offset of Skystone
-     * @return
+     * @return  xOffset: lateral offset of the Skystone
+     *          yOffset: longitudinal offset of the Skystone
+     *          angle: angular offset of the Skystone
      */
     private double[] getStoneOffset() {
         double xOffset = 0.0;
@@ -321,6 +420,9 @@ public class Auto_Blue extends LinearOpMode {
         Scalar mean1, mean2, mean3, mean4, mean5;
         Mat thresholdMat = new Mat();
         // use analog Cb image to detect the Skystone
+        // yCbCrChan2Mat_compensatedn is negatively compensated by Y image to deal with the region with strong reflection
+        // yellow stone region should have low Cb value, but the strong reflection is white which will have mid-level Cb value
+        // yCbCrChan2Mat_compensatedn is 0.75*Cb - 0.25*Y + 64
         block1 = robot.vision.yCbCrChan2Mat_compensatedn.submat(1, 21, 150, 170);
         block2 = robot.vision.yCbCrChan2Mat_compensatedn.submat(55, 75, 150, 170);
         block3 = robot.vision.yCbCrChan2Mat_compensatedn.submat(110, 130, 150, 170);
@@ -358,9 +460,7 @@ public class Auto_Blue extends LinearOpMode {
         Imgproc.dilate(thresholdMat, thresholdMat, kernel);
         robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "erodedilate", (long) timeCurrent);
 
-        telemetry.addData("thresholdMat ", " elemsize %d, elemsize1 %d", thresholdMat.elemSize(), thresholdMat.elemSize1());
-        telemetry.update();
-
+        // extract data array from Mat
         byte[] data = new byte[thresholdMat.cols()*thresholdMat.rows()];
         thresholdMat.get(0, 0, data);
         int minY = -1;
@@ -381,6 +481,89 @@ public class Auto_Blue extends LinearOpMode {
         return new double[] {xOffset, yOffset, angle};
     }
 
+    /**
+     * use arm camera image to detect the offset of Blue Foundation
+     * @return  xOffset: lateral offset of the Foundation
+     *          yOffset: longitudinal offset of the Foundation
+     *          angle: angular offset of the Foundation
+     */
+    private double[] getBlueFoundationOffset() {
+        double xOffset = 0.0;
+        double yOffset = 0.0;
+        double angle = 0.0;
+        double maxLevel, minLevel, thresholdLevel;
+        Mat block1, block2, block3, block4, block5;
+        Scalar mean1, mean2, mean3, mean4, mean5;
+        Mat thresholdMat = new Mat();
+        // use analog Cb image to detect the Blue Foundation
+        // yCbCrChan2Mat_compensated is positively compensated by Y image to deal with the region with strong reflection
+        // Blue Foundation region should have high Cb value, but the strong reflection is white which will have mid-level Cb value
+        // yCbCrChan2Mat_compensated is 0.75*Cb + 0.25*Y
+        block1 = robot.vision.yCbCrChan2Mat_compensated.submat(1, 21, 50, 70);
+        block2 = robot.vision.yCbCrChan2Mat_compensated.submat(30, 50, 150, 170);
+        block3 = robot.vision.yCbCrChan2Mat_compensated.submat(1, 21, 250, 270);
+        block4 = robot.vision.yCbCrChan2Mat_compensated.submat(200, 220, 5, 25);
+        block5 = robot.vision.yCbCrChan2Mat_compensated.submat(200, 220, 295, 315);
+        mean1 = Core.mean(block1);
+        mean2 = Core.mean(block2);
+        mean3 = Core.mean(block3);
+        mean4 = Core.mean(block4);
+        mean5 = Core.mean(block5);
+        telemetry.addData("block1 mean ", "%.2f", mean1.val[0]);
+        telemetry.addData("block2 mean ", "%.2f", mean2.val[0]);
+        telemetry.addData("block3 mean ", "%.2f", mean3.val[0]);
+        telemetry.addData("block4 mean ", "%.2f", mean4.val[0]);
+        telemetry.addData("block5 mean ", "%.2f", mean5.val[0]);
+        telemetry.update();
+        maxLevel = Math.max(mean1.val[0], mean2.val[0]);
+        maxLevel = Math.max(maxLevel, mean3.val[0]);
+        maxLevel = Math.max(maxLevel, mean4.val[0]);
+        maxLevel = Math.max(maxLevel, mean5.val[0]);
+        minLevel = Math.min(mean1.val[0], mean2.val[0]);
+        minLevel = Math.min(minLevel, mean3.val[0]);
+        minLevel = Math.min(minLevel, mean4.val[0]);
+        minLevel = Math.min(minLevel, mean5.val[0]);
+        thresholdLevel = (minLevel + maxLevel) * 0.5;
+        String output = String.format("Blue Foundation: block1 %.2f, block2 %.2f, block3 %.2f, block4 %.2f, block5 %.2f, threshold %.2f",
+                mean1.val[0], mean2.val[0], mean3.val[0], mean4.val[0], mean5.val[0], thresholdLevel);
+        Log.d("autoVision", output);
+        Imgproc.threshold(robot.vision.yCbCrChan2Mat_compensated, thresholdMat, (int) thresholdLevel, 255, Imgproc.THRESH_BINARY);
+        timeCurrent = timer.nanoseconds();
+        robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "BlueFThreshold", (long) timeCurrent);
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
+        Imgproc.dilate(thresholdMat, thresholdMat, kernel);
+        robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "dilate", (long) timeCurrent);
+        Imgproc.erode(thresholdMat, thresholdMat, kernel);
+        robot.vision.saveImage("autoVision", thresholdMat, Imgproc.COLOR_RGBA2BGR, "dilateerode", (long) timeCurrent);
+
+        // extract data array from Mat
+        byte[] data = new byte[thresholdMat.cols()*thresholdMat.rows()];
+        thresholdMat.get(0, 0, data);
+        int maxY0 = -1;
+        int maxY1 = -1;
+        int maxY2 = -1;
+        for (int y = 4; y < thresholdMat.rows(); ++y) {
+            if ((data[y*thresholdMat.cols() + thresholdMat.cols()/2 - 50] == 0) && (maxY0 == -1)) {
+                maxY0 = y;
+            }
+            if ((data[y*thresholdMat.cols() + thresholdMat.cols()/2     ] == 0) && (maxY1 == -1)) {
+                maxY1 = y;
+            }
+            if ((data[y*thresholdMat.cols() + thresholdMat.cols()/2 + 50] == 0) && (maxY2 == -1)) {
+                maxY2 = y;
+            }
+        }
+        int maxY;
+        maxY = Math.max(maxY0, maxY1);
+        maxY = Math.max(maxY, maxY2);
+        yOffset = (double) (126 - maxY)*1.513;
+
+        output = String.format("Blue Foundation: maxY0 %d, maxY1 %d, maxY2 %d, yOffset %.1f", maxY0, maxY1, maxY2, yOffset);
+        Log.d("autoVision", output);
+
+        return new double[] {xOffset, yOffset, angle};
+    }
+
     private void pickupSkySTone(double yOffset) {
         robot.control.openMainClaw();
         mainArmHorizontalPos = 139.0 + yOffset;
@@ -388,19 +571,19 @@ public class Auto_Blue extends LinearOpMode {
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         sleep(300);
-        mainArmVerticalPos = 5.0;
+        mainArmVerticalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
-//        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         sleep(600);
         robot.control.closeMainClawStone();
         sleep(500);
         mainArmVerticalPos = 50.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
-        sleep(200);
+        sleep(300);
         mainArmHorizontalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
-        sleep(500);
+        sleep(400);
     }
 
     private void printRobotPosition() {
