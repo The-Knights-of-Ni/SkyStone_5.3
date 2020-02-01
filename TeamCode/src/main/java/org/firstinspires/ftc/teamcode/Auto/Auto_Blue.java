@@ -514,13 +514,9 @@ public class Auto_Blue extends LinearOpMode {
         telemetry.addData("block5 mean ", "%.2f", mean5.val[0]);
         telemetry.update();
         maxLevel = Math.max(mean1.val[0], mean2.val[0]);
-        maxLevel = Math.max(maxLevel, mean3.val[0]);
-        maxLevel = Math.max(maxLevel, mean4.val[0]);
-        maxLevel = Math.max(maxLevel, mean5.val[0]);
-        minLevel = Math.min(mean1.val[0], mean2.val[0]);
-        minLevel = Math.min(minLevel, mean3.val[0]);
-        minLevel = Math.min(minLevel, mean4.val[0]);
-        minLevel = Math.min(minLevel, mean5.val[0]);
+        maxLevel = Math.max(maxLevel, mean3.val[0]);        // find the max level in the foundation region
+        minLevel = Math.max(mean4.val[0], mean5.val[0]);    // depending on the position of the Skystone, one of these might not be floor
+                                                            // the stone has lower Cb level than the floor
         thresholdLevel = (minLevel + maxLevel) * 0.5;
         String output = String.format("Blue Foundation: block1 %.2f, block2 %.2f, block3 %.2f, block4 %.2f, block5 %.2f, threshold %.2f",
                 mean1.val[0], mean2.val[0], mean3.val[0], mean4.val[0], mean5.val[0], thresholdLevel);

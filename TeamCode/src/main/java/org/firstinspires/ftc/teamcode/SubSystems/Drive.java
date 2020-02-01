@@ -50,7 +50,7 @@ public class Drive extends Subsystem {
     private static final double     COUNTS_PER_MM                 = (TICKS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * Math.PI);
     private static final double     COUNTS_CORRECTION_X             = 1.167;
     private static final double     COUNTS_CORRECTION_Y             = 0.9918;
-    private static final double     COUNTS_PER_DEGREE             = 10.833*0.983;     // 975 ticks per 90 degrees
+    private static final double     COUNTS_PER_DEGREE             = 10.833*0.988;     // 975 ticks per 90 degrees
 
     private static final double     DRIVE_SPEED             = 0.40;
     private static final double     DRIVE_SPEED_X             = 0.35;
@@ -676,6 +676,7 @@ public class Drive extends Subsystem {
                 else { // motorFLForward is false, tick count negative and decreasing
                     if (currentCount <= -tickCount) {
                         isMotorFLDone = true;
+                        isMotorFLNotMoving = true;
                         frontLeft.setPower(0.0);
                     }
                     else {
@@ -734,6 +735,7 @@ public class Drive extends Subsystem {
                 else { // motorFRForward is false
                     if (currentCount <= -tickCount) {
                         isMotorFRDone = true;
+                        isMotorFRNotMoving = true;
                         frontRight.setPower(0.0);
                     }
                     else {
@@ -792,6 +794,7 @@ public class Drive extends Subsystem {
                 else { // motorFLForward is false
                     if (currentCount <= -tickCount) {
                         isMotorRLDone = true;
+                        isMotorRLNotMoving = true;
                         rearLeft.setPower(0.0);
                     }
                     else {
@@ -852,6 +855,8 @@ public class Drive extends Subsystem {
                     currentError = (double) (-currentCount-targetCount);
                     if (currentCount <= -tickCount) {
                         isMotorRRDone = true;
+                        isMotorRRNotMoving = true;
+
                         currentPower = 0.0;
                         rearRight.setPower(0.0);
                     }
