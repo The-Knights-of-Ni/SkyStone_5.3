@@ -848,13 +848,12 @@ public class Vision {
         String file = path + "/" + fileName + "map1";
         RandomAccessFile inputfile = null;
         try {
-            robot.getOpmode().telemetry.addData("file", file);
+hyjgtttttttttttttttt            robot.getOpmode().telemetry.addData("file", file);
             robot.getOpmode().telemetry.addData("reading", "map1");
             robot.getOpmode().telemetry.update();
             inputfile = new RandomAccessFile(file, "rw");
             FileChannel inChannel = inputfile.getChannel();
-
-            ByteBuffer buf = ByteBuffer.allocate(4*cols*rows);
+jk            ByteBuffer buf = ByteBuffer.allocate(4*cols*rows);
             buf.clear();
 
             inChannel.read(buf);
