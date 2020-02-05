@@ -259,18 +259,18 @@ public class Robot extends Subsystem {
     }
 
     public void initServosAuto() {
-        this.control.closeMainClaw();
         this.control.closeCSClaw();
-        this.control.setMainClawRotationDegrees(180.0);
+        this.control.setMainClawRotationDegrees(90.0);
+        this.control.openMainClawWide();
         this.control.retractMainClawArm();
         this.control.retractCSClawArm();
         this.control.raiseClawsFromFoundation();
     }
 
     public void initServosTeleop() {
-        this.control.closeMainClaw();
+//        this.control.closeMainClaw();
         this.control.closeCSClaw();
-        this.control.setMainClawRotationDegrees(90.0);
+//        this.control.setMainClawRotationDegrees(90.0);
         this.control.retractCSClawArm();
         this.control.raiseClawsFromFoundation();
     }

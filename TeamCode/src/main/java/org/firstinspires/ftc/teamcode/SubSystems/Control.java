@@ -100,11 +100,10 @@ public class Control extends Subsystem {
     private static final double     CLAW_ARM_POS_N180_DEG                = 0.04;
     private static final double     CLAW_ARM_ROT_0_DEG                  = 0.046;
     private static final double     CLAW_ARM_ROT_180_DEG                = 0.796;
-//    private static final double     MAIN_CLAW_POS_OPEN                  = 0.65;
-    private static final double     MAIN_CLAW_POS_OPEN_WIDE              = 0.581;
-    private static final double     MAIN_CLAW_POS_OPEN                  = 0.532;
-    private static final double     MAIN_CLAW_POS_CLOSED_STONE          = 0.42;
-    private static final double     MAIN_CLAW_POS_CLOSED                = 0.42;
+    private static final double     MAIN_CLAW_POS_OPEN_WIDE              = 0.369;
+    private static final double     MAIN_CLAW_POS_OPEN                  = 0.416;
+    private static final double     MAIN_CLAW_POS_CLOSED_STONE          = 0.589;
+    private static final double     MAIN_CLAW_POS_CLOSED                = 0.64;
 
     private static final double     CS_ARM_POS_ANGLE                  = 68.5; // most positive angle
     private static final double     CS_ARM_POS_VALUE                  = 0.038; // servo setting at most positive angle

@@ -100,25 +100,30 @@ public class Auto_Red extends LinearOpMode {
         timeCurrent = timer.nanoseconds();
         timeStart = timeCurrent;
         timePre = timeCurrent;
-
-        mainClawRotationAngle = robot.control.getMainClawRotationDegrees();
         telemetry.clearAll();
 
+        // rotate main claw to open sideways
+        mainClawRotationAngle = 0.0;
+        robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
+
+        // activate Vuforia
         robot.vision.getTargetsSkyStone().activate();
 
         // use the front camera image to determine the SkyStone pattern
         skyStonePattern = findSkyStoneLocation();
 
-        // setup main arm and claw position
-        mainClawRotationAngle = 90.0;
-        robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
+        // deploy main claw arm
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
 
         // switch camera to the arm camera
         robot.vision.closeFrontWebcam();
         robot.vision.initArmWebcam(1);
 
+        // setup main claw and main arm initial position
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+        mainClawRotationAngle = 0.0;
+        robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
+        robot.control.openMainClawWide();
         mainArmHorizontalPos = 40.0;
         mainArmVerticalPos = 80.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
@@ -153,6 +158,10 @@ public class Auto_Red extends LinearOpMode {
         stoneOffset = getStoneOffset();
         saveImages();
 //        sleep(3000);
+
+        // rotate main claw
+        mainClawRotationAngle = 90.0;
+        robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
 
         pickupSkySTone(stoneOffset[1]);
 //        sleep(100);
@@ -225,7 +234,9 @@ public class Auto_Red extends LinearOpMode {
         sleep(100);
 
         robot.control.lowerClawsToFoundation();
-        robot.control.closeMainClawStone();
+        mainClawRotationAngle = 0.0;
+        robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
+//        robot.control.closeMainClawStone();
         sleep(800);
 
 
@@ -558,7 +569,8 @@ public class Auto_Red extends LinearOpMode {
     }
 
     private void pickupSkySTone(double yOffset) {
-        robot.control.openMainClaw();
+        robot.control.openMainClawWide();
+        sleep(200);
         mainArmHorizontalPos = 139.0 + yOffset;
         mainArmVerticalPos = 50.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
@@ -567,7 +579,7 @@ public class Auto_Red extends LinearOpMode {
         mainArmVerticalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
-        sleep(600);
+        sleep(400);
         robot.control.closeMainClawStone();
         sleep(500);
         mainArmVerticalPos = 50.0;
