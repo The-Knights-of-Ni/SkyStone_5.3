@@ -111,12 +111,20 @@ public class Robot extends Subsystem {
     public boolean isbButtonPressedPrev = false;
     public boolean isxButtonPressedPrev = false;
     public boolean isyButtonPressedPrev = false;
+    public boolean isdPadUpPressedPrev = false;
+    public boolean isdPadDownPressedPrev = false;
+    public boolean isdPadLeftPressedPrev = false;
+    public boolean isdPadRightPressedPrev = false;
     public boolean islBumperPressedPrev = false;
     public boolean isrBumperPressedPrev = false;
     public boolean isaButton2PressedPrev = false;
     public boolean isbButton2PressedPrev = false;
     public boolean isxButton2PressedPrev = false;
     public boolean isyButton2PressedPrev = false;
+    public boolean isdPadUp2PressedPrev = false;
+    public boolean isdPadDown2PressedPrev = false;
+    public boolean isdPadLeft2PressedPrev = false;
+    public boolean isdPadRight2PressedPrev = false;
     public boolean islBumper2PressedPrev = false;
     public boolean isrBumper2PressedPrev = false;
 
@@ -284,6 +292,10 @@ public class Robot extends Subsystem {
         isbButtonPressedPrev = bButton;
         isxButtonPressedPrev = xButton;
         isyButtonPressedPrev = yButton;
+        isdPadUpPressedPrev = dPadUp;
+        isdPadDownPressedPrev = dPadDown;
+        isdPadLeftPressedPrev = dPadLeft;
+        isdPadRightPressedPrev = dPadRight;
         islBumperPressedPrev = bumperLeft;
         isrBumperPressedPrev = bumperRight;
         leftStickX = joystickDeadzoneCorrection(opMode.gamepad1.left_stick_x);
@@ -307,6 +319,10 @@ public class Robot extends Subsystem {
         isbButton2PressedPrev = bButton2;
         isxButton2PressedPrev = xButton2;
         isyButton2PressedPrev = yButton2;
+        isdPadUp2PressedPrev = dPadUp2;
+        isdPadDown2PressedPrev = dPadDown2;
+        isdPadLeft2PressedPrev = dPadLeft2;
+        isdPadRight2PressedPrev = dPadRight2;
         islBumper2PressedPrev = bumperLeft2;
         isrBumper2PressedPrev = bumperRight2;
         leftStickX2 = joystickDeadzoneCorrection(opMode.gamepad2.left_stick_x);

@@ -117,7 +117,7 @@ public class Control extends Subsystem {
     private double mainArmTargetAngle = 0.0;
     private double mainArmLength;
     private boolean mainClawArmTrackingMode = false;
-    private double mainClawRotationAngle;
+    private double mainClawRotationAngle = 0.0;
 
     public Control(DcMotorEx xRailWinch, DcMotorEx armTilt, Servo mainClaw, Servo mainClawRotation, Servo mainClawArm,
                    Servo csClaw, Servo csArm, Servo fClawL, Servo fClawR, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer) {

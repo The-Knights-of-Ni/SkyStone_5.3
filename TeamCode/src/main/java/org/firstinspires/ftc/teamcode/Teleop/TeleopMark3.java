@@ -21,7 +21,7 @@ public class TeleopMark3 extends LinearOpMode {
     double mainArmHorizontalPos = 0.0;
     double mainArmVerticalPos = 0.0;
     double mainArmHorizontalMax = 1000.0;
-    double mainArmVerticalMax = 1200.0;
+    double mainArmVerticalMax = 1100.0;
     double mainArmIncrement = 600.0;
     double mainClawRotationAngle;
     double mainClawRotationIncrement = 300;
@@ -50,6 +50,9 @@ public class TeleopMark3 extends LinearOpMode {
     private Prospective prospectiveMode = Prospective.ROBOT;
     private double robotAngle;
     private boolean visionEnabled = false;
+
+    private int verticalStepsCount = 10;
+    private double[] verticalSteps = {110.0, 210.0, 310.0, 410.0, 510.0, 603.0, 693.0, 790.0, 880.0, 970.0};
 
     private void initOpMode() {
         //Initialize DC motor objects
@@ -249,6 +252,47 @@ public class TeleopMark3 extends LinearOpMode {
                 mainArmHorizontalPos = 40.0;
                 mainArmVerticalPos = 50.0;
                 robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+            }
+
+            //Automate stone grabbing
+            if(robot.xButton2 && !robot.isxButton2PressedPrev){
+                if (mainArmVerticalPos < 150.0) { // only do this when the arm is low to prevent accidents
+                    // make sure main claw is open
+                    robot.control.openMainClaw();
+                    // move main arm down
+                    mainArmVerticalPos = 0.0;
+                    robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+                    robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+                    sleep (200);
+                    robot.control.closeMainClawStone();
+                    sleep (400);
+                    mainArmVerticalPos = 50.0;
+                    robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+                }
+            }
+
+            //Automate stone vertical stepping
+            if(robot.dPadUp2 && !robot.isdPadUp2PressedPrev){
+                int currentStep = 0;
+                while ((currentStep < verticalStepsCount) && (mainArmVerticalPos + 15.0 > verticalSteps[currentStep])) {
+                    currentStep = currentStep + 1;
+                }
+                if (currentStep < verticalStepsCount) {
+                    mainArmVerticalPos = verticalSteps[currentStep];
+                    robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+                }
+           }
+
+            //Automate stone vertical stepping
+            if(robot.dPadDown2 && !robot.isdPadDown2PressedPrev){
+                int currentStep = verticalStepsCount - 1;
+                while ((currentStep >= 0) && (mainArmVerticalPos - 15.0 < verticalSteps[currentStep])) {
+                    currentStep = currentStep - 1;
+                }
+                if (currentStep >= 0) {
+                    mainArmVerticalPos = verticalSteps[currentStep];
+                    robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+                }
             }
 
             // reset drive motor encoders
