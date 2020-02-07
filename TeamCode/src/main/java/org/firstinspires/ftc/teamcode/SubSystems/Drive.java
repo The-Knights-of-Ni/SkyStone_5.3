@@ -50,7 +50,7 @@ public class Drive extends Subsystem {
     private static final double     COUNTS_PER_MM                 = (TICKS_PER_MOTOR_REV_20 * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_MM * Math.PI);
     private static final double     COUNTS_CORRECTION_X             = 1.167;
     private static final double     COUNTS_CORRECTION_Y             = 0.9918;
-    private static final double     COUNTS_PER_DEGREE             = 10.833*0.988;     // 975 ticks per 90 degrees
+    private static final double     COUNTS_PER_DEGREE             = 10.833*0.99;     // 975 ticks per 90 degrees
 
     private static final double     DRIVE_SPEED             = 0.40;
     private static final double     DRIVE_SPEED_X             = 0.35;

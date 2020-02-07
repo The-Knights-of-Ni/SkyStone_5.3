@@ -176,13 +176,13 @@ public class Auto_Blue extends LinearOpMode {
         sleep(100);
         switch (skyStonePattern) {
             case PATTERNA:
-                robot.drive.moveForward(2236);
+                robot.drive.moveForward(2236-50);
                 break;
             case PATTERNB:
-                robot.drive.moveForward(2033);
+                robot.drive.moveForward(2033-50);
                 break;
             case PATTERNC:
-                robot.drive.moveForward(1830);
+                robot.drive.moveForward(1830-50);
                 break;
             default:
                 break;
@@ -206,11 +206,15 @@ public class Auto_Blue extends LinearOpMode {
         saveImages();
 //        sleep(3000);
 
-        mainArmHorizontalPos = 90.0;
+        // rotate main claw
+        mainClawRotationAngle = 0.0;
+        robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
+
+        mainArmHorizontalPos = 90.0 + 30.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
-        robot.drive.moveForward(170 + stoneOffset[1]);
-//        sleep(100);
+        robot.drive.moveForward(150 + stoneOffset[1]);
+        sleep(200);
 //        saveImages();
 //        sleep(3000);
 
@@ -231,15 +235,15 @@ public class Auto_Blue extends LinearOpMode {
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
 
-        robot.drive.moveRight(30);
+//        robot.drive.moveRight(30);
+        robot.drive.moveLeft(20);
         sleep(100);
 
         robot.control.lowerClawsToFoundation();
         mainClawRotationAngle = 0.0;
         robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
 //        robot.control.closeMainClawStone();
-        sleep(800);
-        robot.control.closeMainClawStone();
+        sleep(600);
 
 
         pullbackBlueFoundation();
@@ -259,6 +263,9 @@ public class Auto_Blue extends LinearOpMode {
 //        robot.control.retractMainClawArm();
 //        sleep(1000);
         sleep(100);
+        robot.control.closeMainClawStone();
+
+        robot.drive.turnRobotByTick(10.0);
 
         parkRobot();
 
@@ -340,7 +347,7 @@ public class Auto_Blue extends LinearOpMode {
     }
 
     private void parkRobot() {
-        robot.drive.moveBackward(580, 0.15);
+        robot.drive.moveBackward(600, 0.15);
         robot.drive.stop();
     }
 
@@ -530,7 +537,7 @@ public class Auto_Blue extends LinearOpMode {
         maxLevel = Math.max(maxLevel, mean3.val[0]);        // find the max level in the foundation region
         minLevel = Math.max(mean4.val[0], mean5.val[0]);    // depending on the position of the Skystone, one of these might not be floor
                                                             // the stone has lower Cb level than the floor
-        thresholdLevel = (minLevel + maxLevel) * 0.5;
+        thresholdLevel = minLevel * 0.55 + maxLevel * 0.45;
         String output = String.format("Blue Foundation: block1 %.2f, block2 %.2f, block3 %.2f, block4 %.2f, block5 %.2f, threshold %.2f",
                 mean1.val[0], mean2.val[0], mean3.val[0], mean4.val[0], mean5.val[0], thresholdLevel);
         Log.d("autoVision", output);
@@ -549,7 +556,7 @@ public class Auto_Blue extends LinearOpMode {
         int maxY0 = -1;
         int maxY1 = -1;
         int maxY2 = -1;
-        for (int y = 4; y < thresholdMat.rows(); ++y) {
+        for (int y = 1; y < thresholdMat.rows(); ++y) {
             if ((data[y*thresholdMat.cols() + thresholdMat.cols()/2 - 50] == 0) && (maxY0 == -1)) {
                 maxY0 = y;
             }
@@ -573,12 +580,12 @@ public class Auto_Blue extends LinearOpMode {
 
     private void pickupSkySTone(double yOffset) {
         robot.control.openMainClawWide();
-        sleep(200);
+//        sleep(200);
         mainArmHorizontalPos = 139.0 + yOffset;
-        mainArmVerticalPos = 50.0;
+//        mainArmVerticalPos = 50.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
-        sleep(300);
+        sleep(500);
         mainArmVerticalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
