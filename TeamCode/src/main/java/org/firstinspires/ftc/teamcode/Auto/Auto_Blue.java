@@ -255,6 +255,7 @@ public class Auto_Blue extends LinearOpMode {
         mainArmHorizontalPos = 0.0;
         mainArmVerticalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
+        robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
 //        robot.control.retractMainClawArm();
 //        sleep(1000);
         sleep(100);
