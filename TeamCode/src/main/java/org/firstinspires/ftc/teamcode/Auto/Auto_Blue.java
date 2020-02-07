@@ -239,6 +239,7 @@ public class Auto_Blue extends LinearOpMode {
         robot.control.setMainClawRotationDegrees(mainClawRotationAngle);
 //        robot.control.closeMainClawStone();
         sleep(800);
+        robot.control.closeMainClawStone();
 
 
         pullbackBlueFoundation();

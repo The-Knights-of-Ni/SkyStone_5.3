@@ -86,6 +86,8 @@ public class Control extends Subsystem {
     private static final double     MAINARM_INIT_LENGTH          = 371.0;    // main arm length before extending (mm)
     private static final double     MAINARM_STACK_HEIGHT         = 123.0;    // main arm vertical offset (mm)
 
+    private static final double     MAINARM_LENGTH_TICK_MAX         = 8900.0;    // main arm tick max
+
     // Servos
     private static final double     fClawLFoundation = 0.42;
     private static final double     fClawRFoundation = 0.58;
@@ -115,7 +117,9 @@ public class Control extends Subsystem {
     // define variables
     private double mainArmAngle = 0.0;
     private double mainArmTargetAngle = 0.0;
-    private double mainArmLength;
+    private double mainArmAngleTick = 0.0;
+    private double mainArmLength = 0.0;
+    private double mainArmLengthTick = 0.0;
     private boolean mainClawArmTrackingMode = false;
     private double mainClawRotationAngle = 0.0;
 
@@ -159,16 +163,25 @@ public class Control extends Subsystem {
     }
     public void setMainArmAngle(double angle) {
         mainArmTargetAngle = angle;
-        armTilt.setTargetPosition((int) mainArmAngleToTick(angle));
+        mainArmAngleTick = mainArmAngleToTick(angle);
+        armTilt.setTargetPosition((int) mainArmAngleTick);
     }
+    public double getMainArmAngleTickTarget() { return mainArmAngleTick;}
+    public double getMainArmAngleTickCurrent() { return (double) armTilt.getCurrentPosition();}
 
     // main arm extension length
     public double getMainArmExtensionLength() {
         return WINCH_MM_PER_TICK * ((double) xRailWinch.getCurrentPosition());
     }
     public void setMainArmExtensionLength(double length) {
-        xRailWinch.setTargetPosition((int) (length / WINCH_MM_PER_TICK));
+        mainArmLengthTick = length / WINCH_MM_PER_TICK;
+        if (mainArmLengthTick > MAINARM_LENGTH_TICK_MAX) {
+            mainArmLengthTick = MAINARM_LENGTH_TICK_MAX;
+        }
+        xRailWinch.setTargetPosition((int) mainArmLengthTick);
     }
+    public double getMainArmLengthTickTarget() { return mainArmLengthTick;}
+    public double getMainArmLengthTickCurrent() { return (double) xRailWinch.getCurrentPosition();}
 
     // main arm total length
     public double getMainArmTotalLength() {

@@ -259,9 +259,9 @@ public class Robot extends Subsystem {
 
         control = new Control(xRailWinch, armTilt, mainClaw, mainClawRotation, mainClawArm, csClaw, csArm, fClawL, fClawR, imu, opMode, timer);
 
-        opMode.telemetry.addData("Mode", " Camera initializing...");
-        opMode.telemetry.update();
         if (visionMode != 0) {
+            opMode.telemetry.addData("Mode", " Camera initializing...");
+            opMode.telemetry.update();
             vision = new Vision(hardwareMap, this, visionMode);
         }
     }

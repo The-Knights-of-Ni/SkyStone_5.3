@@ -256,6 +256,7 @@ public class Auto_Red extends LinearOpMode {
 //        robot.control.retractMainClawArm();
 //        sleep(1000);
         sleep(100);
+        robot.control.closeMainClawStone();
 
         parkRobot();
 

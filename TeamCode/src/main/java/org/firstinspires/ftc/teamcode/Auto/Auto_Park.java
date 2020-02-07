@@ -83,6 +83,7 @@ public class Auto_Park extends LinearOpMode {
 
         sleep(5000);
 
+        robot.control.closeMainClawStone();
         robot.drive.moveBackward(250, 0.15);
         robot.drive.stop();
         sleep(1000);
