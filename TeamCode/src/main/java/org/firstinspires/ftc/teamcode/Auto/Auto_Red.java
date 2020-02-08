@@ -128,6 +128,7 @@ public class Auto_Red extends LinearOpMode {
         mainArmVerticalPos = 80.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
+        sleep(800);
 
         // move out from the wall
         robot.drive.moveForward(570);
@@ -154,7 +155,7 @@ public class Auto_Red extends LinearOpMode {
                 break;
         }
         // detect Skystone offset from the arm camera
-        sleep(100);
+        sleep(300);
         stoneOffset = getStoneOffset();
         saveImages();
 //        sleep(3000);
