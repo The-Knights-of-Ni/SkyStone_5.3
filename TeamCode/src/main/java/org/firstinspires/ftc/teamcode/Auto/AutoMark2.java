@@ -288,6 +288,7 @@ public class AutoMark2 extends LinearOpMode {
         double  deltaX = targetPositionX - robotCurrentPosX;    // in absolute field coordinate
         double  deltaY = targetPositionY - robotCurrentPosY;    // in absolute field coordinate
         double  distanceCountX, distanceCountY;  // distance in motor count in robot coordinate
+
         // rotate vector from field coordinate to robot coordinate
         distanceCountX = deltaX * Math.cos((robotCurrentAngle-90.0)*Math.PI/180.0)
                 + deltaY * Math.sin((robotCurrentAngle-90.0)*Math.PI/180.0);

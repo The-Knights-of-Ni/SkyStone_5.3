@@ -175,6 +175,8 @@ public class Auto_Blue extends LinearOpMode {
 
 //        printRobotPosition();
         sleep(100);
+
+        // Move to different position depending on where skystone is detected
         switch (skyStonePattern) {
             case PATTERNA:
                 robot.drive.moveForward(2236-50);
@@ -322,6 +324,7 @@ public class Auto_Blue extends LinearOpMode {
         robot.drive.frontRight.setTargetPosition(4000);
         robot.drive.rearRight.setTargetPosition(4000);
 
+        // keep going until robot has finished turning
         boolean keepGoing = true;
         while (keepGoing) {
             currentAngle = robot.drive.getYaw();
@@ -581,21 +584,27 @@ public class Auto_Blue extends LinearOpMode {
 
     private void pickupSkySTone(double yOffset) {
         robot.control.openMainClawWide();
-//        sleep(200);
+
+        // extend arm
         mainArmHorizontalPos = 139.0 + yOffset;
-//        mainArmVerticalPos = 50.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         sleep(500);
+
+        // lower arm to get stone
         mainArmVerticalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         sleep(400);
         robot.control.closeMainClawStone();
+
+        // raise arm
         sleep(500);
         mainArmVerticalPos = 50.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         sleep(300);
+
+        // retract arm
         mainArmHorizontalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());

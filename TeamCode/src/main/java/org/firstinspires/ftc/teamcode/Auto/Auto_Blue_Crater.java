@@ -220,12 +220,6 @@ public class Auto_Blue_Crater extends LinearOpMode {
         // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
         telemetry.addLine("Vuforia Init Done");
         telemetry.update();
-        //Tensorflow init
-//        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-//                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-//        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-//        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
 
         //Vuforia Navigation Init
         // Load the data sets that for the trackable objects. These particular data
@@ -444,10 +438,6 @@ public class Auto_Blue_Crater extends LinearOpMode {
 
     private void turnRobot(double degrees) {
         robot.drive.turnByAngle(TURN_SPEED, degrees);
-//        robotCurrentPosX += ROBOT_HALF_LENGTH * (Math.cos((robotCurrentAngle+degrees)*Math.PI/180.0)
-//                - Math.cos(robotCurrentAngle*Math.PI/180.0));
-//        robotCurrentPosY += ROBOT_HALF_LENGTH * (Math.sin((robotCurrentAngle+degrees)*Math.PI/180.0)
-//                - Math.sin(robotCurrentAngle*Math.PI/180.0));
         robotCurrentAngle += degrees;
         // Display it for the driver.
         telemetry.addData("turnRobot",  "turn to %7.2f degrees", robotCurrentAngle);
@@ -455,8 +445,8 @@ public class Auto_Blue_Crater extends LinearOpMode {
         sleep(100);
     }
 
+    // move to a target position (targetPositionX, targetPositionY) in absolute field coordinates
     private void moveToPosABS(double targetPositionX, double targetPositionY) {
-        // move to (targetPositionX, targetPositionY) in absolute field coordinate
         double  deltaX = targetPositionX - robotCurrentPosX;    // in absolute field coordinate
         double  deltaY = targetPositionY - robotCurrentPosY;    // in absolute field coordinate
         double  distanceCountX, distanceCountY;  // distance in motor count in robot coordinate
@@ -474,13 +464,14 @@ public class Auto_Blue_Crater extends LinearOpMode {
         sleep(100);
     }
 
+    // move to target position (targetPositionX, targetPositionY) in relative robot coordinates
     private void moveToPosREL(double targetPositionX, double targetPositionY) {
-        // move to (targetPositionX, targetPositionY) in relative robot coordinate
         robot.drive.moveToPos2D(DRIVE_SPEED, targetPositionX, targetPositionY);
         robotCurrentPosX += targetPositionY * Math.cos(robotCurrentAngle*Math.PI/180.0)
                 + targetPositionX * Math.cos((robotCurrentAngle-90.0)*Math.PI/180.0);
         robotCurrentPosY += targetPositionY * Math.sin(robotCurrentAngle*Math.PI/180.0)
                 + targetPositionX * Math.sin((robotCurrentAngle-90.0)*Math.PI/180.0);
+
         // Display it for the driver.
         telemetry.addData("moveToPosREL",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
         telemetry.update();

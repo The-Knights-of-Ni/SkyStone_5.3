@@ -259,6 +259,7 @@ public class TeleopMark3 extends LinearOpMode {
                 if (mainArmVerticalPos < 150.0) { // only do this when the arm is low to prevent accidents
                     // make sure main claw is open
                     robot.control.openMainClaw();
+
                     // move main arm down
                     mainArmVerticalPos = 0.0;
                     robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);

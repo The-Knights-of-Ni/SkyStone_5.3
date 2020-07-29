@@ -579,21 +579,27 @@ public class Auto_Red extends LinearOpMode {
 
     private void pickupSkySTone(double yOffset) {
         robot.control.openMainClawWide();
-//        sleep(200);
+
+        // extend arm
         mainArmHorizontalPos = 139.0 + yOffset;
-//        mainArmVerticalPos = 50.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         sleep(500);
+
+        // lower arm to get stone
         mainArmVerticalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
         sleep(400);
         robot.control.closeMainClawStone();
         sleep(500);
+
+        // raise arm
         mainArmVerticalPos = 50.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         sleep(300);
+
+        // retract arm
         mainArmHorizontalPos = 0.0;
         robot.control.setMainArmPosition(mainArmHorizontalPos, mainArmVerticalPos);
         robot.control.setMainClawArmDegrees(robot.control.getMainArmTargetAngle());
